@@ -204,8 +204,18 @@ class HospitalSettingsController extends Controller
                 $result['Message'] = "Phone No already exists for : " . $chkPhoneNo->hospitalname;
                 return response()->json($result, 200);
             }
+            $user_obj = new User;
+            $chkEmail = $user_obj->checkEmailIdForEdit($request->email,$request->hospitalId);
+            if (count($chkEmail) > 0) {
+                $result['ShowModal'] = 1;
+                $result['Success'] = 'Email id already exists for another user.';
+                $result['Message'] = "Please change the email id.";
+                return response()->json($result, 200);
+            } else {
+                $user_obj->updateLogin($request->hospitalId,$request->userId,$request->hospitalName,$request->email,config('constant.hospital_user_type_id'));
+            }
 
-            $hospital = $hospitalsettings_obj->updateHospitalSettings($request, $logo);
+            $hospitalsettings_obj->updateHospitalSettings($request, $logo);
 
             $result['ShowModal'] = 1;
             $result['Success'] = 'Success';

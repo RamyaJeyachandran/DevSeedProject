@@ -5,12 +5,15 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\CommonController;
-use App\Http\Controllers\PatientController;
 use App\Http\Controllers\DoctorController;
-use App\Http\Controllers\HospitalSettingsController;
-use App\Http\Controllers\HospitalBranchController;
-use App\Http\Controllers\ConsentFromController;
+use App\Http\Controllers\PatientController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ConsentFromController;
+use App\Http\Controllers\SemenAnalysisController;
+use App\Http\Controllers\HospitalBranchController;
+use App\Http\Controllers\DoctorSignatureController;
+use App\Http\Controllers\HospitalSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,11 +25,6 @@ use App\Http\Controllers\AppointmentController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-  return $request->user();
-});
-// Route::post('/auth/register', [AuthController::class, 'createUser']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
   //Hospital api
@@ -49,6 +47,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::post('updateDoctor', [DoctorController::class, 'updateDoctor']);
   Route::get('deleteDoctor/{id}/{userId}', [DoctorController::class, 'deleteDoctor']);
   Route::get('doctorByDepartment/{hospitalId}/{branchId}/{departId}', [DoctorController::class, 'getDoctorByDepartment']);
+  Route::get('doctorSignature/{doctorId}', [DoctorSignatureController::class, 'getDoctorSignatureByDoctorId']);
   //Branch
   Route::get('listAllHospital', [HospitalBranchController::class, 'getHospitalList']);
   Route::post('addBranch', [HospitalBranchController::class, 'saveHospitalBranch']);
@@ -64,7 +63,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::get('registeredPatientInfo/{hcNo}/{hospitalId}/{branchId}', [AppointmentController::class, 'getPatientInfo']);
   Route::post('addPatientAppointment', [AppointmentController::class, 'addAppointment']);
   Route::get('appointmentList', [AppointmentController::class, 'getAllAppointment']);
-
+  Route::get('patientAppointmentInfo/{id}', [AppointmentController::class, 'getPatientAppointmentInfo']);
+  Route::get('deleteAppointment/{id}/{userId}', [AppointmentController::class, 'deleteAppointment']);
+  Route::post('updateAppointment', [AppointmentController::class, 'updateAppointment']);
+  Route::post('updateStatus', [AppointmentController::class, 'updateAppointmentStatus']);
+  
   //Common api
   Route::get('getCommonData', [CommonController::class, 'getPatientddl']);
   Route::get('listCity', [CommonController::class, 'getCities']);
@@ -72,6 +75,17 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::get('listAppointmentDDl', [CommonController::class, 'getAppointmentddl']);
   Route::get('loadHospital', [CommonController::class, 'loadHospital']);
   Route::get('loadBranch/{hospitalId}', [CommonController::class, 'loadBranchByHospital']);
+
+  Route::post('resetPassword', [DashboardController::class, 'updatePassword']);
+  Route::get('appointmentStatusChart/{doctorId}', [DashboardController::class, 'getAppointmentStatus']);
+  
+  //Report - Semen Analysis
+  Route::post('addSemenAnalysis', [SemenAnalysisController::class, 'saveSemenAnalysis']);
+  Route::post('updateSemenAnalysis', [SemenAnalysisController::class, 'updateSemenAnalysis']);
+  Route::get('getSemenAnalysisCommonData', [CommonController::class, 'getSemenAnalysisddl']);
+  Route::get('getPatientDoctor/{hospitalId}/{branchId}', [SemenAnalysisController::class, 'getPatientDoctor']);
+  Route::get('SemenAnalysisList', [SemenAnalysisController::class, 'getAllSemenAnalysis']);
+  Route::get('deleteSemenAnalysis/{id}/{userId}', [SemenAnalysisController::class, 'deleteSemenAnalysis']);
 });
 
 // Route::get('convertToHash/{id}',[loginController::class,'convertToHash']);

@@ -2,13 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PatientController;
 use App\Http\Controllers\DoctorController;
-use App\Http\Controllers\HospitalSettingsController;
-use App\Http\Controllers\HospitalBranchController;
-use App\Http\Controllers\ConsentFromController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\PatientController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\ConsentFromController;
+use App\Http\Controllers\SemenAnalysisController;
+use App\Http\Controllers\HospitalBranchController;
+use App\Http\Controllers\HospitalSettingsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,14 +59,26 @@ Route::group(['middleware' => 'customAuth'], function () {
     //Appointment
     Route::get('PatientAppointment', [AppointmentController::class, 'index']);
     Route::get('AllAppointments', [AppointmentController::class, 'searchIndex']);
-
+    Route::get('showAppointment/{id}/{type}', [AppointmentController::class, 'showEdit']);
+    Route::get('TodayAppointments', [AppointmentController::class, 'showToday']);
+    
     //Consent Form
     Route::get('ConsentForm/{patientConsentId?}', [ConsentFromController::class, 'index']);
     Route::get('SearchConsent', [ConsentFromController::class, 'searchIndex']);
     Route::get('ViewConsent', [ConsentFromController::class, 'viewIndex']);
 
     Route::get('subscribe', [DashboardController::class, 'subscribe']);
-    Route::get('ResetPassword', [DashboardController::class, 'ResetPassword']);
+    Route::get('ResetPassword/{id}', [DashboardController::class, 'ResetPassword']);
+    Route::get('Profile/{id}', [DashboardController::class, 'userProfile']);
+    
+    //SemenAnalysis
+    Route::get('SemenAnalysis', [SemenAnalysisController::class, 'index']);
+    Route::get('PrintSemenAnalysis/{id}', [SemenAnalysisController::class, 'showPrint']);
+    Route::get('SearchSemenAnalysis', [SemenAnalysisController::class, 'searchIndex']);
+    Route::get('ShowSemenAnalysis/{id}', [SemenAnalysisController::class, 'showEdit']);
+       
+    //Report
+    Route::get('PatientReport', [ReportController::class, 'index']);
 
 });
 // Auth::routes();

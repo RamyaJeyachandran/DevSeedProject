@@ -7,19 +7,8 @@
 @section('content')
     @include('layouts.mobileSideMenu')
     <div class="flex mt-[4.7rem] md:mt-0">
-    @can('isAdmin')
-            @include('layouts.sideMenu')
-        @endcan
-        @can('isHospital')
-            @include('layouts.hospitalSideMenu')
-        @endcan
-        @can('isBranch')
-            @include('layouts.branchSideMenu')
-        @endcan
-        @can('isDoctor')
-            @include('layouts.doctorSideMenu')
-        @endcan
-                <!-- BEGIN: Content -->
+    @include('layouts.sideMenu')
+     <!-- BEGIN: Content -->
                 <div class="content">
                     @include('layouts.topBar')
                     <div class="intro-y flex flex-col sm:flex-row items-center mt-8">

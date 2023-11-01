@@ -49,21 +49,17 @@ class Appointment extends Model
             ]
         );
     }
-    public static function updateAppointment(Request $request)
+    public static function updateAppointment(Request $request,$appointmentId,$doctorId,$userId)
     {
-        $user = new User;
-        $userId=$user->getDecryptedId($request->userId);
-        $decryp_doctorId=$user->getDecryptedId($request->doctorId);
-        $decryp_appointmentId=$user->getDecryptedId($request->appointmentId);
-
+        $status=$request->status==0?'Created':$request->status;
         $appointmentDate = Carbon::parse($request->appointmentDate);
-        return static::where('id',$decryp_appointmentId)->update(
+        return static::where('id',$appointmentId)->update(
             [
              'appointmentDate'=>$appointmentDate,
              'appointmentTime' => $request->appointmentTime,
-             'doctorId'=>$decryp_doctorId,
+             'doctorId'=>$doctorId,
              'reason'=>$request->reason,
-             'status'=>$request->status,
+             'status'=>$status,
              'updated_by'=>$userId
             ]
         );
@@ -82,23 +78,36 @@ class Appointment extends Model
             ]
         );
     }
-    public static function getAllAppointment($hospitalId,$branchId,$pagination)
+    public static function getAllAppointment($hospitalId,$branchId,$pagination,$type)
     {
         $skip=$pagination['page'] ==1 ?0:(($pagination['page'] * $pagination['size'])-$pagination['size']);
-        if($pagination['filters_field']=='hcNo')
+        if($pagination['filters_field']=='hcNo' || $pagination['filters_field']=='patientName' || $pagination['filters_field']=='phoneNo')
         {
-            $wherePatient_sts="patients.is_active=1 ".($hospitalId==0?"":" and patients.hospitalId=".$hospitalId).($branchId==0?"":" and patients.branchId=".$branchId)." and patients.hcNo like '%".$pagination['filters_value']."%'";
+            $pagination['filters_field']=($pagination['filters_field']=='patientName'?'name':$pagination['filters_field']);
+            $wherePatient_sts="patients.is_active=1 ".($hospitalId==0?"":" and patients.hospitalId=".$hospitalId).($branchId==0?"":" and patients.branchId=".$branchId)." and patients.".$pagination['filters_field']." ".$pagination['filters_type'].($pagination['filters_type']=='like'?" '%":"").$pagination['filters_value'].($pagination['filters_type']=='like'?"%'":"");
             $where_sts="appointments.is_active=1 ".($hospitalId==0?"":" and appointments.hospitalId=".$hospitalId).($branchId==0?"":" and appointments.branchId=".$branchId);
+            $whereDoctor_sts="doctors.is_active=1";
+        }
+        else if($pagination["filters_field"]== "doctorName"){
+            $where_sts="appointments.is_active=1 ".($hospitalId==0?"":" and appointments.hospitalId=".$hospitalId).($branchId==0?"":" and appointments.branchId=".$branchId);
+            $whereDoctor_sts="doctors.is_active=1 and doctors.name ".$pagination['filters_type'].($pagination['filters_type']=='like'?" '%":"").$pagination['filters_value'].($pagination['filters_type']=='like'?"%'":"");
+            $wherePatient_sts="patients.is_active=1 ".($hospitalId==0?"":" and patients.hospitalId=".$hospitalId).($branchId==0?"":" and patients.branchId=".$branchId);
         }
         else{
             $wherePatient_sts="patients.is_active=1 ".($hospitalId==0?"":" and patients.hospitalId=".$hospitalId).($branchId==0?"":" and patients.branchId=".$branchId);
-            $where_sts="appointments.is_active=1 ".($hospitalId==0?"":" and appointments.hospitalId=".$hospitalId).($branchId==0?"":" and appointments.branchId=".$branchId)." ".(($pagination['filters_field'] =="" || $pagination['filters_value']=="")?"":" and ".$pagination['filters_field']." ".$pagination['filters_type']." '".$pagination['filters_value']."%'");
+            $whereDoctor_sts="doctors.is_active=1";
+            $where_sts="appointments.is_active=1 ".($hospitalId==0?"":" and appointments.hospitalId=".$hospitalId).($branchId==0?"":" and appointments.branchId=".$branchId)." ".(($pagination['filters_field'] =="" || $pagination['filters_value']=="")?"":" and ".$pagination['filters_field']." ".$pagination['filters_type']." ".($pagination['filters_field']=='appointmentDate'?"'".Carbon::parse($pagination['filters_value'])->toDateString()."'":$pagination['filters_value']).($pagination['filters_field']=='appointmentDate'?"":"%'"));
         }
-        
-
-        $appointmentList['appointmentList']=DB::table('appointments')->selectRaw("concat(appointmentDate, ' ', appointmentTime) as appointmentDateTime,HEX(AES_ENCRYPT(appointments.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,HEX(AES_ENCRYPT(appointments.patientId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,HEX(AES_ENCRYPT(appointments.doctorId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as doctorId,appointments.appointmentDate,appointments.appointmentTime,appointments.status,appointments.reason,COALESCE(departments.name,'') as departmentName,patients.profileImage,patients.hcNo,patients.name as patientName,patients.phoneNo,patients.email,patients.address,doctors.name as doctorName")
-                                    ->join('doctors','doctors.id','=','appointments.doctorId')
-                                    // ->join('patients','patients.id','=','appointments.patientId')
+        if($type==2){
+            $where_sts=$where_sts." and appointments.appointmentDate ='".Carbon::parse(now())->toDateString()."'";
+        }
+        $appointmentList['where_sts']=$where_sts;
+        $appointmentList['appointmentList']=DB::table('appointments')->selectRaw("concat(appointmentDate, ' ', appointmentTime) as appointmentDateTime,HEX(AES_ENCRYPT(appointments.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,HEX(AES_ENCRYPT(appointments.patientId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,HEX(AES_ENCRYPT(appointments.doctorId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as doctorId,appointments.appointmentDate,appointments.appointmentTime,appointments.status,appointments.reason,COALESCE(departments.name,'') as departmentName,patients.profileImage,patients.hcNo,patients.name as patientName,patients.phoneNo,patients.email,patients.address,doctors.name as doctorName,CASE WHEN appointments.status ='Started' THEN 'success' WHEN appointments.status ='Finished'  THEN 'danger' WHEN appointments.status ='Created'  THEN 'info' WHEN appointments.status ='Pending'  THEN 'pending' WHEN appointments.status ='ReSchedule'  THEN 'gray-600' WHEN appointments.status ='OnGoing'  THEN 'dark' WHEN appointments.status ='Cancelled'  THEN 'warning' ELSE 'primary' END as statusColor")
+                                    ->join('doctors', function($join) use ($whereDoctor_sts)
+                                        {
+                                            $join->on('doctors.id', '=', 'appointments.doctorId')
+                                            ->whereRaw($whereDoctor_sts);
+                                        })
                                     ->join('patients', function($join) use ($wherePatient_sts)
                                         {
                                         $join->on('patients.id', '=', 'appointments.patientId')
@@ -120,22 +129,33 @@ class Appointment extends Model
     {
         $user = new User;
         $appointmentId=$user->getDecryptedId($id);
-        return DB::table('appointments')->selectRaw("HEX(AES_ENCRYPT(appointments.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,HEX(AES_ENCRYPT(appointments.patientId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,HEX(AES_ENCRYPT(appointments.doctorId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as doctorId,appointments.appointmentDate,appointments.appointmentTime,appointments.status,appointments.reason,COALESCE(doctors.departmentId,0) as departmentId,patients.gender,patients.profileImage,patients.hcNo,patients.name as patientName,patients.phoneNo,patients.email,patients.address")
+        return DB::table('appointments')->selectRaw("HEX(AES_ENCRYPT(appointments.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,HEX(AES_ENCRYPT(appointments.patientId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,HEX(AES_ENCRYPT(appointments.doctorId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as doctorId,appointments.appointmentDate,appointments.appointmentTime,appointments.status,appointments.reason,COALESCE(doctors.departmentId,0) as departmentId,patients.gender,patients.profileImage,patients.hcNo,patients.name as patientName,patients.phoneNo,patients.email,patients.address,HEX(AES_ENCRYPT(appointments.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(appointments.branchId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as branchId,patients.bloodGroup,patients.martialStatus,patients.spouseName,patients.spousePhnNo")
                                         ->join('doctors','doctors.id','=','appointments.doctorId')
                                         ->join('patients','patients.id','=','appointments.patientId')
-                                        ->where('id',$appointmentId)
+                                        ->where('appointments.id',$appointmentId)
                                     ->first();
     }
-    public static function setAppointmentStatus($status,$id,$userId)
+    public static function setAppointmentStatus($request)
     {
         $user = new User;
-        $appointmentId=$user->getDecryptedId($id);
-        $updated_by=$user->getDecryptedId($userId);
+        $appointmentId=$user->getDecryptedId($request->appointmentId);
+        $updated_by=$user->getDecryptedId($request->userId);
         return static::where('id',$appointmentId)->update(
             [
-             'status'=>$status,
+             'status'=>$request->status,
              'updated_by'=>$updated_by
             ]
         );
+    }
+    public static function getPatientAppointmentInfo($id){
+        $user = new User;
+        $appointmentId=$user->getDecryptedId($id);
+
+        return DB::table('appointments')->selectRaw("HEX(AES_ENCRYPT(appointments.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,HEX(AES_ENCRYPT(appointments.patientId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,HEX(AES_ENCRYPT(appointments.doctorId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as doctorId,appointments.appointmentDate,appointments.appointmentTime,appointments.status,appointments.reason,COALESCE(doctors.departmentId,0) as departmentId,patients.gender,patients.profileImage,patients.hcNo,patients.name as patientName,patients.phoneNo,patients.email,patients.address,patients.spouseName,patients.spousePhnNo,patients.bloodGroup,patients.martialStatus,patients.patientWeight,patients.patientHeight,doctors.name as doctorName,COALESCE(departments.name,'') as departmentName")
+                                        ->join('doctors','doctors.id','=','appointments.doctorId')
+                                        ->leftJoin('departments','departments.id','=','doctors.departmentId')
+                                        ->join('patients','patients.id','=','appointments.patientId')
+                                        ->where('appointments.id',$appointmentId)
+                                    ->first();
     }
 }

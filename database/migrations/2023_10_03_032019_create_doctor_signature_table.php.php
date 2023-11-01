@@ -11,24 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('doctors', function (Blueprint $table) {
+        Schema::create('doctorSignatures', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('doctorCodeNo');
-            $table->string('name');
-            $table->string('profileImage')->nullable();
-            $table->datetime('dob')->nullable();
-            $table->string('gender')->nullable();
-            $table->string('phoneNo');
-            $table->string('email');
-            $table->string('education')->nullable();
-            $table->string('designation')->nullable();
-            $table->bigInteger('departmentId')->unsigned()->nullable();;
-            $table->string('experience')->nullable();
-            $table->string('address')->nullable();
-            $table->string('bloodGroup')->nullable();
-
-
-            $table->bigInteger('hospitalId')->unsigned()->nullable();
+            $table->string('signature');
+            $table->bigInteger('doctorId')->unsigned();
+            $table->bigInteger('hospitalId')->unsigned();
             $table->bigInteger('branchId')->unsigned()->nullable();
 
             $table->boolean('is_active')->default(1);
@@ -39,10 +26,9 @@ return new class extends Migration
 
             $table->foreign('created_by')->references('id')->on('users');
             $table->foreign('updated_by')->references('id')->on('users');
-            $table->foreign('departmentId')->references('id')->on('departments');
-            
             $table->foreign('hospitalId')->references('id')->on('hospitalsettings');
             $table->foreign('branchId')->references('id')->on('hospitalBranch');
+            $table->foreign('doctorId')->references('id')->on('doctors');
         });
     }
 
@@ -51,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('doctors');
+        Schema::dropIfExists('doctorSignatures');
     }
 };

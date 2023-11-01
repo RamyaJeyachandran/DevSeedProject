@@ -13,13 +13,13 @@
                 <ul class="scrollable__content py-2">
                 <li>
                         <a  id="lnkMobileDashboard" href="{{url('Home')}}" class="menu">
-                            <div class="menu__icon"> <i data-lucide="plus-square"></i> </div>
+                            <div class="menu__icon"> <i data-lucide="home"></i> </div>
                             <div class="menu__title"> Dashboard </div>
                         </a>
                     </li>
                     <li>
                         <a id="lnkMobileHospital" href="javascript:;.html" class="menu">
-                            <div class="menu__icon"> <i data-lucide="home"></i> </div>
+                            <div class="menu__icon"> <i data-lucide="folder-plus"></i> </div>
                             <div class="menu__title"> Hospital Settings <i data-lucide="chevron-down" class="menu__sub-icon"></i> </div>
                         </a>
                         <ul id="ulMobileHospital" class="">
@@ -79,7 +79,7 @@
                     </li>
                     <li>
                         <a  id="lnkMobilePatient" href="javascript:;" class="menu">
-                            <div class="menu__icon"> <i data-lucide="activity"></i> </div>
+                            <div class="menu__icon"> <i data-lucide="users"></i> </div>
                             <div class="menu__title"> Patients <i data-lucide="chevron-down" class="menu__sub-icon "></i> </div>
                         </a>
                         <ul  id="ulMobilePatient" class="">
@@ -99,7 +99,7 @@
                     </li>
                     <li>
                         <a  id="lnkMobileAppointment" href="javascript:;" class="menu">
-                            <div class="menu__icon"> <i data-lucide="activity"></i> </div>
+                            <div class="menu__icon"> <i data-lucide="calendar"></i> </div>
                             <div class="menu__title"> Appointment <i data-lucide="chevron-down" class="menu__sub-icon "></i> </div>
                         </a>
                         <ul  id="ulMobileAppointment" class="">
@@ -115,17 +115,51 @@
                                     <div class="menu__title"> All Appointment </div>
                                 </a>
                             </li>
+                            <li>
+                                <a id="aMobileAppointmentToday" href="{{url('TodayAppointments')}}" class="menu">
+                                    <div class="menu__icon"> <i data-lucide="archive"></i> </div>
+                                    <div class="menu__title"> Today Appointment </div>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <li>
-                        <a  id="lnkMobileReport" href="{{url('subscribe')}}" class="menu">
-                            <div class="menu__icon"> <i data-lucide="plus-square"></i> </div>
-                            <div class="menu__title">  Report Settings </div>
+                        <a  id="lnkMobileSemenAnalysis" href="javascript:;" class="menu">
+                            <div class="menu__icon"> <i data-lucide="link-2"></i> </div>
+                            <div class="menu__title">  Semen Analysis <i data-lucide="chevron-down" class="menu__sub-icon "></i></div>
                         </a>
+                        <ul  id="ulMobileSemenAnalysis" class="">
+                        <li>
+                        <a  id="aMobileSemenAnalysis" href="{{url('SemenAnalysis')}}" class="menu">
+                            <div class="menu__icon"> <i data-lucide="plus-circle"></i> </div>
+                            <div class="menu__title"> Semen Analysis  </div>
+                        </a>
+                        </li>
+                        <li>
+                                <a id="aMobileSemenAnalysisSearch" href="{{url('SearchSemenAnalysis')}}" class="menu">
+                                    <div class="menu__icon"> <i data-lucide="search"></i> </div>
+                                    <div class="menu__title"> Search Semen Analysis </div>
+                                </a>
+                            </li>
+                     </ul>
+                    </li>
+                    <li>
+                        <a  id="lnkMobileReport" href="javascript:;" class="menu">
+                            <div class="menu__icon"> <i data-lucide="settings"></i> </div>
+                            <div class="menu__title">  Report Settings <i data-lucide="chevron-down" class="menu__sub-icon "></i></div>
+                        </a>
+                        <ul  id="ulMobilePatientReport" class="">
+                        <li>
+                        <a  id="aMobilePatientReport" href="{{url('PatientReport')}}" class="menu">
+                            <div class="menu__icon"> <i data-lucide="user-check"></i> </div>
+                            <div class="menu__title"> Patient Cycle Report  </div>
+                        </a>
+                        </li>
+                     </ul>
                     </li>
                     <li>
                         <a  id="lnkMobileConsent" href="javascript:;" class="menu">
-                            <div class="menu__icon"> <i data-lucide="activity"></i> </div>
+                            <div class="menu__icon"> <i data-lucide="book"></i> </div>
                             <div class="menu__title">  Generate Consent Form  <i data-lucide="chevron-down" class="menu__sub-icon "></i> </div>
                         </a>
                         <ul  id="ulMobileConsent" class="">

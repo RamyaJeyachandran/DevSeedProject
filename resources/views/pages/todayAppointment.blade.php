@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title','Patients Appointment')
+@section('title','Today Appointments')
 @section ('style')
 <link rel="stylesheet" href="{{ asset('dist/css/app.css') }}" />
 
@@ -11,14 +11,10 @@
                 <!-- BEGIN: Content -->
                 <div class="content">
                     @include('layouts.topBar')
-                    <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
-                    <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
-                        <button onclick="window.location='{{ url("PatientAppointment") }}'" class="btn btn-primary shadow-md mr-2">Add Appointment</button>
-                        <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control" disabled>
-                    </div>
-                </div>
                 <!-- BEGIN: HTML Table Data -->
+                <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control" disabled>
                 <div class="intro-y box p-5 mt-5">
+                    
                     <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
                         <form id="tbAppointment-html-filter-form" class="xl:flex sm:mr-auto" >
                         @csrf
@@ -29,7 +25,6 @@
                                     <option value="patientName">Patient Name</option>
                                     <option value="phoneNo">Phone No</option>
                                     <option value="doctorName">Doctor Name</option>
-                                    <option value="appointmentDate">Appointment Date</option>
                                 </select>
                             </div>
                             <div class="sm:flex items-center sm:mr-4 mt-2 xl:mt-0">
@@ -39,13 +34,9 @@
                                     <option value="=">=</option>
                                 </select>
                             </div>
-                            <div id="divValueSearch" class="sm:flex items-center sm:mr-4 mt-2 xl:mt-0">
-                                <label id="tbAppointment-html-filter-value-label" class="w-12 flex-none xl:w-auto xl:flex-initial mr-2">Value</label>
+                            <div class="sm:flex items-center sm:mr-4 mt-2 xl:mt-0">
+                                <label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2">Value</label>
                                 <input id="tbAppointment-html-filter-value" type="text" class="form-control sm:w-40 2xl:w-full mt-2 sm:mt-0" placeholder="Search...">
-                            </div>
-                            <div id="divDateSearch" class="sm:flex items-center sm:mr-4 mt-2 xl:mt-0">
-                                <label id="tbAppointment-html-filter-value-1-label" class="w-12 flex-none xl:w-auto xl:flex-initial mr-2">Value</label>
-                                <input id="tbAppointment-html-filter-value-1" type="text" class="datepicker form-control" data-single-mode="true" placeholder="Search...">
                             </div>
                             <div class="mt-2 xl:mt-0">
                                 <button id="tbAppointment-html-filter-go" type="button" class="btn btn-primary w-full sm:w-16" >Go</button>
@@ -60,7 +51,7 @@
                         </div>
                     </div>
                     <input id="txtHospital" name="hostpialId" value="{{ session('hospitalId') }}" type="hidden" class="form-control">
-                    <input id="txtType" name="hostpialId" value="1" type="hidden" class="form-control">
+                    <input id="txtType" name="hostpialId" value="2" type="hidden" class="form-control">
                     <input id="txtBranch" name="branchId" value="{{ session('branchId') }}"  type="hidden" class="form-control">
                     <div class="overflow-x-auto scrollbar-hidden">
                         <div id="tbAppointment" class="mt-5 table-report table-report--tabulator"></div>
@@ -219,7 +210,7 @@
 
         @push('js')
         <script type="module" src="{{ asset('dist/js/app.js')}}"></script>
-        <script  type="module" src="{{ asset('dist/js/patient.js')}}"></script>
+        <script type="module"  src="{{ asset('dist/js/patient.js')}}"></script>
         @endpush
 
 

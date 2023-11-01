@@ -40,10 +40,10 @@ class CommonController extends Controller
             $city_list = $cities->getCities();
 
             $mixedTable = new MixedTables;
-            $genderList = $mixedTable->getGender();
-            $maritalStatusList = $mixedTable->getMartialStatus();
-            $refferedByList = $mixedTable->getRefferedBy();
-            $bloodGrp = $mixedTable->getBloodGrp();
+            $genderList = $mixedTable->getConsantValue(config('constant.genderTableId'));
+            $maritalStatusList = $mixedTable->getConsantValue(config('constant.martialStatusTableId'));
+            $refferedByList = $mixedTable->getConsantValue(config('constant.refferedByTableId'));
+            $bloodGrp = $mixedTable->getConsantValue(config('constant.bloodGrpTableId'));
 
             $result['cities'] = $city_list;
             $result['gender'] = $genderList;
@@ -63,9 +63,9 @@ class CommonController extends Controller
     {
         try {
             $mixedTable = new MixedTables;
-            $genderList = $mixedTable->getGender();
+            $genderList = $mixedTable->getConsantValue(config('constant.genderTableId'));
             $departmentList = $mixedTable->getDepartment();
-            $bloodGrp = $mixedTable->getBloodGrp();
+            $bloodGrp = $mixedTable->getConsantValue(config('constant.bloodGrpTableId'));
 
             $result['gender'] = $genderList;
             $result['department'] = $departmentList;
@@ -83,7 +83,7 @@ class CommonController extends Controller
     {
         try {
             $mixedTable = new MixedTables;
-            $genderList = $mixedTable->getGender();
+            $genderList = $mixedTable->getConsantValue(config('constant.genderTableId'));
             $departmentList = $mixedTable->getDepartment();
 
             $result['gender'] = $genderList;
@@ -127,4 +127,37 @@ class CommonController extends Controller
             return response()->json($result, 200);
         }
     }
+    public function getSemenAnalysisddl(Request $request)
+    {
+        try {
+            $mixedTable = new MixedTables;
+            $liquefaction =  $mixedTable->getConsantValue(config('constant.liquefactionId'));
+            $appearance = $mixedTable->getConsantValue(config('constant.appearanceId'));
+            $ph =  $mixedTable->getConsantValue(config('constant.phId'));
+            $viscosity =$mixedTable->getConsantValue(config('constant.viscosityId'));
+            $agglutination =$mixedTable->getConsantValue(config('constant.agglutinationId'));
+            $abstinence = $mixedTable->getConsantValue(config('constant.abstinenceId'));
+            $clumping =$mixedTable->getConsantValue(config('constant.clumpingId'));
+            $pusCells =$mixedTable->getConsantValue(config('constant.pusCellsId'));
+
+            $result['liquefaction'] = $liquefaction;
+            $result['appearance'] = $appearance;
+            $result['ph'] = $ph;
+            $result['viscosity'] = $viscosity;
+            $result['agglutination'] = $agglutination;
+            $result['abstinence'] = $abstinence;
+            $result['clumping'] = $clumping;
+            $result['pusCells'] = $pusCells;
+
+            $result['Success'] = 'Success';
+            $result['Message'] = "Fetched Successfully";
+            return response()->json($result, 200);
+        } catch (\Throwable $th) {
+            $result['Success'] = 'failure';
+            $result['Message'] = $th->getMessage();
+            return response()->json($result, 200);
+        }
+
+    }
+
 }

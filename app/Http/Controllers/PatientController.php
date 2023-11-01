@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use App\Models\Patient;
-use App\Models\MixedTables;
-use App\Models\Cities;
+use URL;
 use App\Models\User;
 use config\constants;
-use URL;
+use App\Models\Cities;
+use App\Models\Patient;
+use App\Models\MixedTables;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class PatientController extends Controller
 {
@@ -98,7 +99,7 @@ class PatientController extends Controller
         try{
             $pagination['page']=(isset($request->page) && !empty($request->page)) ?$request->page : 1;
             $pagination['size']=(isset($request->size) && !empty($request->size)) ?$request->size : 10;
-            $pagination['sorters_field']=(isset($request->sorters[0]['field']) && !empty($request->sorters[0]['field'])) ?$request->sorters[0]['field'] : "id";
+            $pagination['sorters_field']=(isset($request->sorters[0]['field']) && !empty($request->sorters[0]['field'])) ?$request->sorters[0]['field'] : "created_date";
             $pagination['sorters_dir']=(isset($request->sorters[0]['dir']) && !empty($request->sorters[0]['dir'])) ?$request->sorters[0]['dir'] : "desc";
 
             $pagination['filters_field']=(isset($request->filters[0]['field']) && !empty($request->filters[0]['field'])) ?$request->filters[0]['field'] : "";
@@ -135,16 +136,14 @@ class PatientController extends Controller
             $patientDetails->city_list =  $cities->getCities(); 
 
             $mixedTable = new MixedTables;
-            $patientDetails->genderList =  $mixedTable->getGender(); 
-            $patientDetails->maritalStatusList=$mixedTable->getMartialStatus();
-            $patientDetails->refferedByList=$mixedTable->getRefferedBy();
-            $patientDetails->bloodGrp=$mixedTable->getBloodGrp();
+            $patientDetails->genderList =  $mixedTable->getConsantValue(config('constant.genderTableId'));
+            $patientDetails->maritalStatusList=$mixedTable->getConsantValue(config('constant.martialStatusTableId'));
+            $patientDetails->refferedByList=$mixedTable->getConsantValue(config('constant.refferedByTableId'));
+            $patientDetails->bloodGrp=$mixedTable->getConsantValue(config('constant.bloodGrpTableId'));
 
             return view('pages.editPatient')->with('patientDetails', $patientDetails);
         }catch(\Throwable $th){
-            $result['Success']='failure';
-            $result['Message']=$th->getMessage();
-            return response()->json($result,200);
+            return Redirect::back()->withErrors($th->getMessage());
         }
     }
 
@@ -190,7 +189,8 @@ class PatientController extends Controller
             //----------------Store Image ---Begin 
             $profileImage="";
             if($request->isImageChanged==1){
-                $profileImage =config('constant.doctor_default_profileImage');
+                $url = URL::to("/");
+                $profileImage =$url ."/". config('constant.doctor_default_profileImage');
                 if($request->profileImage!=NULL && $request->profileImage!="")
                 {
                     $user = new User;

@@ -7,25 +7,10 @@
 @section('content')
     @include('layouts.mobileSideMenu')
     <div id="divPatient" class="flex mt-[4.7rem] md:mt-0">
-    @can('isAdmin')
-            @include('layouts.sideMenu')
-        @endcan
-        @can('isHospital')
-            @include('layouts.hospitalSideMenu')
-        @endcan
-        @can('isBranch')
-            @include('layouts.branchSideMenu')
-        @endcan
-        @can('isDoctor')
-            @include('layouts.doctorSideMenu')
-        @endcan
+    @include('layouts.sideMenu')
                 <!-- BEGIN: Content -->
                 <div class="content">
                     @include('layouts.topBar')
-                     <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
-                        <button onclick="window.location='{{ url("Patient") }}'" class="btn btn-primary shadow-md mr-2">Add Patient</button>
-                        <button onclick="window.location='{{ url("SearchPatient") }}'" class="btn btn-dark shadow-md mr-2">Go Back</button>
-                    </div>
                     <form id="frmEditPatient" method="POST" action="">
                     <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5">
                     <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
@@ -170,7 +155,7 @@
                             
                            
                             <div class="intro-y col-span-12 justify-center sm:justify-end mt-5">
-                                <button id="btnUpdPatient" type=submit class="btn btn-primary w-24 ml-2">Update</button>
+                                <button id="btnUpdPatient" type=submit class="btn btn-danger w-24 ml-2"><i data-lucide="edit" class="w-4 h-4 mr-2"></i>Update</button>
                             </div>
                         </div>
                         </form>
@@ -191,7 +176,8 @@
             <div class="modal-dialog"> <div class="modal-content"> <div class="modal-body p-0"> 
                 <div class="p-5 text-center"> <i data-lucide="check-circle" class="w-16 h-16 text-success mx-auto mt-3"></i>
                  <div id="divMsg" class="text-3xl mt-5"><span></span></div> <div id="divHcNo" class="text-slate-500 mt-2"><span></span></div> </div>
-                  <div class="px-5 pb-8 text-center"> <button id="btnRedirect" onclick="window.location='{{ url("SearchPatient") }}'" type="button" data-tw-dismiss="modal" class="btn btn-primary w-24">Ok</button>
+                  <div class="px-5 pb-8 text-center">
+                     <button id="btnRedirect" onclick="window.location='{{ url("SearchPatient") }}'" type="button" data-tw-dismiss="modal" class="btn btn-primary w-24">Ok</button>
                  </div> 
                 </div> 
             </div> 

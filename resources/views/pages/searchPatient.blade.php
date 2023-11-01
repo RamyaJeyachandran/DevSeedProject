@@ -7,18 +7,7 @@
 @section('content')
     @include('layouts.mobileSideMenu')
     <div class="flex mt-[4.7rem] md:mt-0">
-    @can('isAdmin')
-            @include('layouts.sideMenu')
-        @endcan
-        @can('isHospital')
-            @include('layouts.hospitalSideMenu')
-        @endcan
-        @can('isBranch')
-            @include('layouts.branchSideMenu')
-        @endcan
-        @can('isDoctor')
-            @include('layouts.doctorSideMenu')
-        @endcan
+    @include('layouts.sideMenu')
                 <!-- BEGIN: Content -->
                 <div class="content">
                     @include('layouts.topBar')
@@ -29,7 +18,6 @@
                 </div>
                 <!-- BEGIN: HTML Table Data -->
                 <div class="intro-y box p-5 mt-5">
-                <input id="txtToken" value="{{ session('prjtoken') }}" type="hidden" class="form-control">
                     <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
                         <form id="tbPatient-html-filter-form" class="xl:flex sm:mr-auto" >
                         @csrf
@@ -158,9 +146,15 @@
                     </div>
                 </div>
                 <!-- END: Profile Info -->
+                 <!-- BEGIN: Modal Footer -->
+                 <div class="modal-footer">
+                         <button type="button" data-tw-dismiss="modal" class="btn btn-danger w-20 mr-1">Ok</button>
+                 </div>
+                <!-- END: Modal Footer -->
                 
                  </div> 
                  <!-- END: Modal Body -->
+                 
               </div> 
             </div> 
         </div>

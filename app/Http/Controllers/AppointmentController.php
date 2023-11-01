@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Appointment;
-use App\Models\Patient;
+use URL;
 use App\Models\User;
+use config\constants;
+use App\Models\doctor;
+use App\Models\Patient;
+use App\Models\Appointment;
+use App\Models\MixedTables;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use config\constants;
-use URL;
 
 class AppointmentController extends Controller
 {
@@ -21,6 +23,11 @@ class AppointmentController extends Controller
     {
         return View("pages.searchAppointment");
     }
+    public function showToday()
+    {
+        return View("pages.todayAppointment");
+    }
+    
     public function getPatientInfo(Request $request,$hcNo,$hospitalId,$branchId)
     {
         try{
@@ -28,7 +35,6 @@ class AppointmentController extends Controller
             $patientDetails=$patient_obj->getPatientByHcNo($hcNo,$hospitalId,$branchId);
 
             $result['Success']='Success';
-            $result['ShowModal']= 1;
             $result['patientDetails']=$patientDetails;
             return response()->json($result,200);
         }catch(\Throwable $th){
@@ -148,10 +154,124 @@ class AppointmentController extends Controller
             //Decrypt --- END
 
             $appointment_obj=new Appointment;
-            $appointmentList=$appointment_obj->getAllAppointment($decrpt_hospitalId,$decrpt_branchId,$pagination);
+            $appointmentList=$appointment_obj->getAllAppointment($decrpt_hospitalId,$decrpt_branchId,$pagination,$request->type);
             
             $result['last_page']=$appointmentList['last_page'];
             $result['data']=$appointmentList['appointmentList'];
+            return response()->json($result,200);
+        }catch(\Throwable $th){
+            $result['Success']='failure';
+            $result['Message']=$th->getMessage();
+            return response()->json($result,200);
+        }
+    }
+    public function getPatientAppointmentInfo(Request $request,$id)
+    {
+        try{
+            $appointment_obj = new Appointment;
+            $appointmentDetails=$appointment_obj->getPatientAppointmentInfo($id);
+
+            $result['Success']='Success';
+            $result['appointmentDetails']=$appointmentDetails;
+            return response()->json($result,200);
+        }catch(\Throwable $th){
+            $result['Success']='failure';
+            $result['Message']=$th->getMessage();
+            return response()->json($result,200);
+        }
+    }
+    public function deleteAppointment(Request $request,$id,$userId)
+    {
+        try{
+            $appointment_obj = new Appointment;
+            $appointmentDetails=$appointment_obj->deleteAppointment($id,$userId);
+
+            $result['Success']='Success';
+            $result['ShowModal']=1;
+            $result['appointmentDetails']=$appointmentDetails;
+            return response()->json($result,200);
+        }catch(\Throwable $th){
+            $result['Success']='failure';
+            $result['Message']=$th->getMessage();
+            return response()->json($result,200);
+        }
+    }
+    public function showEdit(Request $request,$id,$type){
+        try{
+            $appointment_obj = new Appointment;
+            $appointmentDetails=$appointment_obj->getAppointmentById($id);
+
+            $mixedTable = new MixedTables;
+            $appointmentDetails->departmentList = $mixedTable->getDepartment();
+            $appointmentDetails->statusList =  $mixedTable->getConsantValue(config('constant.appointmentStatusTableId'));
+
+            $doctor_obj =new doctor;
+            $appointmentDetails->doctorList=$doctor_obj->getDoctorList($appointmentDetails->hospitalId,$appointmentDetails->branchId,$appointmentDetails->departmentId);
+            $appointmentDetails->type=$type;
+            return view('pages.editAppointment')->with('appointmentDetails', $appointmentDetails);
+        }catch(\Throwable $th){
+            $result['Success']='failure';
+            $result['Message']=$th->getMessage();
+            return response()->json($result,200);
+        }
+    }
+    public function updateAppointment(Request $request)
+    {
+        try{
+            $result=array();
+            DB::beginTransaction();
+            $validateUser=Validator::make($request->all(), [
+                'appointmentDate'=>'required',
+                'appointmentTime'=>'required',
+                'doctorId'=>'required',
+                'reason'=>'required',
+                'patientId'=>'required',
+                'appointmentId'=>'required',
+            ]);
+            if($validateUser->fails()){
+                $result['ShowModal']=1;
+                $result['Success']='Failure';
+                $result['Message']="Validation failed. Please fill the required field marked as *";
+                $result=json_encode($request);
+                return response()->json($result,200);
+            }
+            $user = new User;
+            $userId=$user->getDecryptedId($request->userId);
+            $doctorId=$user->getDecryptedId($request->doctorId);
+            $patientId=$user->getDecryptedId($request->patientId);
+            $appointmentId=$user->getDecryptedId($request->appointmentId);
+
+            if($patientId==0){
+                DB::rollback();
+                    $result['ShowModal']=1;
+                    $result['Success']='Failure';
+                    $result['Message']="Invalid patient information";
+                    $result=json_encode($request);
+                    return response()->json($result,200);
+            }
+            $appointment_obj=new Appointment;
+            $appointment_res=$appointment_obj->updateAppointment($request,$appointmentId,$doctorId,$userId);
+            DB::commit();
+            $result['Success']='Success';
+            $result['Message']='Appointment Updated successfully';
+            $result['ShowModal']= 1;
+            return response()->json($result,200);
+        }catch(\Throwable $th){
+            DB::rollback();
+            $result['ShowModal']=1;
+            $result['Success']='failure';
+            $result['Message']=$th->getMessage();
+            return response()->json($result,200);
+        }
+    }
+    public function updateAppointmentStatus(Request $request)
+    {
+        try{
+            $appointment_obj = new Appointment;
+            $appointment_obj->setAppointmentStatus($request);
+
+            $result['Success']='Success';
+            $result['Message']="Appointment Status Updated Successfully";
             return response()->json($result,200);
         }catch(\Throwable $th){
             $result['Success']='failure';

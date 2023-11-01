@@ -6,18 +6,7 @@
 @section('content')
     @include('layouts.mobileSideMenu')
     <div class="flex mt-[4.7rem] md:mt-0">
-    @can('isAdmin')
-            @include('layouts.sideMenu')
-        @endcan
-        @can('isHospital')
-            @include('layouts.hospitalSideMenu')
-        @endcan
-        @can('isBranch')
-            @include('layouts.branchSideMenu')
-        @endcan
-        @can('isDoctor')
-            @include('layouts.doctorSideMenu')
-        @endcan
+    @include('layouts.sideMenu')
                 <!-- BEGIN: Content -->
                 <div class="content">
                     @include('layouts.topBar')

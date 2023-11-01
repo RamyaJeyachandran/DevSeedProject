@@ -7,18 +7,7 @@
 @section('content')
     @include('layouts.mobileSideMenu')
     <div class="flex mt-[4.7rem] md:mt-0">
-        @can('isAdmin')
-            @include('layouts.sideMenu')
-        @endcan
-        @can('isHospital')
-            @include('layouts.hospitalSideMenu')
-        @endcan
-        @can('isBranch')
-            @include('layouts.branchSideMenu')
-        @endcan
-        @can('isDoctor')
-            @include('layouts.doctorSideMenu')
-        @endcan
+    @include('layouts.sideMenu')
                 <!-- BEGIN: Content -->
                 <div class="content">
                     @include('layouts.topBar')
@@ -66,7 +55,7 @@
                             </div>
                                 <div class="intro-y col-span-12 sm:col-span-6">
                                     <label for="ddlDoctor" class="form-label">Doctor <span class="text-danger mt-2"> *</span></label>
-                                    <select id="ddlDoctor" name="doctorId" class="form-select">
+                                    <select id="ddlDoctor" name="doctorId"  class="form-select">
                                         <option value='0'>Select Doctor</option>
                                     </select>
                             </div>

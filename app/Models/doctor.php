@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
 use config\constants;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\JoinClause;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class doctor extends Model
 {
@@ -15,7 +16,6 @@ class doctor extends Model
     protected $table = 'doctors';
     protected $fillable = [
         'profileImage',
-        'signature',
         'name',
         'dob',
         'gender',
@@ -52,8 +52,16 @@ class doctor extends Model
         $skip=$pagination['page'] ==1 ?0:(($pagination['page'] * $pagination['size'])-$pagination['size']);
         $where_sts="doctors.is_active=1 ".($hospitalId==0?"":" and doctors.hospitalId=".$hospitalId).($branchId==0?"":"  and doctors.branchId=".$branchId)." ".(($pagination['filters_field'] =="" || $pagination['filters_value']=="")?"":" and doctors.".$pagination['filters_field']." ".$pagination['filters_type']." '".$pagination['filters_value']."%'");
         
-        $doctorList['doctorList']=DB::table('doctors')->selectRaw("HEX(AES_ENCRYPT(doctors.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,doctors.doctorCodeNo,doctors.name,doctors.signature,doctors.profileImage,doctors.bloodGroup,doctors.phoneNo,doctors.email,doctors.gender,doctors.education,doctors.designation,COALESCE(departments.name,'') as department,doctors.experience")
+        $signature_sub_table= DB::table('doctorsignatures')->selectRaw('doctorId,COUNT(DISTINCT(id)) as total_signature')
+                                            ->where('is_active',1)
+                                             ->groupBy('doctorId');
+
+        $doctorList['doctorList']=DB::table('doctors')->selectRaw("HEX(AES_ENCRYPT(doctors.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,doctors.doctorCodeNo,doctors.name,doctors.profileImage,doctors.bloodGroup,doctors.phoneNo,doctors.email,doctors.gender,doctors.education,doctors.designation,COALESCE(departments.name,'') as department,doctors.experience,COALESCE(total_signature,0) as total_signature")
                                      ->leftJoin('departments', 'departments.id', '=', 'doctors.departmentId')
+                                     ->leftJoinSub($signature_sub_table, 'signature_sub', function (JoinClause $join)
+                                                {
+                                                    $join->on('doctors.id', '=', 'signature_sub.doctorId');
+                                                })
                                      ->whereRaw($where_sts)
                                      ->skip($skip)->take($pagination['size']) //pagination
                                     ->orderBy($pagination['sorters_field'],$pagination['sorters_dir']) 
@@ -67,10 +75,12 @@ class doctor extends Model
     }
     public function getDoctorById($id)
     {
-        $where_sts="doctors.id=".$id;
-        $patientDetails=DB::table('doctors')->selectRaw("COALESCE(doctors.bloodGroup,0) as bloodGroup,COALESCE(doctors.dob,'') as dob,COALESCE(doctors.gender,0) as gender,COALESCE(doctors.education,'') as education,COALESCE(doctors.designation,'') as designation,COALESCE(doctors.departmentId,0) as departmentId,COALESCE(doctors.experience,'') as experience,COALESCE(doctors.address,'') as address,COALESCE(doctors.hospitalId,'') as hospitalId,COALESCE(doctors.branchId,'') as branchId,COALESCE(doctors.is_active,'') as status,doctors.name,doctors.doctorCodeNo,doctors.phoneNo,doctors.email,doctors.signature,doctors.profileImage,HEX(AES_ENCRYPT(doctors.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as doctorId,COALESCE(departments.name,'') as department,HEX(AES_ENCRYPT(doctors.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(doctors.branchId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as branchId")
+        $user = new User;
+        $original_id=$user->getDecryptedId($id);
+
+        $patientDetails=DB::table('doctors')->selectRaw("COALESCE(doctors.bloodGroup,0) as bloodGroup,COALESCE(doctors.dob,'') as dob,COALESCE(doctors.gender,0) as gender,COALESCE(doctors.education,'') as education,COALESCE(doctors.designation,'') as designation,COALESCE(doctors.departmentId,0) as departmentId,COALESCE(doctors.experience,'') as experience,COALESCE(doctors.address,'') as address,COALESCE(doctors.is_active,'') as status,doctors.name,doctors.doctorCodeNo,doctors.phoneNo,doctors.email,doctors.profileImage,HEX(AES_ENCRYPT(doctors.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as doctorId,COALESCE(departments.name,'') as department,HEX(AES_ENCRYPT(doctors.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(doctors.branchId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as branchId")
                                     ->leftJoin('departments', 'departments.id', '=', 'doctors.departmentId')
-                                    ->whereRaw($where_sts)
+                                    ->where('doctors.id',$original_id)
                                    ->first();
         return $patientDetails;
     }
@@ -95,7 +105,7 @@ class doctor extends Model
         }while($doctorCodeNoList->contains($doctorCodeNo));
         return $doctorCodeNo;
     }
-    public static function addDoctor(Request $request,$doctorCodeNo,$profileImage,$hospitalId,$branchId,$signature){
+    public static function addDoctor(Request $request,$doctorCodeNo,$profileImage,$hospitalId,$branchId){
         $user = new User;
         $userId=$user->getDecryptedId($request->userId);
 
@@ -114,7 +124,6 @@ class doctor extends Model
         return static::create(
             ['doctorCodeNo'=>$doctorCodeNo,
              'profileImage'=>$profileImage,
-             'signature'=>$signature,
              'name' => $name,
              'dob' => $dob,
              'gender'=>$gender,
@@ -132,7 +141,7 @@ class doctor extends Model
             ]
         );
     }
-    public static function updateDoctor(Request $request,$profileImage,$signature){
+    public static function updateDoctor(Request $request,$profileImage){
         $user = new User;
         $userId=$user->getDecryptedId($request->userId);
 
@@ -156,7 +165,6 @@ class doctor extends Model
                 [
                 'name' => $name,
                 'profileImage'=>$profileImage,
-                'signature'=>$signature,
                 'dob' => $dob,
                 'gender'=>$gender,
                 'bloodGroup'=>$bloodGrp,
@@ -191,7 +199,6 @@ class doctor extends Model
             return static::whereRaw($where_sts)->update(
                 [
                 'name' => $name,
-                'signature'=>$signature,
                 'dob' => $dob,
                 'gender'=>$gender,
                 'bloodGroup'=>$bloodGrp,
@@ -238,4 +245,31 @@ class doctor extends Model
                                    ->get();
         return $doctorList;
     }    
+    public function getDoctorByHospital($hospitalId,$branchId)
+    {
+        $user = new User;
+        $decrpt_hospitalId=$user->getDecryptedId($hospitalId);
+        $decrpt_branchId=$user->getDecryptedId($branchId);
+
+        $where_sts="doctors.is_active=1 and doctors.hospitalId=".$decrpt_hospitalId.(($decrpt_branchId==NULL || $decrpt_branchId==0)?"":" and doctors.branchId=".$decrpt_branchId);
+        $doctorList=DB::table('doctors')->selectRaw("HEX(AES_ENCRYPT(doctors.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,CONCAT(doctors.name,' - ',doctorCodeNo) as name")
+                                    ->whereRaw($where_sts)
+                                   ->get();
+        return $doctorList;
+    }   
+    public function getLogoByHospitalId($id){
+        $user = new User;
+        // $original_id=$user->getDecryptedId($id);
+       return DB::table('doctors')->selectRaw("HEX(AES_ENCRYPT(doctors.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(doctors.branchId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as branchId,doctors.profileImage,doctors.name as doctorName,hospitalSettings.logo,COALESCE(hospitalBranch.branchName,hospitalSettings.hospitalName)  as name")
+                                    ->Join('hospitalSettings', 'hospitalSettings.id', '=', 'doctors.hospitalId')
+                                    ->leftJoin('hospitalBranch', function($join)
+                                    {
+                                      $join->on('hospitalBranch.id', '=', 'doctors.branchId');
+                                      $join->on('hospitalBranch.hospitalId', '=', 'doctors.hospitalId');
+                                   
+                                    })
+                                    ->where('doctors.id',$id)
+                                   ->first();
+        
+    } 
 }

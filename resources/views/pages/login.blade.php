@@ -27,6 +27,15 @@
                         <h2 class="intro-x font-bold text-2xl xl:text-3xl text-center xl:text-left">
                             Sign In
                         </h2>
+                        @if ($errors->any())
+    <div class="alert alert-danger">
+        <ul>
+            @foreach ($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
+@endif
                       <form method="post" action='{{ url("login") }}' class="validate-form">
                       @csrf
                       <div class="intro-x mt-2 xl:mt-10 text-danger dark:text-slate-500 text-center xl:text-left"> {{$errorMsg}} </div>

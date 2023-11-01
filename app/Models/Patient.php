@@ -221,7 +221,7 @@ class Patient extends Model
     public function getPatientById($id)
     {
         $where_sts="id=".$id;
-        $patientDetails=DB::table('patients')->selectRaw("COALESCE(age,0) as age,COALESCE(bloodGroup,0) as bloodGroup,COALESCE(dob,'') as dob,COALESCE(gender,0) as gender,COALESCE(martialStatus,0) as martialStatus,COALESCE(patientWeight,'') as weight,COALESCE(patientHeight,'') as height,COALESCE(address,'') as address,COALESCE(city,'') as city,COALESCE(state,'') as state,COALESCE(pincode,'') as pincode,COALESCE(spouseName,'') as spouseName,COALESCE(spousePhnNo,'') as spousePhnNo,COALESCE(refferedBy,'') as refferedBy,COALESCE(refDoctorName,'') as refDoctorName,COALESCE(refDrHospitalName,'') as refDrHospitalName,COALESCE(reason,'') as reason,COALESCE(hospitalId,'') as hospitalId,COALESCE(branchId,'') as branchId,COALESCE(is_active,'') as status,name,hcNo,phoneNo,email,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,profileImage")
+        $patientDetails=DB::table('patients')->selectRaw("COALESCE(age,0) as age,COALESCE(bloodGroup,0) as bloodGroup,COALESCE(dob,'') as dob,COALESCE(gender,0) as gender,COALESCE(martialStatus,0) as martialStatus,COALESCE(patientWeight,'') as weight,COALESCE(patientHeight,'') as height,COALESCE(address,'') as address,COALESCE(city,'') as city,COALESCE(state,'') as state,COALESCE(pincode,'') as pincode,COALESCE(spouseName,'Not Provided') as spouseName,COALESCE(spousePhnNo,'') as spousePhnNo,COALESCE(refferedBy,'') as refferedBy,COALESCE(refDoctorName,'') as refDoctorName,COALESCE(refDrHospitalName,'') as refDrHospitalName,COALESCE(reason,'') as reason,COALESCE(hospitalId,'') as hospitalId,COALESCE(branchId,'') as branchId,COALESCE(is_active,'') as status,name,hcNo,phoneNo,email,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,profileImage")
                                     ->whereRaw($where_sts)
                                    ->first();
         return $patientDetails;
@@ -285,5 +285,22 @@ class Patient extends Model
              'created_by'=>$userId
             ]
         );
+    }
+    public function getPatientByHospitalId($hospitalId,$branchId)
+    {
+        $user = new User;
+        $decrypt_hospitalId=$user->getDecryptedId($hospitalId);
+        $decrypt_branchId=$user->getDecryptedId($branchId);
+        $decrypt_branchId=$decrypt_branchId==0?NULL:$decrypt_branchId;
+
+        $where_sts="patients.is_active=1 and patients.hospitalId=".$decrypt_hospitalId.($decrypt_branchId==0|| $decrypt_branchId==null?"":" and patients.branchId=".$decrypt_branchId);
+
+        $patientDetails=DB::table('patients')->selectRaw("HEX(AES_ENCRYPT(patients.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,CONCAT(patients.name,' - ',patients.hcNo) as name")
+                                    ->join('hospitalsettings','hospitalsettings.id','=','patients.hospitalId')
+                                    ->leftJoin('hospitalbranch','hospitalbranch.id','=','patients.branchId')
+                                    ->whereRaw($where_sts)
+                                   ->get();
+
+        return $patientDetails;
     }
 }

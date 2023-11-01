@@ -92,9 +92,9 @@ class loginController extends Controller
     //     ]);
     //     return $hashed;
     // }
-    public function getCrypId(Request $request){
-        $user = new User;
-        $user_cryptId=$user->getDecrypedId("F4EA38807AEC5F2F2BCE7E336D251538");
-        return $user_cryptId;
-    }
+    // public function getCrypId(Request $request){
+    //     $user = new User;
+    //     $user_cryptId=$user->getEncryptedId(10);
+    //     return $user_cryptId;
+    // }
 }

@@ -7,32 +7,21 @@
 @section('content')
     @include('layouts.mobileSideMenu')
     <div class="flex mt-[4.7rem] md:mt-0">
-    @can('isAdmin')
-            @include('layouts.sideMenu')
-        @endcan
-        @can('isHospital')
-            @include('layouts.hospitalSideMenu')
-        @endcan
-        @can('isBranch')
-            @include('layouts.branchSideMenu')
-        @endcan
-        @can('isDoctor')
-            @include('layouts.doctorSideMenu')
-        @endcan
+    @include('layouts.sideMenu')
                 <!-- BEGIN: Content -->
                 <div class="content">
                     @include('layouts.topBar')
-                    <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
-                        <button onclick="window.location='{{ url("Doctor") }}'" class="btn btn-primary shadow-md mr-2">Add Doctor</button>
-                        <button onclick="window.location='{{ url("SearchDoctor") }}'" class="btn btn-dark shadow-md mr-2">Go Back</button>
-                    </div>
                     <form id="frmEditDoctor" method="POST" enctype="multipart/form-data">
                     <div class="intro-y box p-5 mt-5">
                     <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5">
-                    <input id="txtUser" name="userId" value="1" type="hidden" class="form-control">
+                    <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
                     <input id="txtDoctorId" name="doctorId" value="{{$doctorDetails->doctorId}}" type="hidden" class="form-control">
                     <input id="txtHospital" name="hospitalId" value="{{ $doctorDetails->hospitalId }}" type="hidden" class="form-control">
                     <input id="txtBranch" name="branchId" value="{{ $doctorDetails->branchId }}"  type="hidden" class="form-control">
+                    <input id="txtdeletedSignature" name="deletedSignature" type="hidden" class="form-control">
+                    <div class="intro-y col-span-12 justify-center sm:justify-end mt-5">
+                                <button id="btnEditDoctor" type=submit class="btn btn-danger w-24 ml-2"><i data-lucide="edit" class="w-4 h-4 mr-2"></i>Update</button>
+                            </div>
                     <div class="intro-y col-span-12 sm:col-span-4   form-control">
                     <input id="txtImageChanged" name="isImageChanged" value="0" type="hidden" class="form-control">
                                 <label for="txtProfileImage" class="form-label">Profile Image </label>
@@ -41,14 +30,10 @@
                                 </div>
                                 <input id="txtProfileImage" name="profileImage" type="file" accept="image/*" class="form-control">
                             </div>
-                            <div class="intro-y col-span-12 sm:col-span-4 form-control">
-                                <label for="txtSignature" class="form-label">Doctor Signature </label>
-                                <div class="w-20 h-20 sm:w-24 sm:h-24 flex-none lg:w-32 lg:h-32 image-fit relative">
-                                    <img id="imgSignature" class="rounded-full" src="{{$doctorDetails->signature}}">
-                                </div>
-                                <input id="txtSignature" name="signature" accept="image/*" type="file" class="form-control">
-                            </div>
+                            
                             <div class="intro-y col-span-12 sm:col-span-4 form-control"></div>
+                            <div class="intro-y col-span-12 sm:col-span-4 form-control"></div>
+                            
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtDoctorCodeNo" class="form-label">Doctor Code  <span class="text-danger mt-2"> *</span></label>
                                 <input id="txtDoctorCodeNo" name="name" value="{{$doctorDetails->doctorCodeNo}}" type="text" class="form-control" disabled>
@@ -120,10 +105,49 @@
                                 <label for="txtAddress" class="form-label">Address</label>
                                 <textarea id="txtAddress" value="{{$doctorDetails->address}}" name="address" class="form-control" minlength="10">{{$doctorDetails->address}}</textarea>
                             </div>
-                                                       
-                            <div class="intro-y col-span-12 justify-center sm:justify-end mt-5">
-                                <button id="btnEditDoctor" type=submit class="btn btn-primary w-24 ml-2">Update</button>
+                            <div class="intro-y col-span-12 sm:col-span-4   form-control">
+                                <input id="txtSignChanged" name="isSignChanged" value="0" type="hidden" class="form-control">
+                                <label for="txtSignature" class="form-label">Signature </label>
+                                <input id="txtSignature" name="signature[]" accept="image/*" type="file" class="form-control" multiple>
                             </div>
+                          
+                            <div class="intro-y col-span-12 sm:col-span-6 form-control">
+                            <div class="overflow-x-auto">
+@if($doctorDetails->signLength > 0)
+   <table class="table table-striped">
+     <thead>
+       <tr>
+         <th class="whitespace-nowrap">#</th>
+         <th class="whitespace-nowrap">Signature</th>
+         <th class="whitespace-nowrap">Delete</th>
+       </tr>
+     </thead>
+     <tbody>
+     @foreach ($doctorDetails->signatureList as $signature)
+       <tr>
+        <td class="nr">{{$signature->sNo}}
+        <span class="sign-id" hidden>{{$signature->id}}</span>
+        </td>
+         <td>
+         <div class="grid grid-cols-12">
+         <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y"> <div class="box zoom-in">
+         <img src="{{$signature->signature}}">
+</div></div>
+        </td>
+         <td>
+           <button class="use-sign btn btn-danger mr-1 mb-2 tooltip" title="Delete Signature" type="button">
+                <i data-lucide="trash-2" class="w-5 h-5"></i>
+            </button>
+        </td>
+       </tr>
+    @endforeach 
+     </tbody>
+     @endif
+   </table>
+ </div>
+                            </div>   
+                            
+                            
                         </div></div></div>
                         </div></div>
                         </form>
@@ -144,7 +168,12 @@
             <div class="modal-dialog"> <div class="modal-content"> <div class="modal-body p-0"> 
                 <div class="p-5 text-center"> <i data-lucide="check-circle" class="w-16 h-16 text-success mx-auto mt-3"></i>
                  <div id="divMsg" class="text-3xl mt-5"><span></span></div> <div id="divDoctorCodeNo" class="text-slate-500 mt-2"><span></span></div> </div>
-                  <div class="px-5 pb-8 text-center"> <button id="btnDrRedirect" type="button" data-tw-dismiss="modal" class="btn btn-primary w-24">Ok</button>
+                  <div class="px-5 pb-8 text-center"> 
+                  @if(session('userType')==1 ||  session('userType')==2 ||  session('userType')==4)
+                    <button id="btnDrRedirect" type="button" data-tw-dismiss="modal" class="btn btn-primary w-24">Ok</button>
+                    @else
+                         <button onclick="window.location='{{ url("Profile") }}/{{ session("userId")}}'" data-tw-dismiss="modal" class="btn btn-primary w-24">Ok</button>
+                    @endif
                  </div> 
                 </div> 
             </div> 

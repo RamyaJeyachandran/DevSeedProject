@@ -7,18 +7,7 @@
 @section('content')
     @include('layouts.mobileSideMenu')
     <div class="flex mt-[4.7rem] md:mt-0">
-    @can('isAdmin')
-            @include('layouts.sideMenu')
-        @endcan
-        @can('isHospital')
-            @include('layouts.hospitalSideMenu')
-        @endcan
-        @can('isBranch')
-            @include('layouts.branchSideMenu')
-        @endcan
-        @can('isDoctor')
-            @include('layouts.doctorSideMenu')
-        @endcan
+    @include('layouts.sideMenu')
                 <!-- BEGIN: Content -->
                 <div class="content">
                     @include('layouts.topBar')
@@ -106,7 +95,7 @@
 </div> <!-- END: Error Modal Content --> 
  <!-- BEGIN: Modal View Doctor --> 
  <div id="divViewDoctor" class="modal" data-tw-backdrop="static" tabindex="-1" aria-hidden="true"> 
-        <div class="modal-dialog" style="width: 1000px"> 
+        <div class="modal-dialog" style="width: 800px"> 
             <div class="modal-content">  
             <!--Close Button-->
             <a data-tw-dismiss="modal" href="javascript:;"> <i data-lucide="x-circle" class="w-8 h-8 text-danger"></i> </a>
@@ -145,23 +134,53 @@
                                 <div id="divExperience" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Experience : </b><span></span></div>
                             </div>
                         </div>
-                        <div class="mt-6 lg:mt-0 flex-1 px-5 border-l border-r border-slate-200/60 dark:border-darkmode-400 border-t lg:border-t-0 pt-5 lg:pt-0">
-                        
-                        <span class="font-medium text-lg">Signature</span>
-                            <img id="imgSignature" alt="Signature" class="rounded-full" src="{{ asset('dist/images/profile-5.jpg')}}">
-                           
-</div>
                         </div>
                     </div>
                 </div>
                 <!-- END: Profile Info -->
-                
+                   <!-- BEGIN: Modal Footer -->
+                 <div class="modal-footer">
+                         <button type="button" data-tw-dismiss="modal" class="btn btn-danger w-20 mr-1">Ok</button>
+                 </div>
+                <!-- END: Modal Footer -->
+              
                  </div> 
                  <!-- END: Modal Body -->
               </div> 
             </div> 
         </div>
                 <!-- END: Modal View Doctor --> 
+ <!-- BEGIN: Modal View Signature --> 
+ <div id="divViewSignature" class="modal" data-tw-backdrop="static" tabindex="-1" aria-hidden="true"> 
+        <div class="modal-dialog" style="width: 800px"> 
+            <div class="modal-content">  
+            <!--Close Button-->
+            <a data-tw-dismiss="modal" href="javascript:;"> <i data-lucide="x-circle" class="w-8 h-8 text-danger"></i> </a>
+            <!-- BEGIN: Modal Header -->
+            <div class="modal-header"> 
+                <h2 class="text-lg font-medium mr-auto">Doctor Signature</h2> 
+                </div> 
+                <!-- END: Modal Header -->
+                 <!-- BEGIN: Modal Body --> 
+                 <div class="modal-body box p-5">
+                   <!-- BEGIN: Profile Info -->
+                   <div id="divSignature" class="grid grid-cols-12 gap-6 mt-5">
+                    
+                    </div>
+                <!-- END: Profile Info -->
+                
+                 </div> 
+                 <!-- END: Modal Body -->
+                 <!-- BEGIN: Modal Footer -->
+                 <div class="modal-footer">
+                         <button type="button" data-tw-dismiss="modal" class="btn btn-danger w-20 mr-1">Ok</button>
+                 </div>
+                <!-- END: Modal Footer -->
+              </div> 
+            </div> 
+        </div>
+                <!-- END: Modal View Signature --> 
+
     </div>
 @endsection
 

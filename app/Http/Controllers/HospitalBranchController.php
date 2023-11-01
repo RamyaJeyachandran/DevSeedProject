@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\HospitalBranch;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+use URL;
 use App\Models\User;
 use config\constants;
-use URL;
+use Illuminate\Http\Request;
+use App\Models\HospitalBranch;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class HospitalBranchController extends Controller
 {
@@ -140,9 +141,7 @@ class HospitalBranchController extends Controller
 
             return view('pages.editBranch')->with('branchDetails', $branchDetails);
         } catch (\Throwable $th) {
-            $result['Success'] = 'failure';
-            $result['Message'] = $th->getMessage();
-            return response()->json($result, 200);
+            return Redirect::back()->withErrors($th->getMessage());
         }
     }
 
@@ -205,7 +204,17 @@ class HospitalBranchController extends Controller
                  $result['Message'] = "This Phone No or Email already exists for : " . $chkPhoneNo->branchName;
                  return response()->json($result, 200);
              }
-           
+             $user_obj = new User;
+             $chkEmail = $user_obj->checkEmailIdForEdit($request->email,$request->branchId);
+             if (count($chkEmail) > 0) {
+                 $result['ShowModal'] = 1;
+                 $result['Success'] = 'Email id already exists for another user.';
+                 $result['Message'] = "Please change the email id.";
+                 return response()->json($result, 200);
+             } else {
+                 $user_obj->updateLogin($request->branchId,$request->userId,$request->branchName,$request->email,config("constant.branch_user_type_id"));
+             }
+
             $branch = $branch_obj->updateHospitalBranch($request,$logo);
              
             $result['ShowModal'] = 1;

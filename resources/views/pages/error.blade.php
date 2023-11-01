@@ -5,7 +5,7 @@
         <meta charset="utf-8">
         <link href="{{ asset('dist/images/logo.svg')}}" rel="shortcut icon">
         <meta name="author" content="LEFT4CODE">
-        <title>Error Page - Midone - Tailwind HTML Admin Template</title>
+        <title>Error Page</title>
         <!-- BEGIN: CSS Assets-->
         <link rel="stylesheet" href="{{ asset('dist/css/app.css')}}" />
         <!-- END: CSS Assets-->

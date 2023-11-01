@@ -7,25 +7,10 @@
 @section('content')
     @include('layouts.mobileSideMenu')
     <div class="flex mt-[4.7rem] md:mt-0">
-    @can('isAdmin')
-            @include('layouts.sideMenu')
-        @endcan
-        @can('isHospital')
-            @include('layouts.hospitalSideMenu')
-        @endcan
-        @can('isBranch')
-            @include('layouts.branchSideMenu')
-        @endcan
-        @can('isDoctor')
-            @include('layouts.doctorSideMenu')
-        @endcan
+    @include('layouts.sideMenu')
                 <!-- BEGIN: Content -->
                 <div class="content">
                     @include('layouts.topBar')
-                    <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
-                        <button onclick="window.location='{{ url("Hospital") }}'" class="btn btn-primary shadow-md mr-2">Add Hospital</button>
-                        <button onclick="window.location='{{ url("SearchHospital") }}'" class="btn btn-dark shadow-md mr-2">Go Back</button>
-                    </div>
                     <form id="frmEditHospital" method="POST" enctype="multipart/form-data">
                     <div class="grid grid-cols-12 gap-6 mt-5">
                     <div class="intro-y col-span-12 lg:col-span-6">
@@ -59,7 +44,7 @@
                                         <input id="txtContactPhNo" name="inChargePhoneNo" value="{{$hospitalDetails->inChargePhoneNo}}" type="text" class="form-control" required>
                                     </div>
                                     <div class="mt-3">
-                                        <button id="btnEditHospital" type=submit class="btn btn-primary w-24 ml-2">Update</button>
+                                        <button id="btnEditHospital" type=submit class="btn btn-danger w-24 ml-2"><i data-lucide="edit" class="w-4 h-4 mr-2"></i>Update</button>
                                     </div>
                                 </div>
                             </div>
@@ -98,7 +83,12 @@
             <div class="modal-dialog"> <div class="modal-content"> <div class="modal-body p-0"> 
                 <div class="p-5 text-center"> <i data-lucide="check-circle" class="w-16 h-16 text-success mx-auto mt-3"></i>
                  <div id="divMsg" class="text-3xl mt-5"><span></span></div>  </div>
-                  <div class="px-5 pb-8 text-center"> <button id="btnHsRedirect" type="button" data-tw-dismiss="modal" class="btn btn-primary w-24">Ok</button>
+                  <div class="px-5 pb-8 text-center"> 
+                  @if(session('userType')==1)
+                    <button id="btnHsRedirect" type="button" data-tw-dismiss="modal" class="btn btn-primary w-24">Ok</button>
+                    @else
+                         <button onclick="window.location='{{ url("Profile") }}/{{ session("userId")}}'" data-tw-dismiss="modal" class="btn btn-primary w-24">Ok</button>
+                    @endif
                  </div> 
                 </div> 
             </div> 

@@ -7,18 +7,7 @@
 @section('content')
     @include('layouts.mobileSideMenu')
     <div class="flex mt-[4.7rem] md:mt-0">
-    @can('isAdmin')
-            @include('layouts.sideMenu')
-        @endcan
-        @can('isHospital')
-            @include('layouts.hospitalSideMenu')
-        @endcan
-        @can('isBranch')
-            @include('layouts.branchSideMenu')
-        @endcan
-        @can('isDoctor')
-            @include('layouts.doctorSideMenu')
-        @endcan
+    @include('layouts.sideMenu')
                 <!-- BEGIN: Content -->
                 <div class="content">
                     @include('layouts.topBar')
@@ -47,11 +36,11 @@
                     @endcan
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtProfileImage" class="form-label">Profile Image </label>
-                                <input id="txtProfileImage" name="profileImage" accept="image/*" type="file" class="form-control">
+                                <input id="txtProfileImage" name="profileImage" accept="image/*" type="file" class="form-control" >
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtSignature" class="form-label">Doctor Signature </label>
-                                <input id="txtSignature" name="signature" accept="image/*" type="file" class="form-control">
+                                <input id="txtSignature" name="signature[]" accept="image/*" type="file" class="form-control" multiple>
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtName" class="form-label">Doctor Name <span class="text-danger mt-2"> *</span></label>

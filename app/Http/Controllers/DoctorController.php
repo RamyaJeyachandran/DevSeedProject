@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\doctor;
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
-use App\Models\User;
-use App\Models\MixedTables;
-use App\Models\HospitalBranch;
-use config\constants;
 use URL;
+use App\Models\User;
+use config\constants;
+use App\Models\doctor;
+use App\Models\MixedTables;
+use Illuminate\Http\Request;
+use App\Models\HospitalBranch;
+use App\Models\DoctorSignature;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Redirect;
+use Illuminate\Support\Facades\Validator;
 
 class DoctorController extends Controller
 {
@@ -32,7 +34,7 @@ class DoctorController extends Controller
         try{
             $pagination['page']=(isset($request->page) && !empty($request->page)) ?$request->page : 1;
             $pagination['size']=(isset($request->size) && !empty($request->size)) ?$request->size : 10;
-            $pagination['sorters_field']=(isset($request->sorters[0]['field']) && !empty($request->sorters[0]['field'])) ?$request->sorters[0]['field'] : "id";
+            $pagination['sorters_field']=(isset($request->sorters[0]['field']) && !empty($request->sorters[0]['field'])) ?$request->sorters[0]['field'] : "doctors.created_date";
             $pagination['sorters_dir']=(isset($request->sorters[0]['dir']) && !empty($request->sorters[0]['dir'])) ?$request->sorters[0]['dir'] : "desc";
 
             $pagination['filters_field']=(isset($request->filters[0]['field']) && !empty($request->filters[0]['field'])) ?$request->filters[0]['field'] : "";
@@ -53,8 +55,6 @@ class DoctorController extends Controller
             
             $result['last_page']=$doctorList['last_page'];
             $result['data']=$doctorList['doctorList'];
-            $result['hospitalId']=$decrpt_hospitalId;
-            $result['branchId']=$decrpt_branchId;
             return response()->json($result,200);
         }catch(\Throwable $th){
             $result['Success']='failure';
@@ -104,20 +104,7 @@ class DoctorController extends Controller
                 $profileImage=$url ."/". $profileImage;
             }
             //-------------------Store Image ---End
-             //----------------Store signature ---Begin 
-             $url = URL::to("/");
-             $signature =$url ."/".config('constant.doctor_default_profileImage');
-             if($request->hasfile('signature')){
-                 $hospital_id_store=($hospitalId==NULL?0:$decrpt_hospitalId);
-                 $img_location="images/doctors/";
-                 $img_name =config('constant.prefix_doctor_signature').$hospital_id_store.'_'.time().'.'.$request->signature->getClientOriginalExtension();
-                 $request->signature->move(public_path($img_location), $img_name);
- 
-                 $signature =$img_location.$img_name;
-                 $signature=$url ."/". $signature;
-             }
-             //-------------------Store signature ---End
-            
+                      
             $doctor_obj = new Doctor;
             //Check phone no -- Begin
             $chkPhoneNo=$doctor_obj->checkPhoneNo($request->phoneNo,$decrpt_hospitalId,$decrpt_branchId);
@@ -131,9 +118,43 @@ class DoctorController extends Controller
             
             //Generate doctor code number 
             $doctorCodeNo=$doctor_obj->generateDoctorCodeNo($decrpt_hospitalId);
-            $doctors =  $doctor_obj->addDoctor($request,$doctorCodeNo,$profileImage,$decrpt_hospitalId,$decrpt_branchId,$signature); 
+            $doctors =  $doctor_obj->addDoctor($request,$doctorCodeNo,$profileImage,$decrpt_hospitalId,$decrpt_branchId); 
             $doctorId=$doctors->id;
             
+            if($doctorId>0){
+                //Add Doctor Signature BEGIN
+                $doctorsign_obj = new DoctorSignature;
+                $decrpt_userId=$user_obj->getDecryptedId($request->userId);
+                 //----------------Store signature ---Begin 
+                    $url = URL::to("/");
+                    $signature =$url ."/".config('constant.doctor_default_profileImage');
+                    $files = $request->file('signature');
+
+                    if($request->hasFile('signature'))
+                    {
+                        foreach ($files as $file) {
+                            $hospital_id_store=($hospitalId==NULL?0:$decrpt_hospitalId);
+                            $img_location="images/doctors/";
+                            $img_name =config('constant.prefix_doctor_signature').$hospital_id_store.'_'.time().'.'.$file->getClientOriginalExtension();
+                            $file->move(public_path($img_location), $img_name);
+                            $signature =$img_location.$img_name;
+                            $signature =$url ."/". $signature;
+                             //-------------------Store signature ---End
+
+                            $doctorSignature =  $doctorsign_obj->addDoctorSignature($decrpt_hospitalId,$decrpt_branchId,$doctorId,$signature,$decrpt_userId); 
+                            $doctorSignatureId=$doctorSignature->id;
+                            if($doctorSignatureId<=0){
+                                DB::rollback();
+                                $result['ShowModal'] = 1;
+                                $result['Success'] = 'Doctor Signature upload failed.';
+                                $result['Message'] = "Please retry it.";
+                                return response()->json($result, 200);
+                            }
+                        }
+                    }
+                //Add Doctor Signature END
+            }
+
             //Login creation
             if($doctorId>0){
                  
@@ -158,7 +179,7 @@ class DoctorController extends Controller
             $result['Success']='Success';
             $result['Message']="Doctor registered successfully";
             $result['doctorCodeNo']="Doctor Access Number is ".$doctorCodeNo;
-            $result['loginCreation']=$login_created;
+            $result['loginCreation']=$doctorId;
             DB::commit();
             return response()->json($result,200);
         }catch(\Throwable $th){
@@ -192,6 +213,8 @@ class DoctorController extends Controller
             $user_obj = new User;
             $decrpt_hospitalId=($hospitalId==NULL?$hospitalId:$user_obj->getDecryptedId($hospitalId));
             $decrpt_branchId=($branchId==NULL?$branchId:$user_obj->getDecryptedId($branchId));
+            $decrpt_userId=$user_obj->getDecryptedId($request->userId);
+
             //Decrypt --- END
 
             //----------------Store Image ---Begin 
@@ -212,24 +235,6 @@ class DoctorController extends Controller
             }
             
             //-------------------Store Image ---End
-            
-            //----------------Store signature ---Begin 
-            $signature="";
-            if($request->isSignChanged==1)
-            {
-                $url = URL::to("/");
-                $signature =$url ."/".config('constant.doctor_default_profileImage');
-                if($request->hasfile('signature')){
-                    $hospital_id_store=($hospitalId==NULL?0:$decrpt_hospitalId);
-                    $img_location="images/doctors/";
-                    $img_name =config('constant.prefix_doctor_signature').$hospital_id_store.'_'.time().'.'.$request->signature->getClientOriginalExtension();
-                    $request->signature->move(public_path($img_location), $img_name);
-
-                    $signature =$img_location.$img_name;
-                    $signature=$url ."/". $signature;
-                }
-            }
-            //-------------------Store signature ---End
 
             $doctor_obj = new Doctor;
             $doctorId="AES_DECRYPT(UNHEX('".$request->doctorId."'), UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))";
@@ -240,7 +245,66 @@ class DoctorController extends Controller
                 $result['Message']="Phone No registered doctor number : ".$chkPhoneNo->doctorCodeNo;
                 return response()->json($result,200);
             }
-            $doctors = $doctor_obj->updateDoctor($request,$profileImage,$signature); 
+            $user_obj = new User;
+             $chkEmail = $user_obj->checkEmailIdForEdit($request->email,$request->doctorId);
+             if (count($chkEmail) > 0) {
+                 $result['ShowModal'] = 1;
+                 $result['Success'] = 'Email id already exists for another user.';
+                 $result['Message'] = "Please change the email id.";
+                 return response()->json($result, 200);
+             } else {
+                 $user_obj->updateLogin($request->doctorId,$request->userId,$request->name,$request->email,config('constant.doctor_user_type_id'));
+             }
+
+            $doctors = $doctor_obj->updateDoctor($request,$profileImage); 
+
+            // UPDATE - Doctor Signature
+
+             $signature="";
+             $doctorsign_obj = new DoctorSignature;
+             if($request->isSignChanged==1)
+             {
+                $decrpt_doctorId=$user_obj->getDecryptedId($request->doctorId);
+
+             //----------------Store signature ---Begin 
+                 $url = URL::to("/");
+                 $signature =$url ."/".config('constant.doctor_default_profileImage');
+                 $files = $request->file('signature');
+
+                 if($request->hasFile('signature'))
+                 {
+                     foreach ($files as $file) {
+                         $hospital_id_store=($hospitalId==NULL?0:$decrpt_hospitalId);
+                         $img_location="images/doctors/";
+                         $img_name =config('constant.prefix_doctor_signature').$hospital_id_store.'_'.time().'.'.$file->getClientOriginalExtension();
+                         $file->move(public_path($img_location), $img_name);
+                         $signature =$img_location.$img_name;
+                         $signature =$url ."/". $signature;
+                          //-------------------Store signature ---End
+
+                         $doctorSignature =  $doctorsign_obj->addDoctorSignature($decrpt_hospitalId,$decrpt_branchId,$decrpt_doctorId,$signature,$decrpt_userId); 
+                         $doctorSignatureId=$doctorSignature->id;
+                         if($doctorSignatureId<=0){
+                             DB::rollback();
+                             $result['ShowModal'] = 1;
+                             $result['Success'] = 'Doctor Signature upload failed.';
+                             $result['Message'] = "Please retry it.";
+                             return response()->json($result, 200);
+                         }
+                     }
+                 }
+             }
+             //------------------- UPDATE Doctor signature ---End
+             // DELETE Doctor Signature
+             if($request->deletedSignature != '' || $request->deletedSignature != null){
+                $signatureIds_list=explode(",",$request->deletedSignature);
+                if(count($signatureIds_list)> 0)
+                {
+                    foreach( $signatureIds_list as $value ){
+                        $doctorsign_obj->deleteSignature($value,$decrpt_userId);
+                    }
+                }
+             }
 
             $result['ShowModal']=1;
             $result['Success']='Success';
@@ -250,7 +314,7 @@ class DoctorController extends Controller
         }catch(\Throwable $th){
             $result['ShowModal']=1;
             $result['Success']='failure';
-            $result['Message']=$th->getLine();
+            $result['Message']=$th->getMessage();
             return response()->json($result,200);
         }
     }
@@ -273,34 +337,26 @@ class DoctorController extends Controller
    
     public function showEdit(Request $request,$id){
         try{
-            $id_orignal="AES_DECRYPT(UNHEX('".$id."'), UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))";
             $doctor_obj = new Doctor;
-            $doctorDetails=$doctor_obj->getDoctorById($id_orignal);
-
-            // $branch_obj = new HospitalBranch;
-            // $doctorDetails->hospitalList = $branch_obj->getHospitalList();
-            // $doctorDetails->branchList = $branch_obj->getBranchListByHospitalId($doctorDetails->hospitalId);
-
-            // $doctorDetails->isBranchVisible=($doctorDetails->branchList==null?"hidden":"");
+            $doctorDetails=$doctor_obj->getDoctorById($id);
 
             $mixedTable = new MixedTables;
-            $doctorDetails->genderList =  $mixedTable->getGender(); 
-            $doctorDetails->bloodGrpList=$mixedTable->getBloodGrp();
+            $doctorDetails->genderList =  $mixedTable->getConsantValue(config('constant.genderTableId'));
+            $doctorDetails->bloodGrpList=$mixedTable->getConsantValue(config('constant.bloodGrpTableId'));
             $doctorDetails->departmentList=$mixedTable->getDepartment();
-            
+            $sign_obj=new DoctorSignature;
+            $doctorDetails->signatureList=$sign_obj->getDoctorSignatureByDoctorId($id);
+            $doctorDetails->signLength=$doctorDetails->signatureList->count();
 
             return view('pages.editDoctor')->with('doctorDetails', $doctorDetails);
         }catch(\Throwable $th){
-            $result['Success']='failure';
-            $result['Message']=$th->getMessage();
-            return response()->json($result,200);
+            return Redirect::back()->withErrors($th->getMessage());
         }
     }
     public function getDoctorById(Request $request,$id){
         try{
-            $id_orignal="AES_DECRYPT(UNHEX('".$id."'), UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))";
             $doctor_obj = new doctor;
-            $patientDetails=$doctor_obj->getDoctorById($id_orignal);
+            $patientDetails=$doctor_obj->getDoctorById($id);
             $result['Success']='Success';
             $result['doctorDetails']=$patientDetails;
             return response()->json($result,200);
@@ -323,7 +379,5 @@ class DoctorController extends Controller
             $result['Message']=$th->getMessage();
             return response()->json($result,200);
         }
-    }
-
-
+    }  
 }
