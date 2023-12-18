@@ -2,6 +2,7 @@
 @section('title','Consent Form')
 @section ('style')
 <link rel="stylesheet" href="{{ asset('dist/css/app.css') }}" />
+<link rel="stylesheet" href="{{ asset('dist/css/loading.css') }}" />
 
 @endsection 
 @section('content')
@@ -11,6 +12,7 @@
                 <!-- BEGIN: Content -->
                 <div class="content">
                     @include('layouts.topBar')
+                    <div id="loading"></div>
                     <input id="txtHospital" name="hospitalId" value="{{ session('hospitalId') }}" type="hidden" class="form-control">
                     <input id="txtBranch" name="branchId" value="{{ session('branchId') }}" type="hidden" class="form-control">
                     <div id="divFormList" class="intro-y chat grid grid-cols-12 gap-5 mt-5">
@@ -18,7 +20,7 @@
                     <div class="col-span-12 lg:col-span-4 2xl:col-span-3">
                         <div class="tab-content">
                             <div id="chats" class="tab-pane active" role="tabpanel" aria-labelledby="chats-tab">
-                                <div id="divFormNameList" class="chat__chat-list overflow-y-auto scrollbar-hidden pr-1 pt-1 mt-4">
+                                <div id="divFormNameList" class="chat__chat-list overflow-y-auto scrollbar-hidden pr-1 pt-1 mt-4"  style="height: auto;">
                                     <!-- Consent Form list begin -->
                                    
                                     <!-- Consent Form list End -->
@@ -64,8 +66,12 @@
                         </div>
                     </div>
                     <!-- END: Chat Content -->
+
+                </div>             
+
+                    </div>
                 </div>
-                    </div></div>
+
                  <!-- END: Content -->
 @endsection
 </div>

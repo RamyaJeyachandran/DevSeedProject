@@ -13,7 +13,7 @@
                     @include('layouts.topBar')
                     <input id="txtHospital" name="hospitalId" value="{{ session('hospitalId') }}" type="hidden" class="form-control">
                     <input id="txtBranch" name="branchId" value="{{ session('branchId') }}" type="hidden" class="form-control">
-                    <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
+                <div id="loading"></div>
                     
                     <div id="divRegPanel" class="intro-y box p-5 mt-5">
                     <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
@@ -23,7 +23,7 @@
                             </div>
                             <div class="mt-2 xl:mt-0">
                                 <button id="btnGo" type="button" class="btn btn-primary w-full sm:w-16" >Go</button>
-                                <button id="btnRegNoClear" type="button" class="btn btn-primary w-full sm:w-16" >Clear</button>
+                                <button id="btnRegNoClear" type="button" class="btn btn-dark w-full sm:w-16" >Clear</button>
                             </div>
                     </div>                    
                 </div>
@@ -38,9 +38,8 @@
                     <div class="flex flex-col lg:flex-row border-b border-slate-200/60 dark:border-darkmode-400 pb-5 -mx-5">
                         <div class="flex flex-1 px-5 items-center justify-center lg:justify-start">
                             <div class="ml-5">
-                            <input id="txtPatientId" name="patientId" type="hidden" class="form-control">
                                 <div id="divName" class="w-24 sm:w-40 truncate sm:whitespace-normal font-medium text-lg"><span></span></div>
-                                <div id="divRegNo" class="truncate sm:whitespace-normal flex items-center"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Registered No. :</label><span></span></div>
+                                <div id="divRegNo" class="truncate sm:whitespace-normal flex items-center"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Registered No :</label><span></span></div>
                                 <div id="divEmail" class="truncate sm:whitespace-normal flex items-center"> <i data-lucide="mail" class="w-4 h-4 mr-2"></i><span></span>  </div>
                                 <div id="divPhoneNo" class="truncate sm:whitespace-normal flex items-center"> <i data-lucide="phone" class="w-4 h-4 mr-2"></i><span></span>  </div>
                                 <div id="divAddress" class="truncate sm:whitespace-normal flex items-center mt-3"><i data-lucide="home" class="w-4 h-4 mr-2"></i><span></span>  </div>
@@ -50,41 +49,48 @@
                         
                         <div class="mt-6 lg:mt-0 flex-1 px-5 border-l border-r border-slate-200/60 dark:border-darkmode-400 border-t lg:border-t-0 pt-5 lg:pt-0">
                             <div class="flex flex-col justify-center items-center lg:items-start mt-4">
-                                <div id="divGender" class="truncate sm:whitespace-normal flex items-center"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Gender  :</label> <span></span>  </div>
+                                <div id="divAadharCardNo" class="truncate sm:whitespace-normal flex items-center "><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold"> Aadhar Card No  : </label><span></span></div>
+                                <div id="divGender" class="truncate sm:whitespace-normal flex items-center mt-3"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Gender  :</label> <span></span>  </div>
                                 <div id="divDob" class="truncate sm:whitespace-normal flex items-center mt-3"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold"> DOB  : </label><span></span></div>
                                 <div id="divAge" class="truncate sm:whitespace-normal flex items-center mt-3"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Age : </label><span></span></div>
                                 <div  id= "divBloodGrp" class="truncate sm:whitespace-normal flex items-center mt-3"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Blood Group :</label> <span></span>  </div>
                                 <div  id= "divHeight" class="truncate sm:whitespace-normal flex items-center mt-3"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Height :</label> <span></span></div>
                                 <div  id= "divWeight" class="truncate sm:whitespace-normal flex items-center mt-3"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Weight :</label> <span></span></div>
+                                <div id="divSpouseName" class="truncate sm:whitespace-normal flex items-center  mt-3"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Spouse Name :</label> <span></span></div>
+                                <div id="divSpousePhoneNo" class="truncate sm:whitespace-normal flex items-center mt-3"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Spouse PhoneNo :</label> <span></span> </div>
+                              
                             </div>
                         </div>
                         <div class="mt-6 lg:mt-0 flex-1 px-5 border-t lg:border-0 border-slate-200/60 dark:border-darkmode-400 pt-5 lg:pt-0">
                             <div class="flex flex-col justify-center items-center lg:items-start mt-4">
-                                <div id="divSpouseName" class="truncate sm:whitespace-normal flex items-center"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Spouse Name :</label> <span></span></div>
-                                <div id="divSpousePhoneNo" class="truncate sm:whitespace-normal flex items-center mt-3"><label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Spouse PhoneNo :</label> <span></span> </div>
-                                <div id="divReason" class="truncate sm:whitespace-normal flex items-center mt-3"> <label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Reason for vist :</label> <span></span>  </div>
+                                <div id="divReason" class="truncate sm:whitespace-normal flex items-center "> <label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Reason for vist :</label> <span></span>  </div>
                                 <div id="divReferedBy" class="truncate sm:whitespace-normal flex items-center mt-3"> <label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Refered By :</label> <span></span>  </div>
-                                <div id="divDoctorName" class="truncate sm:whitespace-normal flex items-center mt-3"> <label id="lblDrName" class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold"></label> <span></span>  </div>
-                                <div id="divDrHospital" class="truncate sm:whitespace-normal flex items-center mt-3"><label id="lblDrHospital" class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold"></label> <span></span>  </div>
+                                <div id="divAttendingDoctor" class="truncate sm:whitespace-normal flex items-center mt-3"> <label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Attending Doctor:</label> <span></span>  </div>
+                                <div id="divWitnessHospital" class="truncate sm:whitespace-normal flex items-center mt-3"> <label  class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Witness From Hospital :</label> <span></span>  </div>
+                                <div id="divWitnessBank" class="truncate sm:whitespace-normal flex items-center mt-3"><label  class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Witness From Bank :</label> <span></span>  </div>
+                                <div id="divDonorBankName" class="truncate sm:whitespace-normal flex items-center mt-3"><label  class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Donor Bank Name :</label> <span></span>  </div>
+                                <div id="divDonorBankAddress" class="truncate sm:whitespace-normal flex items-center mt-3"><label  class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Donor Bank Address :</label> <span></span>  </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- END: Profile Info -->
-                
+                <form id="frmPatientConsentForm">
+                <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
+                <input id="txtPatientId" name="patientId" type="hidden" class="form-control">
                 <div id="divFormList" class="hidden intro-y chat grid grid-cols-12 gap-5 mt-5">
                     <!-- BEGIN: Side Menu -->
                     <div class="col-span-12 lg:col-span-4 2xl:col-span-3">
                     <div class="intro-x cursor-pointer box relative flex items-center p-5 ">
                                     <div class="ml-2 overflow-hidden">
-                                        <button id="btnSaveConsent" type="button" class="btn btn-primary" ><i data-lucide="save" class="w-4 h-4 mr-2"></i>Save</button>
+                                        <button id="btnSaveConsent" type="submit" class="btn btn-primary" ><i data-lucide="save" class="w-4 h-4 mr-2"></i>Save</button>
                                             <button id="btnPrintConsent" type="button" class="btn btn-primary" ><i data-lucide="printer" class="w-4 h-4 mr-2"></i>Print</button>
-                                            <button id="btnPrintAllConsent" type="button" class="btn btn-primary" ><i data-lucide="printer" class="w-4 h-4 mr-2"></i>Print All</button>
+                                            <!-- <button id="btnPrintAllConsent" type="button" class="btn btn-primary" ><i data-lucide="printer" class="w-4 h-4 mr-2"></i>Print All</button> -->
                                         </div>
                                     </div>
                         <div class="tab-content">
                             <div id="chats" class="tab-pane active" role="tabpanel" aria-labelledby="chats-tab">
-                                <div id="divFormNameList" class="chat__chat-list overflow-y-auto scrollbar-hidden pr-1 pt-1 mt-4">
+                                <div id="divFormNameList" class="chat__chat-list overflow-y-auto scrollbar-hidden pr-1 pt-1 mt-4" style="height: auto;">
                                     <!-- Consent Form list begin -->
                                    
                                     <!-- Consent Form list End -->
@@ -92,6 +98,7 @@
                         </div>
                     </div>
                     </div>
+                </form>
                     <!-- END:  Side Menu -->
                     <!-- BEGIN: Chat Content -->
                     <div id="divFormContent" class="intro-y col-span-12 lg:col-span-8 2xl:col-span-9">

@@ -29,12 +29,12 @@ class HospitalSettingsController extends Controller
             DB::beginTransaction();
             $validateUser = Validator::make($request->all(), [
                 'hospitalName' => 'required',
-                'phoneNo' => 'required',
+                'phoneNo' => 'required|numeric|digits:10',
                 'email' => 'required',
                 'password' => 'required',
                 'address' => 'required',
                 'inChargePerson' => 'required',
-                'inChargePhoneNo' => 'required'
+                'inChargePhoneNo' => 'required|numeric|digits:10'
             ]);
             if ($validateUser->fails()) {
                 $result['ShowModal'] = 1;
@@ -44,15 +44,15 @@ class HospitalSettingsController extends Controller
             }
 
             //----------------Store Image ---Begin 
-            $url = URL::to("/");
+            $url = request()->getSchemeAndHttpHost();//URL::to("/");
             $logo = $url . "/" . config('constant.hospital_default_logo');
             if ($request->hasfile('logo')) {
-                $img_location = "images/hospitals/";
+                $img_location =config('constant.hospitalLogLocation');
                 $img_name = config('constant.prefix_hospital_logo') . '_' . time() . '.' . $request->logo->getClientOriginalExtension();
                 $request->logo->move(public_path($img_location), $img_name);
 
                 $logo = $img_location . $img_name;
-                $logo = $url . "/" . $logo;
+                $logo = $url . "/" . $logo; //$url . "/seed/public/" . $logo;
             }
 
             //-------------------Store Image ---End
@@ -168,11 +168,11 @@ class HospitalSettingsController extends Controller
             DB::beginTransaction();
             $validateUser = Validator::make($request->all(), [
                 'hospitalName' => 'required',
-                'phoneNo' => 'required',
+                'phoneNo' => 'required|numeric|digits:10',
                 'email' => 'required',
                 'address' => 'required',
                 'inChargePerson' => 'required',
-                'inChargePhoneNo' => 'required'
+                'inChargePhoneNo' => 'required|numeric|digits:10'
             ]);
             if ($validateUser->fails()) {
                 $result['ShowModal'] = 1;
@@ -183,10 +183,10 @@ class HospitalSettingsController extends Controller
             //----------------Store Image ---Begin 
             $logo = "";
             if ($request->isImageChanged == 1) {
-                $url = URL::to("/");
+                $url = request()->getSchemeAndHttpHost();//URL::to("/");
                 $logo = $url . "/" . config('constant.hospital_default_logo');
                 if ($request->hasfile('logo')) {
-                    $img_location = "images/hospitals/";
+                    $img_location = config('constant.hospitalLogLocation');
                     $img_name = config('constant.prefix_hospital_logo') . '_' . time() . '.' . $request->logo->getClientOriginalExtension();
                     $request->logo->move(public_path($img_location), $img_name);
 

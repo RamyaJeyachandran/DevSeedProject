@@ -212,7 +212,7 @@
                                                 </div>
                                                 <div class="lg:ml-2 lg:mr-auto text-center lg:text-left mt-3 lg:mt-0">
                                                     <a href="" class="font-medium">{{$doctorWise->name}}</a> 
-                                                    <div  class="text-primary block font-medium mt-0.5">Code: 2</div>
+                                                    <div  class="text-primary block font-medium mt-0.5">Code: {{$doctorWise->doctorCodeNo}}</div>
                                                 </div>
                                                 <div class="flex mt-4 lg:mt-0">
                                                     <button class="btn btn-rounded-primary py-1 px-2 mr-2"><i data-lucide="activity" class="w-4 h-4 mr-2"></i>Total Patients : {{$doctorWise->total_patient}}</button>

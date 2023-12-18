@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\HospitalSettings;
+use App\Models\loginLog;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\doctor;
@@ -60,9 +61,12 @@ class AuthController extends Controller
             $token = $request->user()->createToken($token_name,expiresAt:now()->addMonth())->plainTextToken;
             $request->session()->put('prjtoken',$token);
             $request->session()->put('prjTokenName',$decrypt_token_name);
-            $url = URL::to("/");
+            $url =request()->getSchemeAndHttpHost();// URL::to("/");
             $logo=$url."/dist/images/logo.svg";
             $request->session()->put('logo',$logo);
+
+            $loginLog=new loginLog;
+            $loginLog->addLoginLog($id,'Logged In');
 
             switch(Auth::user()->user_type_id){
                 case 1: //Admin

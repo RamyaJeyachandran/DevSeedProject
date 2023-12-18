@@ -7,6 +7,7 @@ use config\constants;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -15,7 +16,7 @@ class HospitalSettings extends Model
 
     public $timestamps = false;
     use HasFactory;
-    protected $table = 'hospitalSettings';
+    protected $table = 'hospitalsettings';
     protected $fillable = [
         'logo',
         'hospitalName',
@@ -86,19 +87,19 @@ class HospitalSettings extends Model
         $skip=$pagination['page'] ==1 ?0:(($pagination['page'] * $pagination['size'])-$pagination['size']);
         $where_sts="is_active=1  ".(($pagination['filters_field'] =="" || $pagination['filters_value']=="")?"":" and ".$pagination['filters_field']." ".$pagination['filters_type']." '".$pagination['filters_value']."%'");
        
-        $hospitalSettingsList['hospitalSettingsList'] = DB::table('hospitalSettings')->selectRaw("logo,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,hospitalName,address,phoneNo,email,inChargePerson,inChargePhoneNo,IF(is_subscribed=0,'No','Yes') as is_subscribed,IF(is_active=0,'In Active','Active') as status")
+        $hospitalSettingsList['hospitalSettingsList'] = DB::table('hospitalsettings')->selectRaw("logo,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,hospitalName,address,phoneNo,email,inChargePerson,inChargePhoneNo,IF(is_subscribed=0,'No','Yes') as is_subscribed,IF(is_active=0,'In Active','Active') as status")
                                                             ->whereRaw($where_sts)
                                                             ->skip($skip)->take($pagination['size']) //pagination
                                                             ->orderBy($pagination['sorters_field'],$pagination['sorters_dir']) 
                                                              ->get();
-        $lastPage=DB::table('hospitalSettings')->whereRaw($where_sts)->count();
+        $lastPage=DB::table('hospitalsettings')->whereRaw($where_sts)->count();
         $hospitalSettingsList['last_page']=ceil($lastPage/$pagination['size']);
         return $hospitalSettingsList;
     }
     public function getHospitalSettingsById($id)
     {
         $where_sts = "id=" . $id;
-        $hospitalDetails = DB::table('hospitalSettings')->selectRaw("logo,hospitalName,address,phoneNo,email,inChargePerson,inChargePhoneNo,IF(is_subscribed=0,'No','Yes') as is_subscribed,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId")
+        $hospitalDetails = DB::table('hospitalsettings')->selectRaw("logo,hospitalName,address,phoneNo,email,inChargePerson,inChargePhoneNo,IF(is_subscribed=0,'No','Yes') as is_subscribed,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId")
             ->whereRaw($where_sts)
             ->first();
         return $hospitalDetails;
@@ -108,7 +109,7 @@ class HospitalSettings extends Model
     {
         $email=$request->email;
         $phoneNo=$request->phoneNo;
-        $hospitalDetailsList = DB::table('hospitalSettings')
+        $hospitalDetailsList = DB::table('hospitalsettings')
             ->select("hospitalName")
             ->where(function ($q) use ($email, $phoneNo) {
                 $q
@@ -136,7 +137,7 @@ class HospitalSettings extends Model
         $phoneNo=$request->phoneNo;
         $hospitalId = "AES_DECRYPT(UNHEX('" . $request->hospitalId . "'), UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))";
         $where_sts="is_active=1 and id <>".$hospitalId;
-        $phoneNoList=DB::table('hospitalSettings')->select('hospitalName')->whereRaw($where_sts) ->where(function ($q) use ($email, $phoneNo) {
+        $phoneNoList=DB::table('hospitalsettings')->select('hospitalName')->whereRaw($where_sts) ->where(function ($q) use ($email, $phoneNo) {
             $q
                 ->Where("phoneNo", "=", $phoneNo)
                 ->orWhere("email", "=", $email);
@@ -144,7 +145,7 @@ class HospitalSettings extends Model
          return $phoneNoList; 
     }
     public static function hospitalActiveList(){
-        $hospitalDetails = DB::table('hospitalSettings')->selectRaw("hospitalName as name,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id")
+        $hospitalDetails = DB::table('hospitalsettings')->selectRaw("hospitalName as name,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id")
             ->where("is_active",1)
             ->get();
         return $hospitalDetails;
@@ -177,7 +178,7 @@ class HospitalSettings extends Model
         $patient_sub_table= DB::table('patients')->selectRaw('hospitalId,COUNT(id) as total_patients')->where('is_active',1)->groupBy('hospitalId');
 
         $dashboard['hospitalWise'] = DB::table('hospitalsettings')
-                                                ->selectRaw('hospitalsettings.hospitalName,hospitalsettings.logo,COUNT(hospitalbranch.id) as total_branches,Max(total_doctors) as total_doctors,Max(total_patients) AS total_patients')
+                                                ->selectRaw('hospitalsettings.hospitalName,hospitalsettings.logo,COALESCE(COUNT(hospitalbranch.id),0) as total_branches,COALESCE(Max(total_doctors),0) as total_doctors,COALESCE(Max(total_patients),0) AS total_patients')
                                                                 ->leftJoin('hospitalbranch', function($join)
                                                                 {
                                                                     $join->on('hospitalbranch.hospitalId', '=', 'hospitalsettings.id')
@@ -203,13 +204,13 @@ class HospitalSettings extends Model
         $patient_sub_table= DB::table('patients')->selectRaw('hospitalId,COUNT(id) as total_patients')->where([['is_active','=',1],['hospitalId','=',$hospitalId]])
                                                 ->groupBy('hospitalId');
 
-        $dashboard['hospitalWiseTotal']= DB::table('hospitalsettings')->selectRaw("COUNT(hospitalbranch.id) as total_branches,MAX(total_doctors) AS total_doctors,MAX(total_patients) AS total_patients")
+        $dashboard['hospitalWiseTotal']= DB::table('hospitalsettings')->selectRaw("COALESCE(COUNT(hospitalbranch.id),0) as total_branches,COALESCE(MAX(total_doctors),0) AS total_doctors,COALESCE(MAX(total_patients),0) AS total_patients")
                                                     ->leftJoin("hospitalbranch", "hospitalbranch.hospitalId","=","hospitalsettings.id")
-                                                    ->joinSub($doctor_sub_table, 'doctor_sub', function (JoinClause $join)
+                                                    ->leftJoinSub($doctor_sub_table, 'doctor_sub', function (JoinClause $join)
                                                                 {
                                                                     $join->on('hospitalsettings.id', '=', 'doctor_sub.hospitalId');
                                                                 })
-                                                    ->joinSub($patient_sub_table, 'patient_sub', function (JoinClause $join)
+                                                    ->leftJoinSub($patient_sub_table, 'patient_sub', function (JoinClause $join)
                                                                 {
                                                                     $join->on('hospitalsettings.id', '=', 'patient_sub.hospitalId');
                                                                 })
@@ -221,13 +222,13 @@ class HospitalSettings extends Model
                                                     ->groupBy('hospitalId','branchId');
         $patient_sub_table1= DB::table('patients')->selectRaw('hospitalId,branchId,COUNT(id) as total_patients')->where([['is_active','=',1],['hospitalId','=',$hospitalId]])
                                                     ->groupBy('hospitalId','branchId');
-        $dashboard['branchWise']=DB::table('hospitalbranch')->selectRaw("hospitalbranch.branchName,hospitalbranch.logo,MAX(total_doctors) AS total_doctors,MAX(total_patients) AS total_patients")
-                                                        ->joinSub($doctor_sub_table1, 'doctor_sub', function (JoinClause $join)
+        $dashboard['branchWise']=DB::table('hospitalbranch')->selectRaw("hospitalbranch.branchName,hospitalbranch.logo,COALESCE(MAX(total_doctors),0) AS total_doctors,COALESCE(MAX(total_patients),0) AS total_patients")
+                                                        ->leftJoinSub($doctor_sub_table1, 'doctor_sub', function (JoinClause $join)
                                                         {
                                                             $join->on('hospitalbranch.id', '=', 'doctor_sub.branchId')
                                                                 ->on('hospitalbranch.hospitalId', '=','doctor_sub.hospitalId');
                                                         })
-                                                        ->joinSub($patient_sub_table1, 'patient_sub', function (JoinClause $join)
+                                                        ->leftJoinSub($patient_sub_table1, 'patient_sub', function (JoinClause $join)
                                                         {
                                                             $join->on('hospitalbranch.id', '=', 'patient_sub.branchId')
                                                                     ->on('hospitalbranch.hospitalId', '=', 'patient_sub.hospitalId');
@@ -267,7 +268,7 @@ class HospitalSettings extends Model
                                                 ->where([['is_active','=',1],['branchId','=',$branchId]])
                                                     ->groupBy('doctorId');
     
-        $dashboard['doctorWiseTotal']= DB::table('doctors')->selectRaw("doctors.name,doctors.profileImage,COALESCE(MAX(total_patient),0) AS total_patient,COALESCE(MAX(total_appointment),0) AS total_appointment")
+        $dashboard['doctorWiseTotal']= DB::table('doctors')->selectRaw("doctors.name,doctors.doctorCodeNo,doctors.profileImage,COALESCE(MAX(total_patient),0) AS total_patient,COALESCE(MAX(total_appointment),0) AS total_appointment")
                                                 ->leftJoin("patients",function (JoinClause $join){
                                                     $join->on('patients.hospitalId', '=', 'doctors.hospitalId')
                                                     ->on('patients.branchId', '=','doctors.branchId')
@@ -278,7 +279,7 @@ class HospitalSettings extends Model
                                                     $join->on('doctors.hospitalId', '=', 'appointment_sub.doctorId');
                                                 })
                                                 ->where([["doctors.is_active","=",1],["doctors.branchId","=",$branchId]])
-                                                ->groupBy("doctors.name","doctors.profileImage")
+                                                ->groupBy("doctors.name","doctors.profileImage","doctors.doctorCodeNo")
                                                 ->get();
         
         return $dashboard;
@@ -314,5 +315,17 @@ class HospitalSettings extends Model
                                                                   ->get()
                                                                   ->toArray();
         return $appointmentStatus;
+    }
+    public static function getSubscribed($userId){
+        $session_hospitalId = Session::get('hospitalId');
+        $hospitalId = "AES_DECRYPT(UNHEX('" . $session_hospitalId . "'), UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))";
+        $where_sts = "id=" . $hospitalId;
+
+                return static::whereRaw($where_sts)->update(
+                    [
+                        'is_subscribed'=>1,
+                        'updated_by' => $userId,
+                    ]
+                );
     }
 }

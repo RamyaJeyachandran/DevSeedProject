@@ -4,7 +4,9 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Carbon\Carbon;
+use App\Models\loginLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AuthController;
 use Laravel\Sanctum\PersonalAccessToken;
@@ -67,6 +69,11 @@ class CustomizedAuthentication
                 [AuthController::class, 'login'], ['errorMsg' =>'Session expired. Please login again.']
             );
         }
+        $loginLog=new loginLog;
+        $id=Auth::user()->id;
+        $url = url()->current();
+        $loginLog->addLoginLog($id,$url);
+        
         return $next($request);
     }
 }

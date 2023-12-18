@@ -89586,39 +89586,11 @@ __webpack_require__.r(__webpack_exports__);
   window.addEventListener("load", function (e) {
     e.preventDefault();
     var pathname = window.location.pathname;
-    var base_url = window.location.origin;
-    var searchPatient = "showPatient";
-    if (pathname.indexOf(searchPatient) != -1) {
-      pathname = searchPatient;
-    }
-    var SearchDoctor = "showDoctor";
-    if (pathname.indexOf(SearchDoctor) != -1) {
-      pathname = SearchDoctor;
-    }
-    var SearchHospital = "showHospital";
-    if (pathname.indexOf(SearchHospital) != -1) {
-      pathname = SearchHospital;
-    }
-    var SearchBranch = "showBranch";
-    if (pathname.indexOf(SearchBranch) != -1) {
-      pathname = SearchBranch;
-    }
-    var SearchBranch = "ConsentForm";
-    if (pathname.indexOf(SearchBranch) != -1) {
-      pathname = "/ConsentForm";
-    }
-    var SearchAppointment = "showAppointment";
-    if (pathname.indexOf(SearchAppointment) != -1) {
-      pathname = SearchAppointment;
-    }
-    var PrintSemenAnalysis = "PrintSemenAnalysis";
-    if (pathname.indexOf(PrintSemenAnalysis) != -1) {
-      pathname = PrintSemenAnalysis;
-    }
-    var ShowSemenAnalysis = "ShowSemenAnalysis";
-    if (pathname.indexOf(ShowSemenAnalysis) != -1) {
-      pathname = ShowSemenAnalysis;
-    }
+    var base_url = window.location.origin; // publish +'/seed/public'
+    localStorage.setItem("base_url", base_url);
+    var serverPath = ''; // '/seed/public/index.php';
+    var serverPath2 = ''; // '/seed/public'
+
     function setMenu($lnkControl, $ulControl) {
       $($lnkControl).addClass("side-menu--active");
       $($ulControl).addClass("side-menu__sub-open");
@@ -89632,170 +89604,199 @@ __webpack_require__.r(__webpack_exports__);
         $($aMobile).addClass("menu--active");
       }
     }
-    console.log(pathname);
-    switch (pathname) {
-      case '/Home':
-        $("[id*=lnkDashboard]").addClass("side-menu--active");
-        $("[id*=lnkMobileDashboard]").addClass("menu--active");
-        getAppointmentStatusChart();
-        break;
-      case '/login':
-      case '/Hospital':
-        setMenu("[id*=lnkHospital]", "[id*=ulHospital]");
-        setMobileMenu("[id*=lnkMobileHospital]", "[id*=ulMobileHospital]", "[id*=aMobileHospital]", "[id*=aMobileHpSearch]", 0);
-        break;
-      case '/SearchHospital':
+    if (pathname == serverPath + '/Home' || pathname == serverPath2 + '/Home') {
+      $("[id*=lnkDashboard]").addClass("side-menu--active");
+      $("[id*=lnkMobileDashboard]").addClass("menu--active");
+      getAppointmentStatusChart();
+    }
+    if (pathname == serverPath + '/login' || pathname == serverPath + '/Hospital' || pathname == serverPath2 + '/login' || pathname == serverPath2 + '/Hospital') {
+      setMenu("[id*=lnkHospital]", "[id*=ulHospital]");
+      setMobileMenu("[id*=lnkMobileHospital]", "[id*=ulMobileHospital]", "[id*=aMobileHospital]", "[id*=aMobileHpSearch]", 0);
+    }
+    if (pathname == serverPath + '/SearchHospital' || pathname == serverPath2 + '/SearchHospital')
+      //.indexOf('SearchHospital') != -1
+      {
         setMenu("[id*=lnkHospital]", "[id*=ulHospital]");
         setMobileMenu("[id*=lnkMobileHospital]", "[id*=ulMobileHospital]", "[id*=aMobileHospital]", "[id*=aMobileHpSearch]", 1);
         setHospitalTabulator();
-        break;
-      case 'showHospital':
-        setMenu("[id*=lnkHospital]", "[id*=ulHospital]");
-        setMobileMenu("[id*=lnkMobileHospital]", "[id*=ulMobileHospital]", "[id*=aMobileHospital]", "[id*=aMobileHpSearch]", 0);
-        $("#txtLogo").on('change', function () {
-          $("#txtImageChanged").val(1);
-        });
-        break;
-      case '/Doctor':
-        $("#txtDOB").val('');
-        setMenu("[id*=lnkDoctor]", "[id*=ulDoctor]");
-        setMobileMenu("[id*=lnkMobileDoctor]", "[id*=ulMobileDoctor]", "[id*=aMobileDoctor]", "[id*=aMobileDrSearch]", 0);
-        addDoctorLoadEvent(base_url);
-        localStorage.setItem("pageType", 0);
+      }
+    if (pathname.indexOf('showHospital') != -1) {
+      setMenu("[id*=lnkHospital]", "[id*=ulHospital]");
+      setMobileMenu("[id*=lnkMobileHospital]", "[id*=ulMobileHospital]", "[id*=aMobileHospital]", "[id*=aMobileHpSearch]", 0);
+      $("#txtLogo").on('change', function () {
+        $("#txtImageChanged").val(1);
+      });
+    }
+    if (pathname == serverPath + '/Doctor' || pathname == serverPath2 + '/Doctor') {
+      $("#txtDOB").val('');
+      setMenu("[id*=lnkDoctor]", "[id*=ulDoctor]");
+      setMobileMenu("[id*=lnkMobileDoctor]", "[id*=ulMobileDoctor]", "[id*=aMobileDoctor]", "[id*=aMobileDrSearch]", 0);
+      addDoctorLoadEvent(base_url);
+      loadHospital(base_url);
+    }
+    if (pathname == serverPath + '/SearchDoctor' || pathname == serverPath2 + '/SearchDoctor') {
+      setMenu("[id*=lnkDoctor]", "[id*=ulDoctor]");
+      setMobileMenu("[id*=lnkMobileDoctor]", "[id*=ulMobileDoctor]", "[id*=aMobileDoctor]", "[id*=aMobileDrSearch]", 1);
+      setDoctorTabulator();
+    }
+    if (pathname.indexOf('showDoctor') != -1) {
+      setMenu("[id*=lnkDoctor]", "[id*=ulDoctor]");
+      setMobileMenu("[id*=lnkMobileDoctor]", "[id*=ulMobileDoctor]", "[id*=aMobileDoctor]", "[id*=aMobileDrSearch]", 0);
+      $("#txtProfileImage").on('change', function () {
+        $("#txtImageChanged").val(1);
+        $(imgProfileImage).attr("src", $(txtProfileImage).val());
+      });
+      $("#txtSignature").on('change', function () {
+        $("#txtSignChanged").val(1);
+      });
+    }
+    if (pathname == serverPath + '/Patient' || pathname == serverPath2 + '/Patient') {
+      setMenu("[id*=lnkPatient]", "[id*=ulPatient]");
+      setMobileMenu("[id*=lnkMobilePatient]", "[id*=ulMobilePatient]", "[id*=aMobilePatients]", "[id*=aMobilePatientSearch]", 0);
+      addPatientLoadEvent(pathname, base_url, serverPath, serverPath2);
+      loadHospital(base_url);
+    }
+    if (pathname == serverPath + '/SearchPatient' || pathname == serverPath2 + '/SearchPatient') {
+      setMenu("[id*=lnkPatient]", "[id*=ulPatient]");
+      setMobileMenu("[id*=lnkMobilePatient]", "[id*=ulMobilePatient]", "[id*=aMobilePatients]", "[id*=aMobilePatientSearch]", 1);
+      setTabulator();
+    }
+    if (pathname == serverPath + '/RefferedBy' || pathname == serverPath2 + '/RefferedBy') {
+      setMenu("[id*=lnkPatient]", "[id*=ulPatient]");
+      setMobileMenu("[id*=lnkMobilePatient]", "[id*=ulMobilePatient]", "[id*=aMobilePatients]", "[id*=aMobileRefferedBy]", 1);
+      setRefferedBy();
+    }
+    if (pathname.indexOf('viewRefferedBy') != -1) {
+      setMenu("[id*=lnkPatient]", "[id*=ulPatient]");
+      setMobileMenu("[id*=lnkMobilePatient]", "[id*=ulMobilePatient]", "[id*=aMobilePatients]", "[id*=aMobileRefferedBy]", 1);
+    }
+    if (pathname.indexOf('showPatient') != -1) {
+      setMenu("[id*=lnkPatient]", "[id*=ulPatient]");
+      setMobileMenu("[id*=lnkMobilePatient]", "[id*=ulMobilePatient]", "[id*=aMobilePatients]", "[id*=aMobilePatientSearch]", 0);
+      editPatientLoadEvent();
+    }
+    if (pathname == serverPath + '/Branch' || pathname == serverPath2 + '/Branch') {
+      setMenu("[id*=lnkBranch]", "[id*=ulBranch]");
+      setMobileMenu("[id*=lnkMobileBranch]", "[id*=ulMobileBranch]", "[id*=aMobileBranch]", "[id*=aMobileBrSearch]", 0);
+      addBranchLoadEvent(base_url);
+    }
+    if (pathname == serverPath + '/SearchBranch' || pathname == serverPath2 + '/SearchBranch') {
+      setMenu("[id*=lnkBranch]", "[id*=ulBranch]");
+      setMobileMenu("[id*=lnkMobileBranch]", "[id*=ulMobileBranch]", "[id*=aMobileBranch]", "[id*=aMobileBrSearch]", 1);
+      setBranchTabulator();
+    }
+    if (pathname.indexOf('showBranch') != -1) {
+      setMenu("[id*=lnkBranch]", "[id*=ulBranch]");
+      setMobileMenu("[id*=lnkMobileBranch]", "[id*=ulMobileBranch]", "[id*=aMobileBranch]", "[id*=aMobileBrSearch]", 0);
+      $("#txtLogo").on('change', function () {
+        $("#txtImageChanged").val(1);
+      });
+    }
+    if (pathname.indexOf('ConsentForm') != -1) {
+      setMenu("[id*=lnkConsentForm]", "[id*=ulConsentForm]");
+      setMobileMenu("[id*=lnkMobileConsent]", "[id*=ulMobileConsent]", "[id*=aMobileConsent]", "[id*=aMobilePatientConsent]", 1);
+      consentFormOnLoad();
+    }
+    if (pathname == serverPath + "/SearchConsent" || pathname == serverPath2 + "/SearchConsent") {
+      setMenu("[id*=lnkConsentForm]", "[id*=ulConsentForm]");
+      setMobileMenu("[id*=lnkMobileConsent]", "[id*=ulMobileConsent]", "[id*=aMobileConsent]", "[id*=aMobilePatientConsent]", 1);
+      setConsentTabulator();
+    }
+    if (pathname == serverPath + "/ViewConsent" || pathname == serverPath2 + "/ViewConsent") {
+      setMenu("[id*=lnkConsentForm]", "[id*=ulConsentForm]");
+      setMobileMenu("[id*=lnkMobileConsent]", "[id*=ulMobileConsent]", "[id*=aMobileConsent]", "[id*=aMobilePatientConsent]", 1);
+      loadViewConsentForm();
+    }
+    if (pathname == serverPath + "/subscribe" || pathname == serverPath2 + "/subscribe") {
+      $("[id*=lnkSubscribe]").addClass("side-menu--active");
+      $("[id*=lnkMobileSubscribe]").addClass("menu--active");
+      loadSubscribeHospital(base_url);
+      $("#btnPlan1").addClass('hidden');
+    }
+    if (pathname == serverPath + "/DonorBank" || pathname == serverPath2 + "/DonorBank") {
+      $("[id*=lnkDonor]").addClass("side-menu--active");
+      $("[id*=lnkMobileDonor]").addClass("menu--active");
+      setDonor();
+    }
+    if (pathname == serverPath + '/PatientAppointment' || pathname == serverPath2 + '/PatientAppointment') {
+      setMenu("[id*=lnkAppointment]", "[id*=ulAppointment]");
+      setMobileMenu("[id*=lnkMobileAppointment]", "[id*=ulMobileAppointment]", "[id*=aMobileAppointment]", "[id*=aMobileAppointmentSearch]", 0);
+      addAppointmentLoadEvent(base_url);
+      loadHospital(base_url);
+    }
+    if (pathname == serverPath + '/AllAppointments' || pathname == serverPath2 + '/AllAppointments') {
+      setMenu("[id*=lnkAppointment]", "[id*=ulAppointment]");
+      setMobileMenu("[id*=lnkMobileAppointment]", "[id*=ulMobileAppointment]", "[id*=aMobileAppointment]", "[id*=aMobileAppointmentSearch]", 0);
+      $("#divDateSearch").addClass('hidden');
+      $("input#tbAppointment-html-filter-value-1").hide();
+      $("#tbAppointment-html-filter-value-1-label").hide();
+      setAppointmentTabulator();
+    }
+    if (pathname == serverPath + '/TodayAppointments' || pathname == serverPath2 + '/TodayAppointments') {
+      setMenu("[id*=lnkAppointment]", "[id*=ulAppointment]");
+      setMobileMenu("[id*=lnkMobileAppointment]", "[id*=ulMobileAppointment]", "[id*=aMobileAppointment]", "[id*=aMobileAppointmentSearch]", 0);
+      setTodayAppointmentTabulator();
+    }
+    if (pathname.indexOf('showAppointment') != -1) {
+      setMenu("[id*=lnkAppointment]", "[id*=ulAppointment]");
+      setMobileMenu("[id*=lnkMobileAppointment]", "[id*=ulMobileAppointment]", "[id*=aMobileAppointment]", "[id*=aMobileAppointmentSearch]", 1);
+    }
+    if (pathname == serverPath + '/SemenAnalysis' || pathname == serverPath2 + '/SemenAnalysis') {
+      setMenu("[id*=lnkSemenAnalysis]", "[id*=ulSemenAnalysis]");
+      setMobileMenu("[id*=lnkMobileSemenAnalysis]", "[id*=ulMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", 0);
+      var ddlBranch = document.getElementById('ddlBranch');
+      var ddlHospital = document.getElementById('ddlHospital');
+      if (ddlBranch == null && ddlHospital == null) {
+        getPatientDoctor();
+      } else {
         loadHospital(base_url);
-        break;
-      case '/SearchDoctor':
-        setMenu("[id*=lnkDoctor]", "[id*=ulDoctor]");
-        setMobileMenu("[id*=lnkMobileDoctor]", "[id*=ulMobileDoctor]", "[id*=aMobileDoctor]", "[id*=aMobileDrSearch]", 1);
-        setDoctorTabulator();
-        break;
-      case "showDoctor":
-        setMenu("[id*=lnkDoctor]", "[id*=ulDoctor]");
-        setMobileMenu("[id*=lnkMobileDoctor]", "[id*=ulMobileDoctor]", "[id*=aMobileDoctor]", "[id*=aMobileDrSearch]", 0);
-        $("#txtProfileImage").on('change', function () {
-          $("#txtImageChanged").val(1);
-          $(imgProfileImage).attr("src", $(txtProfileImage).val());
-        });
-        $("#txtSignature").on('change', function () {
-          $("#txtSignChanged").val(1);
-        });
-        break;
-      case '/Patient':
-        setMenu("[id*=lnkPatient]", "[id*=ulPatient]");
-        setMobileMenu("[id*=lnkMobilePatient]", "[id*=ulMobilePatient]", "[id*=aMobilePatients]", "[id*=aMobilePatientSearch]", 0);
-        addPatientLoadEvent(pathname, base_url);
-        localStorage.setItem("pageType", 0);
-        loadHospital(base_url);
-        break;
-      case '/SearchPatient':
-        setMenu("[id*=lnkPatient]", "[id*=ulPatient]");
-        setMobileMenu("[id*=lnkMobilePatient]", "[id*=ulMobilePatient]", "[id*=aMobilePatients]", "[id*=aMobilePatientSearch]", 1);
-        setTabulator();
-        break;
-      case 'showPatient':
-        setMenu("[id*=lnkPatient]", "[id*=ulPatient]");
-        setMobileMenu("[id*=lnkMobilePatient]", "[id*=ulMobilePatient]", "[id*=aMobilePatients]", "[id*=aMobilePatientSearch]", 0);
-        editPatientLoadEvent();
-        break;
-      case '/Branch':
-        setMenu("[id*=lnkBranch]", "[id*=ulBranch]");
-        setMobileMenu("[id*=lnkMobileBranch]", "[id*=ulMobileBranch]", "[id*=aMobileBranch]", "[id*=aMobileBrSearch]", 0);
-        addBranchLoadEvent(base_url);
-        break;
-      case '/SearchBranch':
-        setMenu("[id*=lnkBranch]", "[id*=ulBranch]");
-        setMobileMenu("[id*=lnkMobileBranch]", "[id*=ulMobileBranch]", "[id*=aMobileBranch]", "[id*=aMobileBrSearch]", 1);
-        setBranchTabulator();
-        break;
-      case 'showBranch':
-        setMenu("[id*=lnkBranch]", "[id*=ulBranch]");
-        setMobileMenu("[id*=lnkMobileBranch]", "[id*=ulMobileBranch]", "[id*=aMobileBranch]", "[id*=aMobileBrSearch]", 0);
-        $("#txtLogo").on('change', function () {
-          $("#txtImageChanged").val(1);
-        });
-        break;
-      case "/ConsentForm":
-        setMenu("[id*=lnkConsentForm]", "[id*=ulConsentForm]");
-        setMobileMenu("[id*=lnkMobileConsent]", "[id*=ulMobileConsent]", "[id*=aMobileConsent]", "[id*=aMobilePatientConsent]", 1);
-        consentFormOnLoad();
-        break;
-      case "/SearchConsent":
-        setMenu("[id*=lnkConsentForm]", "[id*=ulConsentForm]");
-        setMobileMenu("[id*=lnkMobileConsent]", "[id*=ulMobileConsent]", "[id*=aMobileConsent]", "[id*=aMobilePatientConsent]", 1);
-        setConsentTabulator();
-        break;
-      case "/ViewConsent":
-        setMenu("[id*=lnkConsentForm]", "[id*=ulConsentForm]");
-        setMobileMenu("[id*=lnkMobileConsent]", "[id*=ulMobileConsent]", "[id*=aMobileConsent]", "[id*=aMobilePatientConsent]", 1);
-        loadViewConsentForm();
-        break;
-      case "/subscribe":
-        $("[id*=lnkSubscribe]").addClass("side-menu--active");
-        $("[id*=lnkMobileSubscribe]").addClass("menu--active");
-        break;
-      case '/PatientAppointment':
-        setMenu("[id*=lnkAppointment]", "[id*=ulAppointment]");
-        setMobileMenu("[id*=lnkMobileAppointment]", "[id*=ulMobileAppointment]", "[id*=aMobileAppointment]", "[id*=aMobileAppointmentSearch]", 0);
-        addAppointmentLoadEvent(base_url);
-        localStorage.setItem("pageType", 0);
-        loadHospital(base_url);
-        break;
-      case '/AllAppointments':
-        setMenu("[id*=lnkAppointment]", "[id*=ulAppointment]");
-        setMobileMenu("[id*=lnkMobileAppointment]", "[id*=ulMobileAppointment]", "[id*=aMobileAppointment]", "[id*=aMobileAppointmentSearch]", 0);
-        $("#divDateSearch").addClass('hidden');
-        $("input#tbAppointment-html-filter-value-1").hide();
-        $("#tbAppointment-html-filter-value-1-label").hide();
-        setAppointmentTabulator();
-        break;
-      case 'showAppointment':
-        setMenu("[id*=lnkAppointment]", "[id*=ulAppointment]");
-        setMobileMenu("[id*=lnkMobileAppointment]", "[id*=ulMobileAppointment]", "[id*=aMobileAppointment]", "[id*=aMobileAppointmentSearch]", 1);
-        break;
-      case '/TodayAppointments':
-        setMenu("[id*=lnkAppointment]", "[id*=ulAppointment]");
-        setMobileMenu("[id*=lnkMobileAppointment]", "[id*=ulMobileAppointment]", "[id*=aMobileAppointment]", "[id*=aMobileAppointmentSearch]", 0);
-        setTodayAppointmentTabulator();
-        break;
-      case '/SemenAnalysis':
-        setMenu("[id*=lnkSemenAnalysis]", "[id*=ulSemenAnalysis]");
-        setMobileMenu("[id*=lnkMobileSemenAnalysis]", "[id*=ulMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", 0);
-        localStorage.setItem("pageType", 1);
-        var ddlBranch = document.getElementById('ddlBranch');
-        var ddlHospital = document.getElementById('ddlHospital');
-        if (ddlBranch == null && ddlHospital == null) {
-          getPatientDoctor();
-        } else {
-          loadHospital(base_url);
-        }
-        semenAnalysisFormOnLoad(base_url);
-        break;
-      case 'PrintSemenAnalysis':
-        setMenu("[id*=lnkSemenAnalysis]", "[id*=ulSemenAnalysis]");
-        setMobileMenu("[id*=lnkMobileSemenAnalysis]", "[id*=ulMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", 1);
-        break;
-      case '/SearchSemenAnalysis':
-        setMenu("[id*=lnkSemenAnalysisSearch]", "[id*=ulSemenAnalysis]");
-        setMobileMenu("[id*=lnkMobileSemenAnalysis]", "[id*=ulMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", 1);
-        $("#divDateSearch").addClass('hidden');
-        $("input#tbSemen-html-filter-value-1").hide();
-        $("#tbSemen-html-filter-value-1-label").hide();
-        setSemenAnalysisTabulator();
-        break;
-      case 'ShowSemenAnalysis':
-        setMenu("[id*=lnkSemenAnalysis]", "[id*=ulSemenAnalysis]");
-        setMobileMenu("[id*=lnkMobileSemenAnalysis]", "[id*=ulMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", 0);
-        break;
-      case '/PatientReport':
-        setMenu("[id*=lnkPatientReport]", "[id*=ulReport]");
-        setMobileMenu("[id*=lnkMobileReport]", "[id*=ulMobilePatientReport]", "[id*=aMobilePatientReport]", "[id*=aMobileSemenAnalysis]", 0);
-        loadYear();
-        localStorage.setItem("pageType", 1);
-        loadHospital(base_url);
-        break;
+      }
+      semenAnalysisFormOnLoad(base_url);
+    }
+    if (pathname.indexOf('PrintSemenAnalysis') != -1) {
+      setMenu("[id*=lnkSemenAnalysis]", "[id*=ulSemenAnalysis]");
+      setMobileMenu("[id*=lnkMobileSemenAnalysis]", "[id*=ulMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", 1);
+    }
+    if (pathname == serverPath + '/SearchSemenAnalysis' || pathname == serverPath2 + '/SearchSemenAnalysis') {
+      setMenu("[id*=lnkSemenAnalysisSearch]", "[id*=ulSemenAnalysis]");
+      setMobileMenu("[id*=lnkMobileSemenAnalysis]", "[id*=ulMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", 1);
+      $("#divDateSearch").addClass('hidden');
+      $("input#tbSemen-html-filter-value-1").hide();
+      $("#tbSemen-html-filter-value-1-label").hide();
+      setSemenAnalysisTabulator();
+    }
+    if (pathname.indexOf('ShowSemenAnalysis') != -1) {
+      setMenu("[id*=lnkSemenAnalysis]", "[id*=ulSemenAnalysis]");
+      setMobileMenu("[id*=lnkMobileSemenAnalysis]", "[id*=ulMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", "[id*=aMobileSemenAnalysis]", 0);
+    }
+    if (pathname == serverPath + '/PatientReport' || pathname == serverPath2 + '/PatientReport') {
+      setMenu("[id*=lnkPatientReport]", "[id*=ulReport]");
+      setMobileMenu("[id*=lnkMobileReport]", "[id*=ulMobilePatientReport]", "[id*=aMobilePatientReport]", "[id*=aMobileSemenAnalysis]", 0);
+      loadYear();
+      loadHospital(base_url);
+      hideReportOption();
+    }
+    if (pathname == serverPath + '/AssignDoctor' || pathname == serverPath2 + '/AssignDoctor') {
+      setMenu("[id*=lnkDoctor]", "[id*=ulDoctor]");
+      setMobileMenu("[id*=lnkMobileReport]", "[id*=ulMobilePatientReport]", "[id*=aMobilePatientReport]", "[id*=aMobileSemenAnalysis]", 0);
+      loadHospitalForAssign(base_url);
+    }
+    if (pathname == serverPath + '/ListAssignedDoctor' || pathname == serverPath2 + '/ListAssignedDoctor') {
+      setMenu("[id*=lnkDoctor]", "[id*=ulDoctor]");
+      setMobileMenu("[id*=lnkMobileReport]", "[id*=ulMobilePatientReport]", "[id*=aMobilePatientReport]", "[id*=aMobileSemenAnalysis]", 0);
+      loadHospital(base_url);
+      setAssignDoctorTabulator();
+    }
+    if (pathname == serverPath + '/PatientDetails' || pathname == serverPath2 + '/PatientDetails') {
+      setMenu("[id*=lnkPatientDetails]", "[id*=ulReport]");
+      setMobileMenu("[id*=lnkMobileReport]", "[id*=ulMobilePatientReport]", "[id*=aMobilePatientReport]", "[id*=aMobilePatientDetails]", 0);
+      loadHospital(base_url);
+      $("#divPrintPatientDetails").addClass('hidden');
+      $("#divPrintPatientButton").addClass("hidden");
     }
     return;
   });
+
   /*--------------------------------------- Edit Patient Load Event--BEGIN ---------------------*/
   function editPatientLoadEvent() {
     if ($("#ddlRefferedBy").val() == 'Doctor') {
@@ -89823,8 +89824,8 @@ __webpack_require__.r(__webpack_exports__);
   /*--------------------------------------- Edit Patient Load Event--END ---------------------*/
 
   /* ------------------------------------------ Add Patient Begin -----------------------*/
-  function addPatientLoadEvent(pathname, base_url) {
-    if (pathname == '/Patient') {
+  function addPatientLoadEvent(pathname, base_url, serverPath, serverPath2) {
+    if (pathname == serverPath + '/Patient' || pathname == serverPath2 + '/Patient') {
       $("#txtDOB").val('');
       $("#divDocName").hide();
       $("#divDocHpName").hide();
@@ -89898,7 +89899,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/updatePatient';
       fetch(url, options).then(function (response) {
         return response.json();
@@ -89942,7 +89943,8 @@ __webpack_require__.r(__webpack_exports__);
       // Setup Tabulator
       var token = $('#txtToken').val();
       var table = new tabulator_tables__WEBPACK_IMPORTED_MODULE_1__["default"]("#tbPatient", {
-        ajaxURL: window.location.origin + "/api/patientList",
+        ajaxURL: localStorage.getItem("base_url") + "/api/patientList",
+        //window.location.origin+"/api/patientList",
         ajaxParams: {
           "hospitalId": hospitalId,
           "branchId": branchId
@@ -90038,7 +90040,7 @@ __webpack_require__.r(__webpack_exports__);
               viewPatient(cell.getData().id);
             });
             $(a).find(".edit").on("click", function () {
-              window.location.href = window.location.origin + "/showPatient/" + cell.getData().id;
+              window.location.href = localStorage.getItem("base_url") + "/showPatient/" + cell.getData().id;
             });
             $(a).find(".delete").on("click", function () {
               var deleteModal = tailwind.Modal.getInstance(document.querySelector("#delete-modal-preview"));
@@ -90140,7 +90142,7 @@ __webpack_require__.r(__webpack_exports__);
 
   /*------------------------ View Patient Begin ------------------------------*/
   function viewPatient($patientId) {
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var url = base_url + '/api/patientInfo/' + $patientId;
     var token = $('#txtToken').val();
     var options = {
@@ -90160,6 +90162,7 @@ __webpack_require__.r(__webpack_exports__);
         $('#lblName span').text(data.patientDetails.name);
         $('#lblPhoneNo span').text(data.patientDetails.phoneNo);
         $('#lblEmail span').text(data.patientDetails.email);
+        $('#lblAadharCardNo span').text(data.patientDetails.aadharCardNo);
         $('#lblDob span').text(data.patientDetails.dob);
         $('#lblAge span').text(data.patientDetails.age);
         $('#lblGender span').text(data.patientDetails.gender);
@@ -90174,6 +90177,8 @@ __webpack_require__.r(__webpack_exports__);
         $('#lblReason span').text(data.patientDetails.reason);
         $('#lblSpouseName span').text(data.patientDetails.spouseName);
         $('#lblSpousePhNo span').text(data.patientDetails.spousePhnNo);
+        $('#lblAttendingDoctor span').text(data.patientDetails.attendingDoctor);
+        $('#lblRefferedByDoctor span').text(data.patientDetails.refferedById);
         var viewModal = tailwind.Modal.getInstance(document.querySelector("#divViewPatient"));
         viewModal.show();
         $("#tbPrintPatient").on("click", function () {
@@ -90211,6 +90216,14 @@ __webpack_require__.r(__webpack_exports__);
   $("#btnCancelPatient").on("click", function () {
     window.scrollTo(0, 0);
   });
+  /*adhaar-number verification */
+  $("#txtAadharCardNo").on("keyup", function () {
+    var value = $("#txtAadharCardNo").val();
+    value = value.replace(/\D/g, "").split(/(?:([\d]{4}))/g).filter(function (s) {
+      return s.length > 0;
+    }).join("-");
+    $("#txtAadharCardNo").val(value);
+  });
 
   /* --------------- Patient Add form submit Begins ------------------------*/
 
@@ -90233,7 +90246,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/addPatient';
       var errorModal = tailwind.Modal.getInstance(document.querySelector("#divPatientErrorModal"));
       fetch(url, options).then(function (response) {
@@ -90247,6 +90260,9 @@ __webpack_require__.r(__webpack_exports__);
             successModal.show();
             document.getElementById("frmPatient").reset();
             $(imgProfileImage).attr("src", "");
+            $("#ddlBranch option").remove();
+            $("#ddlBranch").append($("<option></option>").val(0).html("Select Branch"));
+            $("#divBranchddl").addClass('hidden');
           }
         } else {
           $('#divErrorHead span').text(data.Success);
@@ -90268,7 +90284,7 @@ __webpack_require__.r(__webpack_exports__);
   //Back to search from update/delete Begin
   $("#btnRedirect").on("click", function () {
     window.scrollTo(0, 0);
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     window.location.href = base_url + "/SearchPatient";
   });
 
@@ -90276,7 +90292,7 @@ __webpack_require__.r(__webpack_exports__);
 
   /*----------------------------------- Delete Patient By ID bEGINS -------------------------*/
   function deletePatient(patientId, userId) {
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var url = base_url + '/api/deletePatient/' + patientId + '/' + userId;
     var token = $('#txtToken').val();
     var options = {
@@ -90311,12 +90327,11 @@ __webpack_require__.r(__webpack_exports__);
   }
 
   /*----------------------------------- Delete Patient By ID END -------------------------
-  ==============================================================================================================================================
-                                                      ==========================================Doctor=====================================
-  ==============================================================================================================================================
+  
   ---------------------------------Load Add doctor DropDown  ctrl--BEGIN --------------------------- */
   function loadHospital(base_url) {
     var ddlBranch = document.getElementById('ddlBranch');
+    var ddlPatient = document.getElementById('ddlPatient');
     var token = $('#txtToken').val();
     var options = {
       method: 'GET',
@@ -90338,14 +90353,15 @@ __webpack_require__.r(__webpack_exports__);
       }
     });
     var hospitalId = $('#txtHospital').val();
-    var type = localStorage.getItem("pageType");
-    var ddlUrl = base_url + '/api/loadBranch/' + hospitalId;
-    if (ddlBranch != null) {
+    if (ddlBranch !== null) {
+      var ddlUrl = base_url + '/api/loadBranch/' + hospitalId;
       fetch(ddlUrl, options).then(function (response) {
         return response.json();
       }).then(function (result) {
         // Load Branch
         var listBranch = result.branchList;
+        $("#ddlBranch option").remove();
+        $("#ddlBranch").append($("<option></option>").val(0).html("Select Branch"));
         if (listBranch.length != 0) {
           listBranch.forEach(function (value, key) {
             $("#ddlBranch").append($("<option></option>").val(value.id).html(value.branchName));
@@ -90353,19 +90369,23 @@ __webpack_require__.r(__webpack_exports__);
           $("#divBranchddl").removeClass("hidden").removeAttr("style");
         } else {
           $("#divBranchddl").addClass('hidden');
-          if (type == 1) {
+          if (ddlPatient !== null) {
             getPatientDoctor();
           }
         }
       });
     } else {
-      getPatientDoctor();
+      if (hospitalId > 0 && ddlPatient !== null) {
+        getPatientDoctor();
+      } else {
+        clearddlForSemen();
+      }
     }
   }
   $("#ddlBranch").on('change', function () {
-    var type = localStorage.getItem("pageType");
     $('#txtBranch').val($("#ddlBranch").val());
-    if (type == 1) {
+    var ddlPatient = document.getElementById('ddlPatient');
+    if (ddlPatient !== null) {
       getPatientDoctor();
     }
   });
@@ -90381,10 +90401,9 @@ __webpack_require__.r(__webpack_exports__);
         Authorization: 'Bearer ' + token
       }
     };
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var ddlUrl = base_url + '/api/loadBranch/' + hospitalId;
-    console.log(ddlBranch);
-    if (ddlBranch != null) {
+    if (ddlBranch !== null) {
       fetch(ddlUrl, options).then(function (response) {
         return response.json();
       }).then(function (result) {
@@ -90457,7 +90476,7 @@ __webpack_require__.r(__webpack_exports__);
         }
       };
       // delete options.headers['Content-Type'];
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/addDoctor';
       var drerrorModal = tailwind.Modal.getInstance(document.querySelector("#divDoctorErrorModal"));
       fetch(url, options).then(function (response) {
@@ -90471,6 +90490,9 @@ __webpack_require__.r(__webpack_exports__);
             var successModal = tailwind.Modal.getInstance(document.querySelector("#success-modal-preview"));
             successModal.show();
             document.getElementById("frmDoctor").reset();
+            $("#ddlBranch option").remove();
+            $("#ddlBranch").append($("<option></option>").val(0).html("Select Branch"));
+            $("#divBranchddl").addClass('hidden');
           }
         } else {
           $('#divDrErrorHead span').text(data.Success);
@@ -90504,7 +90526,7 @@ __webpack_require__.r(__webpack_exports__);
       var token = $('#txtToken').val();
       // Setup Tabulator
       var table = new tabulator_tables__WEBPACK_IMPORTED_MODULE_1__["default"]("#tbDoctor", {
-        ajaxURL: window.location.origin + "/api/doctorList",
+        ajaxURL: localStorage.getItem("base_url") + "/api/doctorList",
         ajaxParams: {
           "hospitalId": hospitalId,
           "branchId": branchId
@@ -90617,7 +90639,7 @@ __webpack_require__.r(__webpack_exports__);
               viewDoctor(cell.getData().id);
             });
             $(a).find(".edit").on("click", function () {
-              window.location.href = window.location.origin + "/showDoctor/" + cell.getData().id;
+              window.location.href = localStorage.getItem("base_url") + "/showDoctor/" + cell.getData().id;
             });
             $(a).find(".delete").on("click", function () {
               var deleteModal = tailwind.Modal.getInstance(document.querySelector("#delete-modal-preview"));
@@ -90742,9 +90764,9 @@ __webpack_require__.r(__webpack_exports__);
   }
   /*------------------------ Search Doctor End ------------------------*/
 
-  /*----------------------------------- Delete Patient By ID bEGINS -------------------------*/
+  /*----------------------------------- Delete Doctor By ID BEGINS -------------------------*/
   function deleteDoctor(doctorId, userId) {
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var token = $('#txtToken').val();
     var url = base_url + '/api/deleteDoctor/' + doctorId + '/' + userId;
     var errorModal = tailwind.Modal.getInstance(document.querySelector("#divDoctorErrorModal"));
@@ -90779,10 +90801,10 @@ __webpack_require__.r(__webpack_exports__);
     });
   }
 
-  /*----------------------------------- Delete Patient By ID END -------------------------*/
+  /*----------------------------------- Delete Doctor By ID END -------------------------*/
   /*------------------------ View Doctor Begin ------------------------------*/
   function viewDoctor($doctorId) {
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var url = base_url + '/api/doctorInfo/' + $doctorId;
     var token = $('#txtToken').val();
     var options = {
@@ -90831,7 +90853,7 @@ __webpack_require__.r(__webpack_exports__);
   /*------------------------ View Doctor End ------------------------------*/
   /*------------------------ View Signature Begin ------------------------------*/
   function viewSignature($doctorId) {
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var url = base_url + '/api/doctorSignature/' + $doctorId;
     var token = $('#txtToken').val();
     var options = {
@@ -90849,7 +90871,6 @@ __webpack_require__.r(__webpack_exports__);
         var signatureDetails = data.signatureDetails;
         var signDiv = '';
         signatureDetails.forEach(function (value, key) {
-          console.log(value.signature);
           signDiv = signDiv + '<div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y"> <div class="box p-5 zoom-in"><img src="' + value.signature + '" /></div></div>';
         });
         document.getElementById('divSignature').innerHTML = signDiv;
@@ -90893,7 +90914,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/updateDoctor';
       var errorDrModal = tailwind.Modal.getInstance(document.querySelector("#divErrorEditDoctor"));
       fetch(url, options).then(function (response) {
@@ -90923,7 +90944,7 @@ __webpack_require__.r(__webpack_exports__);
   /*-------------------------------------------------Edit Doctor Ends -----------------------------*/
   $("#btnDrRedirect").on("click", function () {
     window.scrollTo(0, 0);
-    window.location.href = window.location.origin + "/SearchDoctor";
+    window.location.href = localStorage.getItem("base_url") + "/SearchDoctor";
   });
   function deleteSignature() {
     alert("called");
@@ -90935,6 +90956,7 @@ __webpack_require__.r(__webpack_exports__);
     //Hospital registeration
     hospitalFrom.addEventListener("submit", function (e) {
       e.preventDefault();
+      var drerrorModal = tailwind.Modal.getInstance(document.querySelector("#divHospitalErrorModal"));
       var hospitalData = new FormData(hospitalFrom);
       var file = document.querySelector('#txtLogo').files[0];
       if (file != null) {
@@ -90949,9 +90971,8 @@ __webpack_require__.r(__webpack_exports__);
         },
         body: hospitalData
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/addHospital';
-      var drerrorModal = tailwind.Modal.getInstance(document.querySelector("#divHospitalErrorModal"));
       fetch(url, options).then(function (response) {
         return response.json();
       }).then(function (data) {
@@ -90993,7 +91014,7 @@ __webpack_require__.r(__webpack_exports__);
       }; // On submit filter form
       // Setup Tabulator
       var table = new tabulator_tables__WEBPACK_IMPORTED_MODULE_1__["default"]("#tbHospital", {
-        ajaxURL: window.location.origin + "/api/hospitalList",
+        ajaxURL: localStorage.getItem("base_url") + "/api/hospitalList",
         ajaxConfig: {
           method: "GET",
           //set request type to Position
@@ -91089,7 +91110,7 @@ __webpack_require__.r(__webpack_exports__);
               viewHospital(cell.getData().id);
             });
             $(a).find(".edit").on("click", function () {
-              window.location.href = window.location.origin + "/showHospital/" + cell.getData().id;
+              window.location.href = localStorage.getItem("base_url") + "/showHospital/" + cell.getData().id;
             });
             $(a).find(".delete").on("click", function () {
               var deleteModal = tailwind.Modal.getInstance(document.querySelector("#divDeleteHospital"));
@@ -91203,7 +91224,7 @@ __webpack_require__.r(__webpack_exports__);
   /*------------------------ Search Hospital End ------------------------*/
   /*------------------------ View Hospital Begin ------------------------------*/
   function viewHospital($hospitalId) {
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var token = $('#txtToken').val();
     var url = base_url + '/api/hospitalInfo/' + $hospitalId;
     var options = {
@@ -91242,7 +91263,7 @@ __webpack_require__.r(__webpack_exports__);
   /*------------------------ View Hospital End ------------------------------*/
   /*----------------------------------- Delete Hospital By ID BEGINS -------------------------*/
   function deleteHospital(hospitalId, userId) {
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var token = $('#txtToken').val();
     var url = base_url + '/api/deleteHospital/' + hospitalId + '/' + userId;
     var errorModal = tailwind.Modal.getInstance(document.querySelector("#divHospitalErrorModal"));
@@ -91297,7 +91318,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/updateHospital';
       var errorDrModal = tailwind.Modal.getInstance(document.querySelector("#divErrorEditHospital"));
       fetch(url, options).then(function (response) {
@@ -91326,7 +91347,7 @@ __webpack_require__.r(__webpack_exports__);
   /*-------------------------------------------------Edit Hospital Ends -----------------------------*/
   $("#btnHsRedirect").on("click", function () {
     window.scrollTo(0, 0);
-    window.location.href = window.location.origin + "/SearchHospital";
+    window.location.href = localStorage.getItem("base_url") + "/SearchHospital";
   });
   /* ------------------------------------------ Add Branch Begin -----------------------*/
   function addBranchLoadEvent(base_url) {
@@ -91371,7 +91392,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/addBranch';
       var brerrorModal = tailwind.Modal.getInstance(document.querySelector("#divBranchErrorModal"));
       fetch(url, options).then(function (response) {
@@ -91416,7 +91437,7 @@ __webpack_require__.r(__webpack_exports__);
       var token = $('#txtToken').val();
       // Setup Tabulator
       var table = new tabulator_tables__WEBPACK_IMPORTED_MODULE_1__["default"]("#tbBranch", {
-        ajaxURL: window.location.origin + "/api/branchList",
+        ajaxURL: localStorage.getItem("base_url") + "/api/branchList",
         ajaxParams: {
           "hospitalId": hospitalId
         },
@@ -91523,7 +91544,7 @@ __webpack_require__.r(__webpack_exports__);
               viewBranch(cell.getData().id);
             });
             $(a).find(".edit").on("click", function () {
-              window.location.href = window.location.origin + "/showBranch/" + cell.getData().id;
+              window.location.href = localStorage.getItem("base_url") + "/showBranch/" + cell.getData().id;
             });
             $(a).find(".delete").on("click", function () {
               var deleteModal = tailwind.Modal.getInstance(document.querySelector("#divDeleteBranch"));
@@ -91638,7 +91659,7 @@ __webpack_require__.r(__webpack_exports__);
   /*------------------------ View Branch Begin ------------------------------*/
   function viewBranch($branchId) {
     var token = $('#txtToken').val();
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var url = base_url + '/api/branchInfo/' + $branchId;
     var options = {
       method: 'GET',
@@ -91678,7 +91699,7 @@ __webpack_require__.r(__webpack_exports__);
   /*----------------------------------- Delete Branch By ID BEGINS -------------------------*/
   function deleteBranch(branchId, userId) {
     var token = $('#txtToken').val();
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var url = base_url + '/api/deleteBranch/' + branchId + '/' + userId;
     var errorModal = tailwind.Modal.getInstance(document.querySelector("#divBranchErrorModal"));
     var options = {
@@ -91732,7 +91753,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/updateBranch';
       var errorDrModal = tailwind.Modal.getInstance(document.querySelector("#divErrorEditHospital"));
       fetch(url, options).then(function (response) {
@@ -91761,7 +91782,7 @@ __webpack_require__.r(__webpack_exports__);
   /*-------------------------------------------------Edit Branch Ends -----------------------------*/
   $("#btnbrRedirect").on("click", function () {
     window.scrollTo(0, 0);
-    window.location.href = window.location.origin + "/SearchBranch";
+    window.location.href = localStorage.getItem("base_url") + "/SearchBranch";
   });
   /*-------------------------------------- Consent Form --------------------------------------*/
   function consentFormOnLoad() {
@@ -91773,7 +91794,7 @@ __webpack_require__.r(__webpack_exports__);
       $("#divRegPanel").addClass('hidden');
       $("#divNewPanel").removeClass("hidden").removeAttr("style");
       document.getElementById('btnPrintConsent').disabled = false;
-      document.getElementById('btnPrintAllConsent').disabled = false;
+      // document.getElementById('btnPrintAllConsent').disabled = false; 
     } else {
       $("#txtRegNo").val('');
     }
@@ -91802,15 +91823,15 @@ __webpack_require__.r(__webpack_exports__);
         newWin.close();
       }, 10);
     });
-    $('#btnSaveConsent').on("click", function () {
-      saveConsentForm();
-    });
+    // $('#btnSaveConsent').on("click",function(){
+    //     saveConsentForm();
+    // });
   }
   /*----------------- clear consent form -----------*/
   function clearConsentForm() {
     sessionStorage.removeItem("selectedForm");
     document.getElementById('btnPrintConsent').disabled = true;
-    document.getElementById('btnPrintAllConsent').disabled = true;
+    // document.getElementById('btnPrintAllConsent').disabled = true;
     document.getElementById('divFormNameList').innerHTML = "";
     document.getElementById('divConsentContent').innerHTML = '<div class="mx-auto text-center"><div class="font-medium">Please click the form to view</div></div>';
     $('#divConsentHeader span').text("");
@@ -91823,7 +91844,7 @@ __webpack_require__.r(__webpack_exports__);
   function getPatientFormInfo() {
     var selectedForm = [];
     var index_id;
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var errorDrModal = tailwind.Modal.getInstance(document.querySelector("#divConsentErrorModal"));
     var hospitalId = $("#txtHospital").val();
     var branchId = $("#txtBranch").val() == "" ? 0 : $("#txtBranch").val();
@@ -91842,6 +91863,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
+      displayLoading();
       fetch(url, options).then(function (response) {
         return response.json();
       }).then(function (data) {
@@ -91870,7 +91892,6 @@ __webpack_require__.r(__webpack_exports__);
                     selectedForm.push(value.id);
                   }
                 } else if (!this.checked) {
-                  isSaved = 1;
                   index_id = selectedForm.indexOf(value.id);
                   if (index_id >= 0) {
                     selectedForm.splice(index_id, 1);
@@ -91884,8 +91905,23 @@ __webpack_require__.r(__webpack_exports__);
               display_formContent = display_formContent.replaceAll("@hospitalName ", data.patientDetails.hospitalName);
               display_formContent = display_formContent.replaceAll("@hospitalAddress ", data.patientDetails.hospitalAddress);
               display_formContent = display_formContent.replaceAll("@patientName", data.patientDetails.name);
+              display_formContent = display_formContent.replaceAll("@patientPhoneNo", data.patientDetails.phoneNo);
+              display_formContent = display_formContent.replaceAll("@patientAddress", data.patientDetails.address);
               display_formContent = display_formContent.replaceAll("@spouseName", data.patientDetails.spouseName);
+              display_formContent = display_formContent.replaceAll("@aadharCardNo", data.patientDetails.aadharCardNo);
               display_formContent = display_formContent.replaceAll("@date", currentDate);
+              display_formContent = display_formContent.replaceAll("@place", data.patientDetails.city);
+              display_formContent = display_formContent.replaceAll("@witnessName", data.patientDetails.witnessHospital);
+              display_formContent = display_formContent.replaceAll("@witnessAddress", data.patientDetails.witnessHospAddress);
+              display_formContent = display_formContent.replaceAll("@witnessBankName", data.patientDetails.witnessBank);
+              display_formContent = display_formContent.replaceAll("@witnessBankAddress", data.patientDetails.witnessBankAddress);
+              display_formContent = display_formContent.replaceAll("@donorBankName", data.patientDetails.donorBankName);
+              display_formContent = display_formContent.replaceAll("@donorBankAddress", data.patientDetails.donorBankAddress);
+              display_formContent = display_formContent.replaceAll("@attendingDoctor", data.patientDetails.attendingDoctor);
+              display_formContent = display_formContent.replaceAll("@attendingDoctorAddress", data.patientDetails.attendingDoctorAddress);
+              display_formContent = display_formContent.replaceAll("@counsellor", data.patientDetails.counsellor);
+              display_formContent = display_formContent.replaceAll("@counsellorAddress", data.patientDetails.counsellorAddress);
+              display_formContent = display_formContent.replaceAll("@shapeImg", base_url + "/images/shape1.png");
               document.getElementById('divConsentContent').innerHTML = display_formContent;
               $('#divConsentHeader span').text(value.formName);
             });
@@ -91913,6 +91949,7 @@ __webpack_require__.r(__webpack_exports__);
           $('#divPhoneNo span').text(data.patientDetails.phoneNo);
           $('#divAddress span').text(data.patientDetails.address);
           $('#divState span').text(data.patientDetails.stat);
+          $('#divAadharCardNo span').text(data.patientDetails.aadharCardNo);
           $('#divGender span').text(data.patientDetails.gender);
           $('#divDob span').text(data.patientDetails.dob);
           $('#divAge span').text(data.patientDetails.age);
@@ -91922,18 +91959,13 @@ __webpack_require__.r(__webpack_exports__);
           $('#divSpouseName span').text(data.patientDetails.spouseName);
           $('#divSpousePhoneNo span').text(data.patientDetails.spousePhnNo);
           $('#divReason span').text(data.patientDetails.reason);
-          $('#divReferedBy span').text(data.patientDetails.refferedBy);
-          if (data.patientDetails.refferedBy == "Doctor") {
-            $('#divDoctorName span').text(data.patientDetails.refDoctorName);
-            $('#divDrHospital span').text(data.patientDetails.refDrHospitalName);
-            $('#lblDrName').text("Doctor Name :");
-            $('#lblDrHospital').text("Doctor hospital :");
-          } else {
-            $('#divDoctorName span').text("");
-            $('#divDrHospital span').text("");
-            $('#lblDrName').text("");
-            $('#lblDrHospital').text("");
-          }
+          $('#divReferedBy span').text(data.patientDetails.counsellor);
+          $('#divWitnessHospital span').text(data.patientDetails.witnessHospital);
+          $('#divWitnessBank span').text(data.patientDetails.witnessBank);
+          $('#divDonorBankName span').text(data.patientDetails.donorBankName);
+          $('#divDonorBankAddress span').text(data.patientDetails.donorBankAddress);
+          $('#divAttendingDoctor span').text(data.patientDetails.attendingDoctor);
+
           // Patient Information --- END
           $("#divProfile").removeClass("hidden").removeAttr("style");
           $("#divFormList").removeClass("hidden").removeAttr("style");
@@ -91945,6 +91977,7 @@ __webpack_require__.r(__webpack_exports__);
             errorDrModal.show();
           }
         }
+        hideLoading();
       })["catch"](function (error) {
         $('#divErrorHead span').text('Error');
         $('#divErrorMsg span').text(error);
@@ -91954,54 +91987,56 @@ __webpack_require__.r(__webpack_exports__);
   }
   /*----------------------------------------------- Display Patient Info and Consent Form END -------------------------------------*/
   /*--------------------------- Save CONSENT FORM BEGIN ------------------------------*/
-  function saveConsentForm() {
-    var selectedForm = sessionStorage.getItem("selectedForm");
-    var errorModal = tailwind.Modal.getInstance(document.querySelector("#divConsentErrorModal"));
-    if (selectedForm == null || selectedForm.length == 0) {
-      $('#divErrorHead span').text('Validation Error');
-      $('#divErrorMsg span').text("Please select the any one of the consent form");
-      errorModal.show();
-      return;
-    }
-    var patientDetails = {
-      "userId": $("#txtUser").val(),
-      "patientId": $("#txtPatientId").val(),
-      "consentFormList": selectedForm
-    };
-    var token = $('#txtToken').val();
-    var base_url = window.location.origin;
-    var url = base_url + '/api/savePatientConsent';
-    var options = {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + token
-      },
-      body: JSON.stringify(patientDetails)
-    };
-    fetch(url, options).then(function (response) {
-      return response.json();
-    }).then(function (data) {
-      if (data.Success == 'Success') {
-        $('#divMsg span').text(data.Message);
-        if (data.ShowModal == 1) {
-          var successModal = tailwind.Modal.getInstance(document.querySelector("#divSuccessModal"));
-          successModal.show();
-          document.getElementById('btnPrintConsent').disabled = false;
-          document.getElementById('btnPrintAllConsent').disabled = false;
-          $('#txtRegNo').val('');
-        }
-      } else {
-        $('#divErrorHead span').text(data.Success);
-        $('#divErrorMsg span').text(data.Message);
-        if (data.ShowModal == 1) {
-          errorModal.show();
-        }
+  var consentForm = document.getElementById('frmPatientConsentForm');
+  if (consentForm != null) {
+    consentForm.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var selectedForm = sessionStorage.getItem("selectedForm");
+      var errorModal = tailwind.Modal.getInstance(document.querySelector("#divConsentErrorModal"));
+      if (selectedForm == null || selectedForm.length == 0) {
+        $('#divErrorHead span').text('Validation Error');
+        $('#divErrorMsg span').text("Please select the any one of the consent form");
+        errorModal.show();
+        return;
       }
-    })["catch"](function (error) {
-      $('#divErrorHead span').text('Error');
-      $('#divErrorMsg span').text(error);
-      errorModal.show();
+      var consentdata = new FormData(consentForm);
+      consentdata.append('consentFormList', selectedForm);
+      var token = $('#txtToken').val();
+      var options = {
+        method: "POST",
+        body: consentdata,
+        headers: {
+          Accept: 'application/json',
+          Authorization: 'Bearer ' + token
+        }
+      };
+      var base_url = localStorage.getItem("base_url");
+      var url = base_url + '/api/savePatientConsent';
+      fetch(url, options).then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        if (data.Success == 'Success') {
+          $('#divMsg span').text(data.Message);
+          if (data.ShowModal == 1) {
+            var successModal = tailwind.Modal.getInstance(document.querySelector("#divSuccessModal"));
+            successModal.show();
+            document.getElementById('btnPrintConsent').disabled = false;
+            // document.getElementById('btnPrintAllConsent').disabled = false;   
+            $('#txtRegNo').val('');
+          }
+        } else {
+          $('#divErrorHead span').text(data.Success);
+          $('#divErrorMsg span').text(data.Message);
+          if (data.ShowModal == 1) {
+            errorModal.show();
+          }
+        }
+      })["catch"](function (error) {
+        $('#divErrorHead span').text('Error');
+        $('#divErrorMsg span').text(error);
+        errorModal.show();
+      });
+      window.scrollTo(0, 0);
     });
   }
   /*--------------------------- Save CONSENT FORM END ------------------------------*/
@@ -92021,7 +92056,7 @@ __webpack_require__.r(__webpack_exports__);
       var branchId = $("#txtBranch").val();
       var token = $('#txtToken').val();
       var table = new tabulator_tables__WEBPACK_IMPORTED_MODULE_1__["default"]("#tbConsent", {
-        ajaxURL: window.location.origin + "/api/patientConsentList",
+        ajaxURL: localStorage.getItem("base_url") + "/api/patientConsentList",
         ajaxParams: {
           "hospitalId": hospitalId,
           "branchId": branchId
@@ -92123,7 +92158,7 @@ __webpack_require__.r(__webpack_exports__);
           formatter: function formatter(cell, formatterParams) {
             var a = $("<div class=\"flex lg:justify-center items-center text-info\">\n                            <a class=\"edit flex items-center mr-3 text-primary\" href=\"javascript:;\">\n                                <i data-lucide=\"check-square\" class=\"w-5 h-5 mr-1\"></i> \n                            </a>\n                        </div>");
             $(a).find(".edit").on("click", function () {
-              window.location.href = window.location.origin + "/ConsentForm/" + cell.getData().hcNo;
+              window.location.href = localStorage.getItem("base_url") + "/ConsentForm/" + cell.getData().hcNo;
             });
             return a[0];
           }
@@ -92226,7 +92261,7 @@ __webpack_require__.r(__webpack_exports__);
   }
   /*------------------------ Search Hospital End ------------------------*/
   function loadViewConsentForm() {
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var hospitalId = $("#txtHospital").val();
     var branchId = $("#txtBranch").val() == "" ? 0 : $("#txtBranch").val();
     var url = base_url + '/api/consentFormList/' + hospitalId + '/' + branchId + '/' + 0;
@@ -92238,6 +92273,7 @@ __webpack_require__.r(__webpack_exports__);
         Authorization: 'Bearer ' + token
       }
     };
+    displayLoading();
     fetch(url, options).then(function (response) {
       return response.json();
     }).then(function (data) {
@@ -92256,12 +92292,16 @@ __webpack_require__.r(__webpack_exports__);
                 $(el).removeClass("hidden").removeAttr("style");
               });
             });
-            document.getElementById('divConsentContent').innerHTML = value.formContent;
+            var display_formContent = value.formContent;
+            display_formContent = display_formContent.replaceAll("@shapeImg", base_url + "/images/shape1.png");
+            document.getElementById('divConsentContent').innerHTML = display_formContent;
             $('#divConsentHeader span').text(value.formName);
+            window.scrollTo(0, 0);
           });
           i = i + 1;
         });
       }
+      hideLoading();
     });
   }
   function take_snapshot() {
@@ -92434,7 +92474,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/addPatientAppointment';
       var errorModal = tailwind.Modal.getInstance(document.querySelector("#divErrorAppointment"));
       fetch(url, options).then(function (response) {
@@ -92449,6 +92489,9 @@ __webpack_require__.r(__webpack_exports__);
             clearTabData(1);
             clearTabData(2);
             document.getElementById("frmAppointment").reset();
+            $("#ddlBranch option").remove();
+            $("#ddlBranch").append($("<option></option>").val(0).html("Select Branch"));
+            $("#divBranchddl").addClass('hidden');
           }
         } else {
           $('#divAppErrorHead span').text(data.Success);
@@ -92494,7 +92537,7 @@ __webpack_require__.r(__webpack_exports__);
       // Setup Tabulator
       var token = $('#txtToken').val();
       var table = new tabulator_tables__WEBPACK_IMPORTED_MODULE_1__["default"]("#tbAppointment", {
-        ajaxURL: window.location.origin + "/api/appointmentList",
+        ajaxURL: localStorage.getItem("base_url") + "/api/appointmentList",
         ajaxParams: {
           "hospitalId": hospitalId,
           "branchId": branchId,
@@ -92605,7 +92648,7 @@ __webpack_require__.r(__webpack_exports__);
               viewPatientAppointment(cell.getData().id);
             });
             $(a).find(".edit").on("click", function () {
-              window.location.href = window.location.origin + "/showAppointment/" + cell.getData().id + "/1";
+              window.location.href = localStorage.getItem("base_url") + "/showAppointment/" + cell.getData().id + "/1";
             });
             $(a).find(".delete").on("click", function () {
               var deleteModal = tailwind.Modal.getInstance(document.querySelector("#divDeleteAppointment"));
@@ -92751,7 +92794,7 @@ __webpack_require__.r(__webpack_exports__);
   });
   /*------------------------ View Patient Appointment Begin ------------------------------*/
   function viewPatientAppointment($appointmentId) {
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var url = base_url + '/api/patientAppointmentInfo/' + $appointmentId;
     var token = $('#txtToken').val();
     var options = {
@@ -92803,7 +92846,7 @@ __webpack_require__.r(__webpack_exports__);
   /*------------------------ View Patient Appointment End ------------------------------*/
   /*----------------------------------- Delete Patient Appointment By ID bEGINS -------------------------*/
   function deleteAppointment(appointmentId, userId) {
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var url = base_url + '/api/deleteAppointment/' + appointmentId + '/' + userId;
     var token = $('#txtToken').val();
     var options = {
@@ -92860,7 +92903,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/updateAppointment';
       fetch(url, options).then(function (response) {
         return response.json();
@@ -92888,7 +92931,7 @@ __webpack_require__.r(__webpack_exports__);
   /*-------------------------------------------------Edit patient Ends -----------------------------*/
   $("#btnAppointmentRedirect").on("click", function () {
     window.scrollTo(0, 0);
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var type = $('#txtType').val();
     if (type == 1) {
       window.location.href = base_url + "/AllAppointments";
@@ -92914,7 +92957,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/updateStatus';
       fetch(url, options).then(function (response) {
         return response.json();
@@ -92955,7 +92998,7 @@ __webpack_require__.r(__webpack_exports__);
       // Setup Tabulator
       var token = $('#txtToken').val();
       var table = new tabulator_tables__WEBPACK_IMPORTED_MODULE_1__["default"]("#tbAppointment", {
-        ajaxURL: window.location.origin + "/api/appointmentList",
+        ajaxURL: localStorage.getItem("base_url") + "/api/appointmentList",
         ajaxParams: {
           "hospitalId": hospitalId,
           "branchId": branchId,
@@ -93066,7 +93109,7 @@ __webpack_require__.r(__webpack_exports__);
               viewPatientAppointment(cell.getData().id);
             });
             $(a).find(".edit").on("click", function () {
-              window.location.href = window.location.origin + "/showAppointment/" + cell.getData().id + "/2";
+              window.location.href = localStorage.getItem("base_url") + "/showAppointment/" + cell.getData().id + "/2";
             });
             $(a).find(".delete").on("click", function () {
               var deleteModal = tailwind.Modal.getInstance(document.querySelector("#divDeleteAppointment"));
@@ -93199,7 +93242,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/resetPassword';
       var errorModal = tailwind.Modal.getInstance(document.querySelector("#divPasswordErrorModal"));
       fetch(url, options).then(function (response) {
@@ -93227,7 +93270,7 @@ __webpack_require__.r(__webpack_exports__);
   }
   $("#btnReLogin").on("click", function () {
     window.scrollTo(0, 0);
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     window.location.href = base_url + "/logout";
   });
   /*---------------------------------------------- Doctor Dashboard Appointment status CHART BEGIN ----------------------------*/
@@ -93243,7 +93286,7 @@ __webpack_require__.r(__webpack_exports__);
             Authorization: 'Bearer ' + token
           }
         };
-        var base_url = window.location.origin;
+        var base_url = localStorage.getItem("base_url");
         var url = base_url + '/api/appointmentStatusChart/' + id;
         var _errorModal2 = tailwind.Modal.getInstance(document.querySelector("#divDashboardErrorModal"));
         var chart_data = "";
@@ -93368,7 +93411,7 @@ __webpack_require__.r(__webpack_exports__);
     });
     // Patient change Event
     $("#ddlPatient").on('change', function () {
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var patientId = $("#ddlPatient").val();
       var url = base_url + '/api/patientInfo/' + patientId;
       fetch(url, options).then(function (response) {
@@ -93398,7 +93441,7 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/addSemenAnalysis';
       var errorModal = tailwind.Modal.getInstance(document.querySelector("#warning-modal-preview"));
       fetch(url, options).then(function (response) {
@@ -93411,7 +93454,10 @@ __webpack_require__.r(__webpack_exports__);
             document.getElementById("frmSemenAnalysis").reset();
             var ddlBranch = document.getElementById('ddlBranch');
             var ddlHospital = document.getElementById('ddlHospital');
-            if (ddlBranch !== null || ddlHospital != null) {
+            if (ddlBranch !== null || ddlHospital !== null) {
+              $("#ddlBranch option").remove();
+              $("#ddlBranch").append($("<option></option>").val(0).html("Select Branch"));
+              $("#divBranchddl").addClass('hidden');
               $("#ddlPatient option").remove();
               $("#ddlPatient").append($("<option></option>").val(0).html("Select Patient"));
               $("#ddlDoctor option").remove();
@@ -93442,7 +93488,7 @@ __webpack_require__.r(__webpack_exports__);
   $("#btnSemenSuccessPrint").on("click", function () {
     window.scrollTo(0, 0);
     var id = $('#txtId').val();
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     window.location.href = base_url + "/PrintSemenAnalysis/" + id;
   });
   /*---------------------- PRINT SEMEN ANALYSIS -------------------*/
@@ -93461,7 +93507,7 @@ __webpack_require__.r(__webpack_exports__);
     frameDoc.document.write('<html><head><title>DIV Contents</title>');
     frameDoc.document.write('</head><body>');
     //Append the external CSS file.
-    var styleLocation = window.location.origin + "/dist/css/app.css";
+    var styleLocation = localStorage.getItem("base_url") + "/dist/css/app.css";
     frameDoc.document.write("<link rel='stylesheet' href='" + styleLocation + "' />");
     //Append the DIV contents.
     frameDoc.document.write(contents);
@@ -93489,14 +93535,12 @@ __webpack_require__.r(__webpack_exports__);
           Authorization: 'Bearer ' + token
         }
       };
-      var base_url = window.location.origin;
+      var base_url = localStorage.getItem("base_url");
       var url = base_url + '/api/updateSemenAnalysis';
-      console.log(url);
       var errorModal = tailwind.Modal.getInstance(document.querySelector("#warning-modal-preview"));
       fetch(url, options).then(function (response) {
         return response.json();
       }).then(function (data) {
-        console.log(data);
         if (data.Success == 'Success') {
           $('#divMsg span').text(data.Message);
           if (data.ShowModal == 1) {
@@ -93521,37 +93565,52 @@ __webpack_require__.r(__webpack_exports__);
   /*-------------------------------------------------Update semen analysis update Ends -----------------------------*/
   /* Get Patient and Doctor for Semen Analysis -- BEGIN */
   function getPatientDoctor() {
-    var token = $('#txtToken').val();
-    var options = {
-      method: "GET",
-      headers: {
-        Accept: 'application/json',
-        Authorization: 'Bearer ' + token
-      }
-    };
-    var hospitalId = $('#txtHospital').val();
-    var branchId = $('#txtBranch').val();
-    var base_url = window.location.origin;
-    var url = base_url + '/api/getPatientDoctor/' + hospitalId + "/" + branchId;
-    $("#ddlPatient option").remove();
-    $("#ddlPatient").append($("<option></option>").val(0).html("Select Patient"));
-    fetch(url, options).then(function (response) {
-      return response.json();
-    }).then(function (result) {
-      var patientList = result.patientList;
-      if (patientList != null) {
-        patientList.forEach(function (value, key) {
-          $("#ddlPatient").append($("<option></option>").val(value.id).html(value.name));
-        });
-      }
-      var doctorList = result.doctorList;
-      if (doctorList != null) {
-        loadDoctorddl('ddlDoctor', doctorList);
-        loadDoctorddl('ddlScientist1', doctorList);
-        loadDoctorddl('ddlScientist2', doctorList);
-        loadDoctorddl('ddlMedicalDirector', doctorList);
-      }
-    });
+    var ddlPatient = document.getElementById('ddlPatient');
+    if (ddlPatient !== null) {
+      var token = $('#txtToken').val();
+      var options = {
+        method: "GET",
+        headers: {
+          Accept: 'application/json',
+          Authorization: 'Bearer ' + token
+        }
+      };
+      var hospitalId = $('#txtHospital').val();
+      var branchId = $('#txtBranch').val();
+      var base_url = localStorage.getItem("base_url");
+      var url = base_url + '/api/getPatientDoctor/' + hospitalId + "/" + branchId;
+      $("#ddlPatient option").remove();
+      $("#ddlPatient").append($("<option></option>").val(0).html("Select Patient"));
+      fetch(url, options).then(function (response) {
+        return response.json();
+      }).then(function (result) {
+        var patientList = result.patientList;
+        if (patientList != null) {
+          patientList.forEach(function (value, key) {
+            $("#ddlPatient").append($("<option></option>").val(value.id).html(value.name));
+          });
+        }
+        var doctorList = result.doctorList;
+        if (doctorList != null) {
+          var ddlDoctor = document.getElementById("ddlDoctor");
+          if (ddlDoctor !== null) {
+            loadDoctorddl('ddlDoctor', doctorList);
+          }
+          var ddlScientist1 = document.getElementById("ddlScientist1");
+          if (ddlScientist1 !== null) {
+            loadDoctorddl('ddlScientist1', doctorList);
+          }
+          var ddlScientist2 = document.getElementById("ddlScientist2");
+          if (ddlScientist2 !== null) {
+            loadDoctorddl('ddlScientist2', doctorList);
+          }
+          var ddlMedicalDirector = document.getElementById("ddlMedicalDirector");
+          if (ddlMedicalDirector !== null) {
+            loadDoctorddl('ddlMedicalDirector', doctorList);
+          }
+        }
+      });
+    }
   }
   function loadDoctorddl(ddlCtrl, doctorList) {
     var ddloption = "#" + ddlCtrl + " option";
@@ -93560,6 +93619,33 @@ __webpack_require__.r(__webpack_exports__);
     doctorList.forEach(function (value, key) {
       $("#" + ddlCtrl).append($("<option></option>").val(value.id).html(value.name));
     });
+  }
+  function clearddlForSemen() {
+    var ddlPatient = document.getElementById("ddlPatient");
+    var ddlDoctor = document.getElementById("ddlDoctor");
+    var ddlScientist1 = document.getElementById("ddlScientist1");
+    var ddlScientist2 = document.getElementById("ddlScientist2");
+    var ddlMedicalDirector = document.getElementById("ddlMedicalDirector");
+    if (ddlPatient !== null) {
+      $("#ddlPatient option").remove();
+      $("#ddlPatient").append($("<option></option>").val(0).html("Select Patient"));
+    }
+    if (ddlDoctor !== null) {
+      $("#ddlDoctor option").remove();
+      $("#ddlDoctor").append($("<option></option>").val(0).html("Select Doctor"));
+    }
+    if (ddlScientist1 !== null) {
+      $("#ddlScientist1 option").remove();
+      $("#ddlScientist1").append($("<option></option>").val(0).html("Select Doctor"));
+    }
+    if (ddlScientist2 !== null) {
+      $("#ddlScientist2 option").remove();
+      $("#ddlScientist2").append($("<option></option>").val(0).html("Select Doctor"));
+    }
+    if (ddlMedicalDirector !== null) {
+      $("#ddlMedicalDirector option").remove();
+      $("#ddlMedicalDirector").append($("<option></option>").val(0).html("Select Doctor"));
+    }
   }
   /* Get Patient and Doctor for Semen Analysis --END */
   /*------------------------------------------- Semen Analysis Search BEGIN -------------------------*/
@@ -93583,7 +93669,7 @@ __webpack_require__.r(__webpack_exports__);
       // Setup Tabulator
       var token = $('#txtToken').val();
       var table = new tabulator_tables__WEBPACK_IMPORTED_MODULE_1__["default"]("#tbSemen", {
-        ajaxURL: window.location.origin + "/api/SemenAnalysisList",
+        ajaxURL: localStorage.getItem("base_url") + "/api/SemenAnalysisList",
         ajaxParams: {
           "hospitalId": hospitalId,
           "branchId": branchId
@@ -93677,10 +93763,10 @@ __webpack_require__.r(__webpack_exports__);
           formatter: function formatter(cell, formatterParams) {
             var a = $("<div class=\"flex lg:justify-center items-center text-info\">\n                            <a class=\"tooltip view flex items-center mr-3 tooltip\" title=\"Print Semen Details\" href=\"javascript:;\">\n                                <i data-lucide=\"printer\" class=\"w-5 h-5 mr-1\"></i> \n                            </a>\n                            <a class=\"tooltip edit flex items-center mr-3 text-primary tooltip\" title=\"Edit Semen Details\" href=\"javascript:;\">\n                                <i data-lucide=\"check-square\" class=\"w-5 h-5 mr-1\"></i> \n                            </a>\n                            <a class=\"tooltip delete flex items-center text-danger tooltip\" title=\"Delete Details\" href=\"javascript:;\">\n                                <i data-lucide=\"trash-2\" class=\"w-5 h-5 mr-1\"></i> \n                            </a>\n                        </div>");
             $(a).find(".view").on("click", function () {
-              window.location.href = window.location.origin + "/PrintSemenAnalysis/" + cell.getData().id;
+              window.location.href = localStorage.getItem("base_url") + "/PrintSemenAnalysis/" + cell.getData().id;
             });
             $(a).find(".edit").on("click", function () {
-              window.location.href = window.location.origin + "/ShowSemenAnalysis/" + cell.getData().id;
+              window.location.href = localStorage.getItem("base_url") + "/ShowSemenAnalysis/" + cell.getData().id;
             });
             $(a).find(".delete").on("click", function () {
               var deleteModal = tailwind.Modal.getInstance(document.querySelector("#divDeleteSemen"));
@@ -93815,7 +93901,7 @@ __webpack_require__.r(__webpack_exports__);
   });
   /*----------------------------------- Delete Patient Semen Analysis By ID BEGINS -------------------------*/
   function deleteSemenAnalysis(semenId, userId) {
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var url = base_url + '/api/deleteSemenAnalysis/' + semenId + '/' + userId;
     var token = $('#txtToken').val();
     var options = {
@@ -93852,7 +93938,7 @@ __webpack_require__.r(__webpack_exports__);
   /*----------------------------------- Delete Patient Semen Analysis By ID END -------------------------*/
   $("#btnSemenAnalysisSuccess").on("click", function () {
     window.scrollTo(0, 0);
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     window.location.href = base_url + "/SearchSemenAnalysis";
   });
   $("#ddlScientist1").on('change', function () {
@@ -93865,7 +93951,7 @@ __webpack_require__.r(__webpack_exports__);
     getSignatureValue('ddlMedicalDirector', 'divRightSignature', 'ddlCenterSignDoctorId', 'rightsigndoctorId');
   });
   function getSignatureValue(ddlCtrl, divName, ddlSignCtrl, ddlSignCtrlName) {
-    var base_url = window.location.origin;
+    var base_url = localStorage.getItem("base_url");
     var doctorId = $("#" + ddlCtrl).val();
     var url = base_url + '/api/doctorSignature/' + doctorId;
     var token = $('#txtToken').val();
@@ -93889,6 +93975,7 @@ __webpack_require__.r(__webpack_exports__);
       document.getElementById(divName).innerHTML = divSignature;
     });
   }
+  /*-------------- Report Load Year -----------------*/
   function loadYear() {
     var dateDropdown = document.getElementById('ddlYear');
     var currentYear = new Date().getFullYear();
@@ -93901,6 +93988,1497 @@ __webpack_require__.r(__webpack_exports__);
       currentYear -= 1;
     }
   }
+  /*------------------------------ Report Option ------------------*/
+  $('#ddlReport').on('change', function () {
+    var reportType = $('#ddlReport').val();
+    switch (reportType) {
+      case '1':
+        $("#divMonth").addClass('hidden');
+        $("#divYear").addClass('hidden');
+        $("#divDateRange").removeClass("hidden").removeAttr("style");
+        break;
+      case '2':
+        $("#divYear").addClass('hidden');
+        $("#divDateRange").addClass('hidden');
+        $("#divMonth").removeClass("hidden").removeAttr("style");
+        break;
+      case '3':
+        $("#divDateRange").addClass('hidden');
+        $("#divMonth").addClass('hidden');
+        $("#divYear").removeClass("hidden").removeAttr("style");
+        break;
+      default:
+        hideReportOption();
+        break;
+    }
+  });
+  function hideReportOption() {
+    $("#divDateRange").addClass('hidden');
+    $("#divYear").addClass('hidden');
+    $("#divMonth").addClass('hidden');
+    /*Hide Table*/
+    $("#divPrintButton").addClass('hidden');
+    $("#divPrintContent").addClass('hidden');
+    $("#divPrintReport").addClass('hidden');
+    $("#divReportPatient").addClass('hidden');
+    $("#divReportNoRecord").addClass('hidden');
+  }
+  /*------------------------------------------ Patient wise report ----------------------------------*/
+  function reportValidation(reportId) {
+    var chkResult = 0;
+    if (reportId > 0) {
+      switch (reportId) {
+        case '1':
+          chkResult = $('#txtDateRange').val() != '' ? 0 : 1;
+          break;
+        case '2':
+          chkResult = $('#txtMonthYear').val() != '' ? 0 : 1;
+          break;
+        case '3':
+          chkResult = $('#ddlYear').val() > 0 ? 0 : 1;
+          break;
+      }
+    } else {
+      chkResult = 1;
+    }
+    return chkResult;
+  }
+  var frmPatientReport = document.getElementById('frmPatientReport');
+  if (frmPatientReport != null) {
+    frmPatientReport.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var drerrorModal = tailwind.Modal.getInstance(document.querySelector("#divReportErrorModal"));
+      var reportId = $('#ddlReport').val();
+      var chkResult = reportValidation(reportId);
+      if (chkResult == 0) {
+        var reportData = new FormData(frmPatientReport);
+        var token = $('#txtToken').val();
+        var options = {
+          method: "POST",
+          body: reportData,
+          headers: {
+            Accept: 'application/json',
+            Authorization: 'Bearer ' + token
+          }
+        };
+        var base_url = localStorage.getItem("base_url");
+        var url = base_url + '/api/reportPatientWise';
+        fetch(url, options).then(function (response) {
+          return response.json();
+        }).then(function (data) {
+          if (data.Success == 'Success') {
+            $("#divPrintReport").removeClass("hidden").removeAttr("style");
+            $("#divPrintContent").removeClass("hidden").removeAttr("style");
+            if (data.reportDetails.length == 0) {
+              $('#divReportNoRecord span').text('No Record Found');
+              $("#divPrintButton").addClass("hidden");
+              tableVisible(1);
+            } else {
+              var title = "",
+                subTitle = "",
+                reportType = 0;
+              var ddlPatient = document.getElementById("ddlPatient");
+              var patientDetails = "";
+              var patientTitle = "";
+              deleteRows('tbReport'); /* Delete Rows */
+              var tableHeader = document.getElementById('tbReport').getElementsByTagName('thead')[0];
+              if (tableHeader.rows.length > 0) /* Delete Header */
+                {
+                  tableHeader.deleteRow(0);
+                }
+              if ($("#ddlPatient").val() != '0' && $("#ddlDoctor").val() != '0') /* Particular Patient  & Particular Doctor */
+                {
+                  patientTitle = "Appointment";
+                  var headerData = "<tr><th >S.No</th><th >APPOINTMENT DATE</th><th>APPOINTMENT TIME</th><th>REASON</th></tr>";
+                  tableHeader.insertRow().innerHTML = headerData;
+                  tableVisible(7);
+                  reportType = 1;
+                } else if ($("#ddlPatient").val() == '0' && $("#ddlDoctor").val() == '0') /* All Patient  & All Doctor */
+                {
+                  patientTitle = "Over All Appointment";
+                  var headerData = "<tr><th >S.No</th><th >APPOINTMENT DATE & TIME</th><th>PATIENT NAME</th><th>PHONE NO</th><th>EMAIL</th><th>DOCTOR NAME</th><th>DEPARTMENT / DESIGNATION</th><th>REASON</th></tr>";
+                  tableHeader.insertRow().innerHTML = headerData;
+                  tableVisible(6);
+                  reportType = 2;
+                } else if ($("#ddlPatient").val() != '0' && $("#ddlDoctor").val() == '0') /* Particular Patient  */
+                {
+                  patientDetails = ddlPatient.options[ddlPatient.selectedIndex].text;
+                  var patientName = patientDetails.split("-");
+                  patientTitle = patientName[0] + " (" + patientName[1] + ") Appointment";
+                  var headerData = "<tr><th >S.No</th><th >APPOINTMENT DATE & TIME</th><th >REASON</th><th >DOCTOR NAME</th><th >DOCTOR CODE</th><th >DOCTOR PHONE NO</th><th >DOCTOR EMAIL</th><th >DEPARTMENT / DESIGNATION</th></tr>";
+                  tableHeader.insertRow().innerHTML = headerData;
+                  tableVisible(3);
+                  reportType = 3;
+                } else if ($("#ddlPatient").val() == '0' && $("#ddlDoctor").val() != '0') /* Particular Doctor  */
+                {
+                  var doctorDetails = ddlDoctor.options[ddlDoctor.selectedIndex].text;
+                  var doctorName = doctorDetails.split("-");
+                  patientTitle = doctorName[0] + " (" + doctorName[1] + ") Appointment";
+                  var headerData = "<tr><th >S.No</th><th >APPOINTMENT DATE & TIME</th><th>PATIENT NAME</th><th>PATIENT #</th><th>PHONE NO</th><th>EMAIL</th><th>GENDER</th><th>REASON</th></tr>";
+                  tableHeader.insertRow().innerHTML = headerData;
+                  reportType = 4;
+                }
+              switch (reportId) {
+                case '1':
+                  title = patientTitle + " Report";
+                  subTitle = "(" + $('#txtDateRange').val() + " )";
+                  break;
+                case '2':
+                  title = patientTitle + " Report";
+                  subTitle = "(" + $('#txtMonthYear').val() + " )";
+                  break;
+                case '3':
+                  title = patientTitle + " Report";
+                  subTitle = "(" + $('#ddlYear').val() + " )";
+                  break;
+              }
+              $('#divPrintHeader span').text(title);
+              $('#divPrintSubHeader span').text(subTitle);
+              var tableData = "";
+              var tableRef = document.getElementById('tbReport').getElementsByTagName('tbody')[0];
+              data.reportDetails.forEach(function (value, key) {
+                switch (reportType) {
+                  case 1:
+                    /* Particular patient and doctor report */
+                    /* Patient Information */
+                    $('#divPatientName span').text(value.patientName);
+                    $('#divPatientHcNo span').text(value.hcNo);
+                    $('#divPatientPhoneNo span').text(value.phoneNo);
+                    $('#divPatientEmail span').text(value.email);
+                    $('#divPatientGender span').text(value.gender);
+                    $('#divPatientSpouse span').text(value.spouseName);
+                    /* Doctor Information */
+                    $('#divDoctorName span').text(value.doctorName);
+                    $('#divDoctorCode span').text(value.doctorCodeNo);
+                    $('#divDoctorPhoneNo span').text(value.doctorPhoneNo);
+                    $('#divDoctorEmail span').text(value.doctorEmail);
+                    $('#divDepartment span').text(value.department);
+                    $('#divDesignation span').text(value.designation);
+                    tableData = tableData + '<tr class="intro-x">';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.sNo + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.appointmentDate + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.appointmentTime + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.reason + '</div></td>';
+                    tableData = tableData + '</tr>';
+                    tableRef.insertRow().innerHTML = tableData;
+                    break;
+                  case 2:
+                    /* All the patient and doctor report */
+                    tableData = tableData + '<tr class="intro-x">';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.sNo + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.appointmentDate + ' - ' + value.appointmentTime + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.patientName + ' - ' + value.hcNo + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.phoneNo + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.email + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.doctorName + ' - ' + value.doctorCodeNo + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.department + ' - ' + value.designation + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.reason + '</div></td>';
+                    tableData = tableData + '</tr>';
+                    tableRef.insertRow().innerHTML = tableData;
+                    break;
+                  case 3:
+                    /* Particular patient report */
+                    $('#divPatientName span').text(value.patientName);
+                    $('#divPatientHcNo span').text(value.hcNo);
+                    $('#divPatientPhoneNo span').text(value.phoneNo);
+                    $('#divPatientEmail span').text(value.email);
+                    $('#divPatientGender span').text(value.gender);
+                    $('#divPatientSpouse span').text(value.spouseName);
+                    tableData = tableData + '<tr class="intro-x">';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.sNo + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.appointmentDate + ' - ' + value.appointmentTime + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.reason + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.doctorName + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.doctorCodeNo + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.doctorPhoneNo + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.doctorEmail + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.department + ' / ' + value.designation + '</div></td>';
+                    tableData = tableData + ' </tr>';
+                    tableRef.insertRow().innerHTML = tableData;
+                    break;
+                  case 4:
+                    /* Particular Doctor report */
+                    $('#divDoctorName span').text(value.doctorName);
+                    $('#divDoctorCode span').text(value.doctorCodeNo);
+                    $('#divDoctorPhoneNo span').text(value.doctorPhoneNo);
+                    $('#divDoctorEmail span').text(value.doctorEmail);
+                    $('#divDepartment span').text(value.department);
+                    $('#divDesignation span').text(value.designation);
+                    tableData = tableData + '<tr class="intro-x">';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.sNo + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.appointmentDate + ' - ' + value.appointmentTime + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.doctorName + ' - ' + value.doctorCodeNo + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.doctorPhoneNo + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.doctorEmail + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.department + ' - ' + value.designation + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.patientName + ' - ' + value.hcNo + '</div></td>';
+                    tableData = tableData + '<td class="w-40"><div class="flex">' + value.reason + '</div></td>';
+                    tableData = tableData + ' </tr>';
+                    tableRef.insertRow().innerHTML = tableData;
+                    break;
+                }
+                tableData = "";
+              });
+              $("#divPrintButton").removeClass("hidden").removeAttr("style");
+            }
+          } else {
+            $('#divErrorHead span').text(data.Success);
+            $('#divErrorMsg span').text(data.Message);
+            drerrorModal.show();
+          }
+        })["catch"](function (error) {
+          $('#divErrorHead span').text('Error');
+          $('#divErrorMsg span').text(error);
+          drerrorModal.show();
+        });
+        window.scrollTo(0, 0);
+      } else {
+        $('#divErrorHead span').text('Validation Error');
+        $('#divErrorMsg span').text("Please select the mandatory field marked as *.");
+        drerrorModal.show();
+      }
+    });
+  }
+  function tableVisible(type) {
+    switch (type) {
+      case 1:
+        /*---No Record--*/
+        $("#divPrintHeader").addClass('hidden');
+        $("#divPrintSubHeader").addClass('hidden');
+        $("#divReportNoRecord").removeClass("hidden").removeAttr("style");
+        $("#divReportPatient").addClass('hidden');
+        $("#tbReport").addClass('hidden');
+        $("#tbDoctorHeader").addClass('hidden');
+        break;
+      case 2:
+        /*---All patient--*/
+        $("#divPrintHeader").removeClass("hidden").removeAttr("style");
+        $("#divPrintSubHeader").removeClass("hidden").removeAttr("style");
+        $("#divReportNoRecord").addClass('hidden');
+        $("#divReportPatient").addClass('hidden');
+        $("#tbReport").removeClass("hidden").removeAttr("style");
+        $("#tbDoctorHeader").addClass('hidden');
+        break;
+      case 3:
+        /*---paritcular patient--*/
+        $("#divPrintHeader").removeClass("hidden").removeAttr("style");
+        $("#divPrintSubHeader").removeClass("hidden").removeAttr("style");
+        $("#divReportNoRecord").addClass('hidden');
+        $("#divReportPatient").removeClass("hidden").removeAttr("style");
+        $("#tbReport").removeClass("hidden").removeAttr("style");
+        $("#tbDoctorHeader").addClass('hidden');
+        break;
+      case 4:
+        /*---paritcular doctor--*/
+        $("#divPrintHeader").removeClass("hidden").removeAttr("style");
+        $("#divPrintSubHeader").removeClass("hidden").removeAttr("style");
+        $("#divReportNoRecord").addClass('hidden');
+        $("#divReportPatient").addClass('hidden');
+        $("#tbReport").removeClass("hidden").removeAttr("style");
+        $("#tbDoctorHeader").removeClass("hidden").removeAttr("style");
+        break;
+      case 5:
+        /*---All doctor--*/
+        $("#divPrintHeader").removeClass("hidden").removeAttr("style");
+        $("#divPrintSubHeader").removeClass("hidden").removeAttr("style");
+        $("#divReportNoRecord").addClass('hidden');
+        $("#divReportPatient").addClass('hidden');
+        $("#tbReport").removeClass("hidden").removeAttr("style");
+        $("#tbDoctorHeader").addClass('hidden');
+        break;
+      case 6:
+        /* All */
+        $("#divPrintHeader").removeClass("hidden").removeAttr("style");
+        $("#divPrintSubHeader").removeClass("hidden").removeAttr("style");
+        $("#divReportNoRecord").addClass('hidden');
+        $("#divReportPatient").addClass('hidden');
+        $("#tbDoctorHeader").addClass('hidden');
+        $("#tbReport").removeClass("hidden").removeAttr("style");
+        break;
+      case 7:
+        $("#divPrintHeader").removeClass("hidden").removeAttr("style");
+        $("#divPrintSubHeader").removeClass("hidden").removeAttr("style");
+        $("#divReportNoRecord").addClass('hidden');
+        $("#divReportPatient").removeClass("hidden").removeAttr("style");
+        $("#tbDoctorHeader").removeClass("hidden").removeAttr("style");
+        $("#tbReport").removeClass("hidden").removeAttr("style");
+        break;
+    }
+  }
+  function deleteRows(ctrlElement) {
+    var tbReport = document.getElementById(ctrlElement);
+    var rowCount = tbReport.rows.length;
+    for (var i = rowCount - 1; i > 0; i--) {
+      tbReport.deleteRow(i);
+    }
+  }
+  /*---------------------------- PRINT REPORT --------------------------*/
+  function printData(printContent, title) {
+    var contents = $(printContent).html();
+    var frame1 = $('<iframe />');
+    frame1[0].name = "frame1";
+    frame1.css({
+      "position": "absolute",
+      "top": "-1000000px"
+    });
+    $("body").append(frame1);
+    var frameDoc = frame1[0].contentWindow ? frame1[0].contentWindow : frame1[0].contentDocument.document ? frame1[0].contentDocument.document : frame1[0].contentDocument;
+    frameDoc.document.open();
+    //Create a new HTML document.
+    frameDoc.document.write('<html><head><title>' + title + '</title>');
+    frameDoc.document.write('</head><body>');
+    //Append the external CSS file.
+    var styleLocation = localStorage.getItem("base_url") + "/dist/css/app.css";
+    frameDoc.document.write("<link rel='stylesheet' href='" + styleLocation + "' />");
+    //Append the DIV contents.
+    frameDoc.document.write(contents);
+    frameDoc.document.write('</body></html>');
+    frameDoc.document.close();
+    setTimeout(function () {
+      window.frames["frame1"].focus();
+      window.frames["frame1"].print();
+      frame1.remove();
+    }, 500);
+  }
+  /*---------------------------- PRINT REPORT --------------------------*/
+  $("#btnPrintReport").on("click", function () {
+    var title = '';
+    var divPrintContent = '#divPrintContent';
+    printData(divPrintContent, title);
+  });
+  /* ---------------------- Reset Report----------------------------- */
+  $("#btnReportReset").on("click", function (event) {
+    deleteRows('tbReport');
+    hideReportOption();
+    $("#ddlBranch option").remove();
+    $("#ddlBranch").append($("<option></option>").val(0).html("Select Branch"));
+    $("#divBranchddl").addClass('hidden');
+  });
+
+  /*---------------------------- PRINT Patient details --------------------------*/
+  $("#btnPrintPatientDetails").on("click", function () {
+    var title = '';
+    var divPrintContent = '#divPrintPatientContent';
+    printData(divPrintContent, title);
+  });
+  /* ---------------------- Reset Patient details----------------------------- */
+  $("#btnReportPatientReset").on("click", function (event) {
+    deleteRows('tbPatientDetails');
+    $("#divPrintPatientDetails").addClass('hidden');
+    $("#divBranchddl").addClass('hidden');
+    $('#divPrintPatientButton').addClass('hidden');
+  });
+  /* ---------------------------- Report Patient Detials --------------------------------------- */
+  var frmPatientDetailReport = document.getElementById('frmPatientDetailReport');
+  if (frmPatientDetailReport != null) {
+    frmPatientDetailReport.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var drerrorModal = tailwind.Modal.getInstance(document.querySelector("#divReportPatientErrorModal"));
+      var reportData = new FormData(frmPatientDetailReport);
+      var token = $('#txtToken').val();
+      var options = {
+        method: "POST",
+        body: reportData,
+        headers: {
+          Accept: 'application/json',
+          Authorization: 'Bearer ' + token
+        }
+      };
+      var base_url = localStorage.getItem("base_url");
+      var url = base_url + '/api/reportPatientDetails';
+      fetch(url, options).then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        if (data.Success == 'Success') {
+          deleteRows('tbPatientDetails');
+          $("#divPrintPatientDetails").removeClass("hidden").removeAttr("style");
+          if (data.reportDetails.length == 0) {
+            $('#divReportNoRecord span').text('No Record Found');
+            $("#divPrintPatientButton").addClass("hidden");
+          } else {
+            var tableData = "";
+            var tableRef = document.getElementById('tbPatientDetails').getElementsByTagName('tbody')[0];
+            data.reportDetails.forEach(function (value, key) {
+              tableData = tableData + '<tr class="intro-x">';
+              tableData = tableData + '<td class="w-40"><div class="flex">' + value.sNo + '</div></td>';
+              tableData = tableData + '<td class="w-40"><div class="flex">' + value.name + ' - ' + value.hcNo + '</div></td>';
+              tableData = tableData + '<td class="w-40"><div class="flex">' + value.created_date + '</div></td>';
+              tableData = tableData + '<td class="w-40"><div class="flex">' + value.phoneNo + '</div></td>';
+              tableData = tableData + '<td class="w-40"><div class="flex">' + value.email + '</div></td>';
+              tableData = tableData + '<td class="w-40"><div class="flex">' + value.age + '</div></td>';
+              tableData = tableData + '<td class="w-40"><div class="flex">' + value.gender + '</div></td>';
+              tableData = tableData + '<td class="w-40"><div class="flex">' + value.bloodGroup + '</div></td>';
+              tableData = tableData + '<td class="w-40"><div class="flex">' + value.height + (value.height != "" && value.weight != "" ? ' / ' : '') + value.weight + '</div></td>';
+              tableData = tableData + '<td class="w-40"><div class="flex">' + value.spouseName + (value.spouseName != "" && value.spousePhnNo != "" ? ' - ' : '') + value.spousePhnNo + '</div></td>';
+              tableData = tableData + '<td class="w-40"><div class="flex">' + value.assignedDoctor + '</div></td>';
+              tableData = tableData + '</tr>';
+              tableRef.insertRow().innerHTML = tableData;
+              tableData = "";
+            });
+            $("#divPrintPatientButton").removeClass("hidden").removeAttr("style");
+            $("#divReportNoRecord").addClass("hidden");
+          }
+        } else {
+          $('#divErrorHead span').text(data.Success);
+          $('#divErrorMsg span').text(data.Message);
+          drerrorModal.show();
+        }
+      })["catch"](function (error) {
+        $('#divErrorHead span').text('Error');
+        $('#divErrorMsg span').text(error);
+        drerrorModal.show();
+      });
+    });
+  }
+  /* -------------------------------- Load Hospital,Branch,Patient and Doctor For Assign Doctor -------BEGIN ------------------------------------ */
+  function loadHospitalForAssign() {
+    var token = $('#txtToken').val();
+    var options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token
+      }
+    };
+    var base_url = localStorage.getItem("base_url");
+    var url = base_url + '/api/loadHospital';
+    fetch(url, options).then(function (response) {
+      return response.json();
+    }).then(function (result) {
+      // Load Hospital
+      var listHospital = result.hospitalList;
+      if (listHospital != null) {
+        listHospital.forEach(function (value, key) {
+          $("#ddlAssignHospital").append($("<option></option>").val(value.id).html(value.hospitalName));
+        });
+      }
+    });
+    var ddlAssignBranch = document.getElementById('ddlAssignBranch');
+    var hospitalId = $('#txtHospital').val();
+    if (ddlAssignBranch !== null) {
+      var ddlUrl = base_url + '/api/loadBranch/' + hospitalId;
+      fetch(ddlUrl, options).then(function (response) {
+        return response.json();
+      }).then(function (result) {
+        // Load Branch
+        var listBranch = result.branchList;
+        $("#ddlAssignBranch option").remove();
+        $("#ddlAssignBranch").append($("<option></option>").val(0).html("Select Branch"));
+        if (listBranch.length != 0) {
+          listBranch.forEach(function (value, key) {
+            $("#ddlAssignBranch").append($("<option></option>").val(value.id).html(value.branchName));
+          });
+          $("#divAssignBranchddl").removeClass("hidden").removeAttr("style");
+        } else {
+          $("#divAssignBranchddl").addClass('hidden');
+        }
+      });
+    }
+    //getAssignPatient & doctor
+    getAssignPatientDoctor();
+  }
+  /* -------------------------- Get Unassigned Patient & Doctor List----------------------------- */
+  function getAssignPatientDoctor() {
+    var token = $('#txtToken').val();
+    var options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token
+      }
+    };
+    var errorModal = tailwind.Modal.getInstance(document.querySelector("#divAssignErrorModal"));
+    var hospitalId = $('#txtHospital').val();
+    var branchId = $('#txtBranch').val();
+    var base_url = localStorage.getItem("base_url");
+    var url = base_url + '/api/loadUnAssigned/' + hospitalId + "/" + branchId;
+    $("#ddlAssignPatient option").remove();
+    $("#ddlAssignPatient").append($("<option></option>").val(0).html("Select Patient"));
+    $("#ddlAssignDoctor option").remove();
+    $("#ddlAssignDoctor").append($("<option></option>").val(0).html("Select Doctor"));
+    fetch(url, options).then(function (response) {
+      return response.json();
+    }).then(function (result) {
+      // Load Patient
+      var listPatient = result.patientList;
+      if (listPatient != null) {
+        listPatient.forEach(function (value, key) {
+          $("#ddlAssignPatient").append($("<option></option>").val(value.id).html(value.name));
+        });
+      }
+      // Load Doctor
+      var listDoctor = result.doctorList;
+      if (listDoctor != null) {
+        listDoctor.forEach(function (value, key) {
+          $("#ddlAssignDoctor").append($("<option></option>").val(value.id).html(value.name));
+        });
+      }
+    })["catch"](function (error) {
+      $('#divErrorHead span').text('Error');
+      $('#divErrorMsg span').text(error);
+      errorModal.show();
+    });
+  }
+  /*----- Assign Doctor -- Branch change ------------------*/
+  $("#ddlAssignBranch").on('change', function () {
+    $('#txtBranch').val($("#ddlAssignBranch").val());
+    getAssignPatientDoctor();
+  });
+  /* Assign doctor - Hospital change */
+  $("#ddlAssignHospital").on('change', function () {
+    var token = $('#txtToken').val();
+    var hospitalId = $("#ddlAssignHospital").val();
+    $('#txtHospital').val(hospitalId);
+    var ddlAssignBranch = document.getElementById('ddlAssignBranch');
+    var options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token
+      }
+    };
+    var base_url = localStorage.getItem("base_url");
+    var ddlUrl = base_url + '/api/loadBranch/' + hospitalId;
+    if (ddlAssignBranch !== null) {
+      $("#ddlAssignBranch option").remove();
+      $("#ddlAssignBranch").append($("<option></option>").val(0).html("Select Branch"));
+      fetch(ddlUrl, options).then(function (response) {
+        return response.json();
+      }).then(function (result) {
+        //Load Branch
+        var listBranch = result.branchList;
+        var branchId = $("#ddlAssignBranch").val();
+        if (listBranch.length != 0) {
+          listBranch.forEach(function (value, key) {
+            $("#ddlAssignBranch").append($("<option></option>").val(value.id).html(value.branchName));
+          });
+          $("#divAssignBranchddl").removeClass("hidden").removeAttr("style");
+          $('#txtBranch').val(branchId);
+        } else {
+          $("#divAssignBranchddl").addClass('hidden');
+          $('#txtBranch').val(branchId);
+        }
+      });
+    }
+    getAssignPatientDoctor();
+  });
+  /* Clear dropdown list after save */
+  function ClearAssignDdl() {
+    $("#ddlAssignPatient option").remove();
+    $("#ddlAssignPatient").append($("<option></option>").val(0).html("Select Patient"));
+    $("#ddlAssignDoctor option").remove();
+    $("#ddlAssignDoctor").append($("<option></option>").val(0).html("Select Doctor"));
+    $("#ddlAssignBranch option").remove();
+    $("#ddlAssignBranch").append($("<option></option>").val(0).html("Select Doctor"));
+    $("#divAssignBranchddl").addClass('hidden');
+  }
+  /* -------------------------------- Load Hospital,Branch,Patient and Doctor For Assign Doctor --- END --------------------------------- */
+  /* ------------------------------------ Assign Doctor for Patient -------------------------------------- */
+  function chkAssignDoctor() {
+    /*------- Form Validation---- */
+    var chkResult = 0;
+    if ($("#ddlAssignPatient").val() == 0) {
+      chkResult = 1;
+    } else if ($("#ddlAssignDoctor").val() == 0) {
+      chkResult = 1;
+    } else {
+      var ddlAssignHospital = document.getElementById('ddlAssignHospital');
+      if (ddlAssignHospital !== null) {
+        chkResult = $("#ddlAssignHospital").val() == 0 ? 1 : 0;
+      }
+    }
+    return chkResult;
+  }
+  /* Form Submit */
+  var frmAssignDoctor = document.getElementById('frmAssignDoctor');
+  if (frmAssignDoctor != null) {
+    frmAssignDoctor.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var errorModal = tailwind.Modal.getInstance(document.querySelector("#divAssignErrorModal"));
+      var chkResult = chkAssignDoctor();
+      if (chkResult == 1) {
+        $('#divErrorHead span').text('Validation Error');
+        $('#divErrorMsg span').text("Please select the mandatory field marked as *.");
+        errorModal.show();
+      } else {
+        var assigndata = new FormData(frmAssignDoctor);
+        var assignParam = new URLSearchParams(assigndata);
+        var token = $('#txtToken').val();
+        var options = {
+          method: "POST",
+          body: assignParam,
+          headers: {
+            Accept: 'application/json',
+            Authorization: 'Bearer ' + token
+          }
+        };
+        var base_url = localStorage.getItem("base_url");
+        var url = base_url + '/api/addAssignDoctor';
+        fetch(url, options).then(function (response) {
+          return response.json();
+        }).then(function (data) {
+          if (data.Success == 'Success') {
+            $('#divMsg span').text(data.Message);
+            if (data.ShowModal == 1) {
+              var successModal = tailwind.Modal.getInstance(document.querySelector("#divAssignSuccessModal"));
+              successModal.show();
+              document.getElementById("frmAssignDoctor").reset();
+              ClearAssignDdl();
+            }
+          } else {
+            $('#divErrorHead span').text(data.Success);
+            $('#divErrorMsg span').text(data.Message);
+            if (data.ShowModal == 1) {
+              errorModal.show();
+            }
+          }
+        })["catch"](function (error) {
+          $('#divErrorHead span').text('Error');
+          $('#divErrorMsg span').text(error);
+          errorModal.show();
+        });
+      }
+    });
+  }
+  $("#btnAssignCancel").on("click", function () {
+    ClearAssignDdl();
+  });
+  /* -------------------------------------- ASSIGN DOCTOR ENDS------------------------------------ */
+  /* ------------------------------------ Subscribe --------------------------------------------- */
+  function loadSubscribeHospital(base_url) {
+    var ddlBranch = document.getElementById('ddlSubBranch');
+    var token = $('#txtToken').val();
+    var options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token
+      }
+    };
+    var url = base_url + '/api/loadHospital';
+    fetch(url, options).then(function (response) {
+      return response.json();
+    }).then(function (result) {
+      // Load Hospital
+      var listHospital = result.hospitalList;
+      if (listHospital != null) {
+        listHospital.forEach(function (value, key) {
+          $("#ddlSubHospital").append($("<option></option>").val(value.id).html(value.hospitalName));
+        });
+      }
+    });
+    var hospitalId = $('#txtHospital').val();
+    if (ddlBranch !== null) {
+      var ddlUrl = base_url + '/api/loadBranch/' + hospitalId;
+      fetch(ddlUrl, options).then(function (response) {
+        return response.json();
+      }).then(function (result) {
+        // Load Branch
+        var listBranch = result.branchList;
+        $("#ddlSubBranch option").remove();
+        $("#ddlSubBranch").append($("<option></option>").val(0).html("Select Branch"));
+        if (listBranch.length != 0) {
+          listBranch.forEach(function (value, key) {
+            $("#ddlSubBranch").append($("<option></option>").val(value.id).html(value.branchName));
+          });
+          $("#divSubBranchddl").removeClass("hidden").removeAttr("style");
+        } else {
+          $("#divSubBranchddl").addClass('hidden');
+        }
+      });
+    }
+  }
+  /* ---- Hospital Change Event ----*/
+  $("#ddlSubHospital").on('change', function () {
+    var token = $('#txtToken').val();
+    var hospitalId = $("#ddlSubHospital").val();
+    $('#txtHospital').val(hospitalId);
+    var ddlBranch = document.getElementById('ddlSubBranch');
+    var options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token
+      }
+    };
+    $("#divSubBranchddl").addClass('hidden');
+    var base_url = localStorage.getItem("base_url");
+    var ddlUrl = base_url + '/api/loadBranch/' + hospitalId;
+    if (ddlBranch !== null) {
+      fetch(ddlUrl, options).then(function (response) {
+        return response.json();
+      }).then(function (result) {
+        $("#ddlSubBranch option").remove();
+        $("#ddlSubBranch").append($("<option></option>").val(0).html("Select Branch"));
+        //Load Branch
+        var listBranch = result.branchList;
+        if (listBranch.length != 0) {
+          listBranch.forEach(function (value, key) {
+            $("#ddlSubBranch").append($("<option></option>").val(value.id).html(value.branchName));
+          });
+          $("#divSubBranchddl").removeClass("hidden").removeAttr("style");
+        }
+      });
+    }
+    if (hospitalId != '0') {
+      $("#btnPlan1").removeClass("hidden").removeAttr("style");
+    } else {
+      $("#btnPlan1").addClass('hidden');
+    }
+  });
+  /*-----------------Branch Change Event ----------------- */
+  $("#ddlSubBranch").on('change', function () {
+    $('#txtBranch').val($("#ddlSubBranch").val());
+  });
+  /*--------------Buy button-------------- */
+  $("#btnPlan1").on("click", function () {
+    var base_url = localStorage.getItem("base_url");
+    var errorModal = tailwind.Modal.getInstance(document.querySelector("#divSubscribeErrorModal"));
+    var hospitalId = $('#txtHospital').val();
+    var branchId = $('#txtBranch').val();
+    var userId = $('#txtUser').val();
+    // var url=base_url+'/phonepe/'+hospitalId+'/'+branchId+'/'+userId;
+    var url = base_url + '/phonepe';
+    window.location.href = url;
+  });
+  /*------------------------------------ Search Assign Doctor Begin ----------------------------*/
+  function setAssignDoctorTabulator() {
+    // Tabulator
+    if ($("#tbAssign").length) {
+      // Filter function
+      var filterHTMLDoctorForm = function filterHTMLDoctorForm() {
+        var field = $("#tbAssign-html-filter-field").val();
+        var type = $("#tbAssign-html-filter-type").val();
+        var value = $("#tbAssign-html-filter-value").val();
+        table.setFilter(field, type, value);
+      }; // On submit filter form
+      var hospitalId = $('#txtHospital').val();
+      var branchId = $('#txtBranch').val();
+      var token = $('#txtToken').val();
+      // Setup Tabulator
+      var table = new tabulator_tables__WEBPACK_IMPORTED_MODULE_1__["default"]("#tbAssign", {
+        ajaxURL: localStorage.getItem("base_url") + "/api/assignedPatientList",
+        ajaxParams: {
+          "hospitalId": hospitalId,
+          "branchId": branchId
+        },
+        ajaxConfig: {
+          method: "GET",
+          //set request type to Position
+          headers: {
+            "Content-type": 'application/json; charset=utf-8',
+            //set specific content type
+            "Accept": 'application/json',
+            "Authorization": 'Bearer ' + token
+          }
+        },
+        ajaxFiltering: true,
+        ajaxSorting: true,
+        printAsHtml: true,
+        printStyled: true,
+        pagination: "remote",
+        paginationSize: 10,
+        paginationSizeSelector: [10, 20, 30, 40],
+        layout: "fitColumns",
+        responsiveLayout: "collapse",
+        placeholder: "No matching records found",
+        columns: [{
+          formatter: "responsiveCollapse",
+          width: 40,
+          minWidth: 30,
+          hozAlign: "center",
+          resizable: false,
+          headerSort: false
+        },
+        // For HTML table
+        {
+          title: "PATIENT INFORMATION",
+          minWidth: 75,
+          field: "patientName",
+          hozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          formatter: function formatter(cell, formatterParams) {
+            return "<div class=\"flex lg:justify-center\">\n                            <div class=\"intro-x w-12 h-12 image-fit\">\n                                <img class=\"rounded-full\" src=\"".concat(cell.getData().patientImage, "\">\n                            </div>\n                        </div>\n                        <div class=\"bg-white dark:bg-darkmode-600 px-5 -mt-3 text-slate-500\"> </div>\n                    <div>\n                        <div class=\"font-medium whitespace-nowrap\">").concat(cell.getData().patientName, "</div>\n                        <div class=\"text-xs whitespace-nowrap\">Reg.No: ").concat(cell.getData().hcNo, "</div>\n                        <div class=\"text-xs whitespace-nowrap\">\n                            <a class=\"flex items-center mr-3\" href=\"javascript:;\">\n                                    <i data-lucide=\"phone\" class=\"w-3 h-3 mr-1\"></i>  ").concat(cell.getData().patientPhoneNo, "\n                            </a>\n                       </div>\n                    </div>");
+          }
+        }, {
+          title: "DOCTOR INFORMATION",
+          minWidth: 75,
+          field: "doctorName",
+          hozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          formatter: function formatter(cell, formatterParams) {
+            return "<div class=\"flex lg:justify-center\">\n                            <div class=\"intro-x w-12 h-12 image-fit\">\n                                <img class=\"rounded-full\" src=\"".concat(cell.getData().doctorImage, "\">\n                            </div>\n                        </div>\n                        <div class=\"bg-white dark:bg-darkmode-600 px-5 -mt-3 text-slate-500\"> </div>\n                    <div>\n                        <div class=\"font-medium whitespace-nowrap\">").concat(cell.getData().doctorName, "</div>\n                        <div class=\"text-xs whitespace-nowrap\">Code: ").concat(cell.getData().doctorCodeNo, "</div>\n                        <div class=\"text-xs whitespace-nowrap\">\n                            <a class=\"flex items-center mr-3\" href=\"javascript:;\">\n                                    <i data-lucide=\"phone\" class=\"w-3 h-3 mr-1\"></i>  ").concat(cell.getData().doctorPhoneNo, "\n                            </a>\n                       </div>\n                    </div>");
+          }
+        }, {
+          title: "ACTIONS",
+          minWidth: 200,
+          field: "actions",
+          responsive: 1,
+          hozAlign: "center",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          formatter: function formatter(cell, formatterParams) {
+            var a = $("<div class=\"flex lg:justify-center items-center text-info\">\n                            <a class=\"edit flex items-center mr-3 text-primary tooltip\" title=\"Edit Doctor Details\" href=\"javascript:;\">\n                                <i data-lucide=\"check-square\" class=\"w-5 h-5 mr-1\"></i> \n                            </a>\n                            <a class=\"delete flex items-center text-danger tooltip\" title=\"Delete Doctor\" href=\"javascript:;\">\n                                <i data-lucide=\"trash-2\" class=\"w-5 h-5 mr-1\"></i> \n                            </a>\n                        </div>");
+            $(a).find(".edit").on("click", function () {
+              window.location.href = localStorage.getItem("base_url") + "/showAssignEdit/" + cell.getData().id;
+            });
+            $(a).find(".delete").on("click", function () {
+              var deleteModal = tailwind.Modal.getInstance(document.querySelector("#divDeleteAssign"));
+              deleteModal.show();
+              $("#btnDelAssign").on("click", function () {
+                var userId = $('#txtUser').val();
+                deleteAssignDoctor(cell.getData().id, userId);
+              });
+            });
+            return a[0];
+          }
+        },
+        // For print format
+        {
+          title: "PATIENT NAME",
+          field: "patientName",
+          visible: false,
+          print: true,
+          download: true
+        }, {
+          title: "PATIENT REG.NO",
+          field: "hcNo",
+          visible: false,
+          print: true,
+          download: true
+        }, {
+          title: "PATIENT PHONE NO",
+          field: "patientPhoneNo",
+          visible: false,
+          print: true,
+          download: true
+        }, {
+          title: "DOCTOR NAME",
+          field: "doctorName",
+          visible: false,
+          print: true,
+          download: true
+        }, {
+          title: "DOCTOR CODE NO",
+          field: "doctorCodeNo",
+          visible: false,
+          print: true,
+          download: true
+        }, {
+          title: "DOCTOR PHONE NO",
+          field: "doctorPhoneNo",
+          visible: false,
+          print: false,
+          download: false
+        }],
+        renderComplete: function renderComplete() {
+          (0,lucide__WEBPACK_IMPORTED_MODULE_4__.createIcons)({
+            icons: lucide__WEBPACK_IMPORTED_MODULE_5__,
+            "stroke-width": 1.5,
+            nameAttr: "data-lucide"
+          });
+        }
+      });
+
+      // Redraw table onresize
+      window.addEventListener("resize", function () {
+        table.redraw();
+        (0,lucide__WEBPACK_IMPORTED_MODULE_4__.createIcons)({
+          icons: lucide__WEBPACK_IMPORTED_MODULE_5__,
+          "stroke-width": 1.5,
+          nameAttr: "data-lucide"
+        });
+      });
+      $("#tbAssign-html-filter-form")[0].addEventListener("keypress", function (event) {
+        var keycode = event.keyCode ? event.keyCode : event.which;
+        if (keycode == "13") {
+          event.preventDefault();
+          filterHTMLDoctorForm();
+        }
+      });
+
+      // On click go button
+      $("#tbAssign-html-filter-go").on("click", function (event) {
+        filterHTMLDoctorForm();
+      });
+
+      // On reset filter form
+      $("#tbAssign-html-filter-reset").on("click", function (event) {
+        $("#tbAssign-html-filter-field").val("patientName");
+        $("#tbAssign-html-filter-type").val("like");
+        $("#tbAssign-html-filter-value").val("");
+        filterHTMLDoctorForm();
+      });
+
+      // Export
+      $("#tbAssign-export-csv").on("click", function (event) {
+        table.download("csv", "data.csv");
+      });
+      $("#tbAssign-export-json").on("click", function (event) {
+        table.download("json", "data.json");
+      });
+      $("#tbAssign-export-xlsx").on("click", function (event) {
+        window.XLSX = (xlsx__WEBPACK_IMPORTED_MODULE_0___default());
+        table.download("xlsx", "Doctors.xlsx", {
+          sheetName: "Doctors"
+        });
+      });
+      $("#tbAssign-export-html").on("click", function (event) {
+        table.download("html", "data.html", {
+          style: true
+        });
+      });
+
+      // Print
+      $("#tbAssign-print").on("click", function (event) {
+        table.print();
+      });
+    }
+  }
+  /*------------------------ Search Assign Doctor End ------------------------*/
+  /*----------------------------------- Delete Assign Doctor By ID BEGINS -------------------------*/
+  function deleteAssignDoctor(assignId, userId) {
+    var base_url = localStorage.getItem("base_url");
+    var token = $('#txtToken').val();
+    var url = base_url + '/api/deleteAssignedDoctor/' + assignId + '/' + userId;
+    var errorModal = tailwind.Modal.getInstance(document.querySelector("#divAssignErrorModal"));
+    var options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token
+      }
+    };
+    fetch(url, options).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      if (data.Success == 'Success') {
+        if (data.ShowModal == 1) {
+          var el = document.querySelector("#divDeleteAssign");
+          var modal = tailwind.Modal.getOrCreateInstance(el);
+          modal.hide();
+          setAssignDoctorTabulator();
+        }
+      } else {
+        $('#divErrorHead span').text(data.Success);
+        $('#divErrorMsg span').text(data.Message);
+        if (data.ShowModal == 1) {
+          errorModal.show();
+        }
+      }
+    })["catch"](function (error) {
+      $('#divErrorHead span').text('Error');
+      $('#divErrorMsg span').text(error);
+      errorModal.show();
+    });
+  }
+
+  /*----------------------------------- Delete Assign Doctor By ID END -------------------------*/
+  function assignRedirect() {
+    window.scrollTo(0, 0);
+    var base_url = localStorage.getItem("base_url");
+    window.location.href = base_url + "/ListAssignedDoctor";
+  }
+  $("#btnBackAssign").on("click", function () {
+    assignRedirect();
+  });
+  $("#btnAssignRedirect").on("click", function () {
+    assignRedirect();
+  });
+
+  /*--------------------------------------Edit Doctor Begins------------------------------*/
+  var assignEditform = document.getElementById('frmEditAssign');
+  if (assignEditform != null) {
+    assignEditform.addEventListener("submit", function (epf) {
+      epf.preventDefault();
+      var hospitaldata = new FormData(assignEditform);
+      var token = $('#txtToken').val();
+      var options = {
+        method: "POST",
+        body: hospitaldata,
+        headers: {
+          Accept: 'application/json',
+          Authorization: 'Bearer ' + token
+        }
+      };
+      var base_url = localStorage.getItem("base_url");
+      var url = base_url + '/api/updateAssignDoctor';
+      var errorDrModal = tailwind.Modal.getInstance(document.querySelector("#divErrorEditAssign"));
+      fetch(url, options).then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        if (data.Success == 'Success') {
+          $('#divMsg span').text(data.Message);
+          if (data.ShowModal == 1) {
+            var successEditModal = tailwind.Modal.getInstance(document.querySelector("#divSuccessEditAssign"));
+            successEditModal.show();
+          }
+        } else {
+          $('#divErrorHead span').text(data.Success);
+          $('#divErrorMsg span').text(data.Message);
+          if (data.ShowModal == 1) {
+            errorDrModal.show();
+          }
+        }
+      })["catch"](function (error) {
+        $('#divErrorHead span').text('Error');
+        $('#divErrorMsg span').text(error);
+        errorDrModal.show();
+      });
+    });
+  }
+  /*-------------------------------------------------Edit Assign Doctor Ends -----------------------------*/
+  /*------------------------------------ Search reffered By Begin ----------------------------*/
+  function setRefferedBy() {
+    // Tabulator
+    if ($("#tbRefferedBy").length) {
+      // Filter function
+      var filterHTMLForm = function filterHTMLForm() {
+        var field = $("#tbRefferedBy-html-filter-field").val();
+        var type = $("#tbRefferedBy-html-filter-type").val();
+        var value = $("#tbRefferedBy-html-filter-value").val();
+        table.setFilter(field, type, value);
+      }; // On submit filter form
+      var hospitalId = $('#txtHospital').val();
+      var branchId = $('#txtBranch').val();
+      // Setup Tabulator
+      var token = $('#txtToken').val();
+      var table = new tabulator_tables__WEBPACK_IMPORTED_MODULE_1__["default"]("#tbRefferedBy", {
+        ajaxURL: localStorage.getItem("base_url") + "/api/patientList",
+        ajaxParams: {
+          "hospitalId": hospitalId,
+          "branchId": branchId
+        },
+        ajaxConfig: {
+          method: "GET",
+          //set request type to Position
+          headers: {
+            "Content-type": 'application/json; charset=utf-8',
+            //set specific content type
+            "Accept": 'application/json',
+            "Authorization": 'Bearer ' + token
+          }
+        },
+        ajaxFiltering: true,
+        ajaxSorting: true,
+        printAsHtml: true,
+        printStyled: true,
+        pagination: "remote",
+        paginationSize: 10,
+        paginationSizeSelector: [10, 20, 30, 40],
+        layout: "fitColumns",
+        responsiveLayout: "collapse",
+        placeholder: "No matching records found",
+        columns: [{
+          formatter: "responsiveCollapse",
+          width: 40,
+          minWidth: 30,
+          hozAlign: "center",
+          resizable: false,
+          headerSort: false
+        },
+        // For HTML table
+        {
+          title: "PROFILE IMAGE",
+          minWidth: 75,
+          field: "images",
+          hozAlign: "center",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          formatter: function formatter(cell, formatterParams) {
+            return "<div class=\"flex lg:justify-center\">\n                            <div class=\"intro-x w-12 h-12 image-fit\">\n                                <img class=\"rounded-full\" src=\"".concat(cell.getData().profileImage, "\">\n                            </div>\n                        </div>");
+          }
+        }, {
+          title: "PATIENT NAME",
+          minWidth: 100,
+          field: "name",
+          hozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          formatter: function formatter(cell, formatterParams) {
+            return "<div>\n                            <div class=\"font-medium whitespace-nowrap\">".concat(cell.getData().name, "</div>\n                            <div class=\"text-slate-800 text-xs whitespace-nowrap\">").concat(cell.getData().hcNo, "</div>\n                        </div>");
+          }
+        }, {
+          title: "PHONE NO",
+          minWidth: 100,
+          field: "phoneNo",
+          hozAlign: "center",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          responsive: 2
+        }, {
+          title: "EMAIL",
+          minWidth: 100,
+          field: "email",
+          hozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false
+        }, {
+          title: "REFFERED BY",
+          minWidth: 50,
+          field: "doctorName",
+          hozAlign: "center",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          formatter: function formatter(cell, formatterParams) {
+            return "<div class=\"flex lg:justify-center\">\n                            <div class=\"intro-x w-12 h-12 image-fit\" style=\"display: ".concat(cell.getData().doctorCodeNo == 0 ? 'none' : 'block', ";\">\n                                <img class=\"rounded-full\" src=\"").concat(cell.getData().doctorImage, "\">\n                            </div>\n                        </div>\n                        <div class=\"bg-white dark:bg-darkmode-600 px-5 -mt-3 text-slate-500\"> </div>\n                    <div>\n                        <div class=\"font-medium whitespace-nowrap\">").concat(cell.getData().doctorName == 0 ? '' : cell.getData().doctorName, "</div>\n                        <div class=\"text-xs whitespace-nowrap\"> ").concat(cell.getData().doctorCodeNo == 0 ? '' : cell.getData().doctorCodeNo, "</div>\n                    </div>");
+          }
+        }, {
+          title: "ACTIONS",
+          minWidth: 200,
+          field: "actions",
+          responsive: 1,
+          hozAlign: "center",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          formatter: function formatter(cell, formatterParams) {
+            var a = $("<div class=\"flex lg:justify-center items-center text-danger\">\n                            <a class=\"view flex items-center mr-3 tooltip\" title=\"Add/View Reffered By\" href=\"javascript:;\">\n                                <i data-lucide=\"check-square\" class=\"w-4 h-4 mr-2\"></i>  Reffered By\n                            </a>\n                        </div>");
+            $(a).find(".view").on("click", function () {
+              window.location.href = localStorage.getItem("base_url") + "/viewRefferedBy/" + cell.getData().id;
+            });
+            return a[0];
+          }
+        }],
+        renderComplete: function renderComplete() {
+          (0,lucide__WEBPACK_IMPORTED_MODULE_4__.createIcons)({
+            icons: lucide__WEBPACK_IMPORTED_MODULE_5__,
+            "stroke-width": 1.5,
+            nameAttr: "data-lucide"
+          });
+        }
+      });
+
+      // Redraw table onresize
+      window.addEventListener("resize", function () {
+        table.redraw();
+        (0,lucide__WEBPACK_IMPORTED_MODULE_4__.createIcons)({
+          icons: lucide__WEBPACK_IMPORTED_MODULE_5__,
+          "stroke-width": 1.5,
+          nameAttr: "data-lucide"
+        });
+      });
+      $("#tbRefferedBy-html-filter-form")[0].addEventListener("keypress", function (event) {
+        var keycode = event.keyCode ? event.keyCode : event.which;
+        if (keycode == "13") {
+          event.preventDefault();
+          filterHTMLForm();
+        }
+      });
+
+      // On click go button
+      $("#tbRefferedBy-html-filter-go").on("click", function (event) {
+        filterHTMLForm();
+      });
+
+      // On reset filter form
+      $("#tbRefferedBy-html-filter-reset").on("click", function (event) {
+        $("#tbRefferedBy-html-filter-field").val("hcNo");
+        $("#tbRefferedBy-html-filter-type").val("like");
+        $("#tbRefferedBy-html-filter-value").val("");
+        filterHTMLForm();
+      });
+    }
+  }
+  /*------------------------------------------------------- Reffered By END ---------------------------*/
+  function redirectToRefferedBy() {
+    window.scrollTo(0, 0);
+    var base_url = localStorage.getItem("base_url");
+    window.location.href = base_url + "/RefferedBy";
+  }
+  $("#btnCancelRefferedBy").on("click", function () {
+    redirectToRefferedBy();
+  });
+  $("#btnRefRedirect").on("click", function () {
+    redirectToRefferedBy();
+  });
+  /*--------------------------------------Save Reffered Begins------------------------------*/
+  var refferedByform = document.getElementById('frmRefferedBy');
+  if (refferedByform != null) {
+    refferedByform.addEventListener("submit", function (epf) {
+      epf.preventDefault();
+      var patientdata = new FormData(refferedByform);
+      var errorModal = tailwind.Modal.getInstance(document.querySelector("#divRefferedByErrorModal"));
+      var token = $('#txtToken').val();
+      var options = {
+        method: "POST",
+        body: patientdata,
+        headers: {
+          Accept: 'application/json',
+          Authorization: 'Bearer ' + token
+        }
+      };
+      var base_url = localStorage.getItem("base_url");
+      var url = base_url + '/api/updateRefferedBy';
+      fetch(url, options).then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        if (data.Success == 'Success') {
+          $('#divMsg span').text(data.Message);
+          if (data.ShowModal == 1) {
+            var successEditModal = tailwind.Modal.getInstance(document.querySelector("#divRefferedBySuccessModal"));
+            successEditModal.show();
+          }
+        } else {
+          $('#divErrorHead span').text(data.Success);
+          $('#divErrorMsg span').text(data.Message);
+          if (data.ShowModal == 1) {
+            errorModal.show();
+          }
+        }
+      })["catch"](function (error) {
+        $('#divErrorHead span').text('Error');
+        $('#divErrorMsg span').text(error);
+        errorModal.show();
+      });
+    });
+  }
+  /*-------------------------------------------------Save Reffered Ends -----------------------------*/
+  /*------------------------------------ Search Donor Begin ----------------------------*/
+  function setDonor() {
+    // Tabulator
+    if ($("#tbDonor").length) {
+      var hospitalId = $('#txtHospital').val();
+      var branchId = $('#txtBranch').val();
+      // Setup Tabulator
+      var token = $('#txtToken').val();
+      var table = new tabulator_tables__WEBPACK_IMPORTED_MODULE_1__["default"]("#tbDonor", {
+        ajaxURL: localStorage.getItem("base_url") + "/api/donorBankList",
+        ajaxParams: {
+          "hospitalId": hospitalId,
+          "branchId": branchId
+        },
+        ajaxConfig: {
+          method: "GET",
+          //set request type to Position
+          headers: {
+            "Content-type": 'application/json; charset=utf-8',
+            //set specific content type
+            "Accept": 'application/json',
+            "Authorization": 'Bearer ' + token
+          }
+        },
+        ajaxFiltering: false,
+        ajaxSorting: true,
+        printAsHtml: true,
+        printStyled: true,
+        pagination: "remote",
+        paginationSize: 10,
+        paginationSizeSelector: [10, 20, 30, 40],
+        layout: "fitColumns",
+        responsiveLayout: "collapse",
+        placeholder: "No matching records found",
+        columns: [{
+          formatter: "responsiveCollapse",
+          width: 40,
+          minWidth: 30,
+          hozAlign: "center",
+          resizable: false,
+          headerSort: false
+        },
+        // For HTML table
+        {
+          title: "NAME",
+          minWidth: 100,
+          field: "name",
+          hozAlign: "center",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          responsive: 2
+        }, {
+          title: "ADDRESS",
+          minWidth: 100,
+          field: "address",
+          hozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false
+        }, {
+          title: "ACTIONS",
+          minWidth: 200,
+          field: "actions",
+          responsive: 1,
+          hozAlign: "center",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          formatter: function formatter(cell, formatterParams) {
+            var a = $("<div class=\"flex lg:justify-center items-center text-info\">\n                        <a class=\"edit flex items-center mr-3 text-primary tooltip\" title=\"Edit Donor Bank Details\" href=\"javascript:;\">\n                            <i data-lucide=\"check-square\" class=\"w-5 h-5 mr-1\"></i> \n                        </a>\n                        <a class=\"delete flex items-center text-danger tooltip\" title=\"Delete Donor Bank\" href=\"javascript:;\">\n                            <i data-lucide=\"trash-2\" class=\"w-5 h-5 mr-1\"></i> \n                        </a>\n                    </div>");
+            $(a).find(".edit").on("click", function () {
+              $('#txtName').val(cell.getData().name);
+              $('#txtAddress').val(cell.getData().address);
+              $('#txtMode').val(2);
+              $('#txtDonorId').val(cell.getData().id);
+            });
+            $(a).find(".delete").on("click", function () {
+              var deleteModal = tailwind.Modal.getInstance(document.querySelector("#divDeleteDonorBank"));
+              deleteModal.show();
+              $('#divDonorBank span').text(cell.getData().name);
+              $("#btnDelDonorBank").on("click", function () {
+                var userId = $('#txtUser').val();
+                deleteDonorBank(cell.getData().id, userId);
+              });
+            });
+            return a[0];
+          }
+        },
+        // For print format
+        {
+          title: "DONOR BANK NAME",
+          field: "name",
+          visible: false,
+          print: true,
+          download: true
+        }, {
+          title: "ADDRESS",
+          field: "address",
+          visible: false,
+          print: true,
+          download: true
+        }],
+        renderComplete: function renderComplete() {
+          (0,lucide__WEBPACK_IMPORTED_MODULE_4__.createIcons)({
+            icons: lucide__WEBPACK_IMPORTED_MODULE_5__,
+            "stroke-width": 1.5,
+            nameAttr: "data-lucide"
+          });
+        }
+      });
+
+      // Redraw table onresize
+      window.addEventListener("resize", function () {
+        table.redraw();
+        (0,lucide__WEBPACK_IMPORTED_MODULE_4__.createIcons)({
+          icons: lucide__WEBPACK_IMPORTED_MODULE_5__,
+          "stroke-width": 1.5,
+          nameAttr: "data-lucide"
+        });
+      });
+      // Export
+      $("#tbDonor-export-xlsx").on("click", function (event) {
+        window.XLSX = (xlsx__WEBPACK_IMPORTED_MODULE_0___default());
+        table.download("xlsx", "DonorBankList.xlsx", {
+          sheetName: "DonorBanks"
+        });
+      });
+      // Print
+      $("#tbDonor-print").on("click", function (event) {
+        table.print();
+      });
+    }
+  }
+  /*------------------------------------------------------- Donor END ---------------------------*/
+  /* --------------- Donor Bank Add form submit Begins ------------------------*/
+
+  var donorBankform = document.getElementById('frmDonorBank');
+  if (donorBankform != null) {
+    //donorBankform registeration
+    donorBankform.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var donorBankdata = new FormData(donorBankform);
+      var token = $('#txtToken').val();
+      var options = {
+        method: "POST",
+        body: donorBankdata,
+        headers: {
+          Accept: 'application/json',
+          Authorization: 'Bearer ' + token
+        }
+      };
+      var base_url = localStorage.getItem("base_url");
+      var url = base_url + '/api/addDonorBank';
+      var errorModal = tailwind.Modal.getInstance(document.querySelector("#divDonorErrorModal"));
+      fetch(url, options).then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        if (data.Success == 'Success') {
+          $('#divMsg span').text(data.Message);
+          if (data.ShowModal == 1) {
+            var successModal = tailwind.Modal.getInstance(document.querySelector("#divDonorSuccessModal"));
+            successModal.show();
+            document.getElementById("frmDonorBank").reset();
+            $('#txtMode').val(1);
+            setDonor();
+          }
+        } else {
+          $('#divErrorHead span').text(data.Success);
+          $('#divErrorMsg span').text(data.Message);
+          if (data.ShowModal == 1) {
+            errorModal.show();
+          }
+        }
+      })["catch"](function (error) {
+        $('#divErrorHead span').text('Error');
+        $('#divErrorMsg span').text(error);
+        errorModal.show();
+      });
+      window.scrollTo(0, 0);
+    });
+  }
+  /* --------------- Donor Bank Add form submit End ------------------------*/
+  /*----------------------------------- Delete Donor Bank By ID bEGINS -------------------------*/
+  function deleteDonorBank(patientId, userId) {
+    var base_url = localStorage.getItem("base_url");
+    var url = base_url + '/api/deleteDonorBank/' + patientId + '/' + userId;
+    var token = $('#txtToken').val();
+    var options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token
+      }
+    };
+    fetch(url, options).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      if (data.Success == 'Success') {
+        if (data.ShowModal == 1) {
+          var el = document.querySelector("#divDeleteDonorBank");
+          var modal = tailwind.Modal.getOrCreateInstance(el);
+          modal.hide();
+          setDonor();
+        }
+      } else {
+        $('#divErrorHead span').text(data.Success);
+        $('#divErrorMsg span').text(data.Message);
+        if (data.ShowModal == 1) {
+          errorModal.show();
+        }
+      }
+    })["catch"](function (error) {
+      $('#divErrorHead span').text('Error');
+      $('#divErrorMsg span').text(error);
+      errorModal.show();
+    });
+  }
+
+  /*----------------------------------- Delete Donor Bank By ID END -------------------------*/
+  $("#btnCancelDonor").on("click", function () {
+    $('#txtMode').val(1);
+  });
+  /*-------------Loading------- Begin */
+  var loader = document.querySelector("#loading");
+  function displayLoading() {
+    loader.classList.add("display");
+    setTimeout(function () {
+      loader.classList.remove("display");
+    }, 5000);
+  }
+  function hideLoading() {
+    loader.classList.remove("display");
+  }
+  /* ------------Loading ------ END-----*/
 })();
 })();
 

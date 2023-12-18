@@ -84,6 +84,12 @@
                 <div class="side-menu__title"> Search Doctor </div>
             </a>
         </li>
+        <li>
+            <a href="{{url('AssignDoctor')}}" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="user-check"></i> </div>
+                <div class="side-menu__title"> Assign Doctor </div>
+            </a>
+        </li>        
     </ul>
 </li>
 @endcan
@@ -107,7 +113,13 @@
                 <div class="side-menu__icon"> <i data-lucide="search"></i> </div>
                 <div class="side-menu__title"> Search Patient </div>
             </a>
-        </li>
+        </li> 
+        <li>
+            <a href="{{url('RefferedBy')}}" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="external-link"></i> </div>
+                <div class="side-menu__title"> Reffered By </div>
+            </a>
+        </li>      
     </ul>
 </li>
 <li>
@@ -168,21 +180,21 @@
     <a id="lnkReport" href="javascript:;" class="side-menu">
         <div class="side-menu__icon"> <i data-lucide="settings"></i> </div>
         <div class="side-menu__title">
-            Report Settings
+            Report 
             <div class="side-menu__sub-icon "> <i data-lucide="chevron-down"></i> </div>
         </div>
     </a>
     <ul id="ulReport" class="">
                         <li>
                         <a id="lnkPatientReport" href="{{url('PatientReport')}}" class="side-menu">
-                            <div class="side-menu__icon"> <i data-lucide="user-check"></i> </div>
-                            <div class="side-menu__title"> Patient Wise Report </div>
+                            <div class="side-menu__icon"> <i data-lucide="user"></i> </div>
+                            <div class="side-menu__title"> Patient / Doctor Report </div>
                         </a>
                         </li>
                         <li>
-                        <a id="lnkDoctorReport" href="{{url('DoctorReport')}}" class="side-menu">
-                            <div class="side-menu__icon"> <i data-lucide="activity"></i> </div>
-                            <div class="side-menu__title"> Doctor Wise Report </div>
+                        <a id="lnkPatientDetails" href="{{url('PatientDetails')}}" class="side-menu">
+                            <div class="side-menu__icon"> <i data-lucide="user-check"></i> </div>
+                            <div class="side-menu__title"> Patient Detail Report </div>
                         </a>
                         </li>
                         </ul>
@@ -217,14 +229,21 @@
         </li>
     </ul>
 </li>
-@can('isAdminHospitalBranch')
 <li>
+    <a id="lnkDonor" href="{{url('DonorBank')}}" class="side-menu">
+        <div class="side-menu__icon"> <i data-lucide="droplet"></i> </div>
+        <div class="side-menu__title"> Donor Bank </div>
+    </a>
+</li>
+@can('isAdminHospitalBranch')
+<!-- <li>
     <a id="lnkSubscribe" href="{{url('subscribe')}}" class="side-menu">
         <div class="side-menu__icon"> <i data-lucide="plus-square"></i> </div>
         <div class="side-menu__title"> Subscribe </div>
     </a>
-</li>
+</li> -->
 @endcan
+
 </ul>
 </nav>
 <!-- END: Side Menu -->

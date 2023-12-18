@@ -6,8 +6,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\CommonController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DonorBankController;
+use App\Http\Controllers\RefferedByController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ConsentFromController;
 use App\Http\Controllers\SemenAnalysisController;
@@ -39,6 +42,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::get('patientInfo/{id}', [PatientController::class, 'getPatientById']);
   Route::post('updatePatient', [PatientController::class, 'updatePatient']);
   Route::get('deletePatient/{id}/{userId}', [PatientController::class, 'deletePatient']);
+  Route::post('updateRefferedBy', [RefferedByController::class, 'updatePatient']);
   //Doctor    
   Route::post('addDoctor', [DoctorController::class, 'registerDoctor']);
   Route::get('doctorList', [DoctorController::class, 'getAllDoctor']);
@@ -86,6 +90,22 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::get('getPatientDoctor/{hospitalId}/{branchId}', [SemenAnalysisController::class, 'getPatientDoctor']);
   Route::get('SemenAnalysisList', [SemenAnalysisController::class, 'getAllSemenAnalysis']);
   Route::get('deleteSemenAnalysis/{id}/{userId}', [SemenAnalysisController::class, 'deleteSemenAnalysis']);
+
+  //Report
+  Route::post('reportPatientWise', [ReportController::class, 'getReportPatientWise']);
+  Route::post('reportPatientDetails', [ReportController::class, 'getPatientDetailReport']);
+
+  //Assign Doctor
+  Route::post('addAssignDoctor', [DoctorController::class, 'addAssignDoctor']);
+  Route::get('assignedPatientList', [DoctorController::class, 'getAllAssignedPatient']);
+  Route::get('deleteAssignedDoctor/{id}/{userId}', [DoctorController::class, 'deleteAssignDoctor']);
+  Route::post('updateAssignDoctor', [DoctorController::class, 'updateAssignDoctor']);
+  Route::get('loadUnAssigned/{hospitalId}/{branchId}', [DoctorController::class, 'getUnAssignedPatientDoctor']);
+
+  //Donor Bank
+  Route::get('donorBankList', [DonorBankController::class, 'getAllDonorBank']);
+  Route::post('addDonorBank', [DonorBankController::class, 'addDonorBank']);
+  Route::get('deleteDonorBank/{id}/{userId}', [DonorBankController::class, 'deleteDonorBank']);
 });
 
 // Route::get('convertToHash/{id}',[loginController::class,'convertToHash']);

@@ -19,6 +19,7 @@ mix.js("public/src/js/app.js", "public/dist/js/")
     .js("public/src/js/ckeditor-document.js", "public/dist/js")
     .js('public/src/js/patient.js', 'public/dist/js/patient.js')
     .css("public/dist/css/_app.css", "public/dist/css/app.css")
+    .css("public/src/css/loading.css", "public/dist/css/loading.css")
     .options({
         processCssUrls: false,
     })

@@ -52,11 +52,15 @@
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtPhoneNo" class="form-label">Phone No <span class="text-danger mt-2"> *</span></label>
-                                <input id="txtPhoneNo" name="phoneNo" type="text" class="form-control" required>
+                                <input id="txtPhoneNo" name="phoneNo" type="text" class="form-control" pattern="(0|91)?(-)?[6-9][0-9]{9}" maxlength="13" title="Phone No format 9999999999 or 91-9999999999" required>
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtEmail" class="form-label">Email Id <span class="text-danger mt-2"> *</span></label>
                                 <input id="txtEmail" name="email" type="email" class="form-control" placeholder="example@gmail.com" required>
+                            </div>
+                            <div class="intro-y col-span-12 sm:col-span-4 form-control">
+                                <label for="txtAadharCardNo" class="form-label">Aadhar Card No</label>
+                                <input id="txtAadharCardNo" name="aadharCardNo" type="text" class="form-control" maxLength="14" placeholder="xxxx-xxxx-xxxx">
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4">
                                 <label for="txtDOB" class="form-label">Date of Birth</label>
@@ -116,7 +120,7 @@
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4">
                                 <label for="txtSpousePhNo" class="form-label">Spouse Phone No</label>
-                                <input id="txtSpousePhNo" name="spousePhNo" type="text" class="form-control">
+                                <input id="txtSpousePhNo" name="spousePhNo" type="text" class="form-control" pattern="(0|91)?(-)?[6-9][0-9]{9}" maxlength="13" title="Phone No format 9999999999 or 91-9999999999">
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4">
                                 <label for="txtReason" class="form-label">Reason For Vist</label>

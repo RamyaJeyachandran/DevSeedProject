@@ -128,7 +128,8 @@
                         </div>
                         <div class="mt-6 lg:mt-0 flex-1 px-5 border-l border-r border-slate-200/60 dark:border-darkmode-400 border-t lg:border-t-0 pt-5 lg:pt-0">
                             <div class="flex flex-col justify-center items-center lg:items-start mt-4">
-                                <div id="lblDob" class="truncate sm:whitespace-normal flex items-center"><b>Date of Birth : </b><span></span> </div>
+                                <div id="lblAadharCardNo" class="truncate sm:whitespace-normal flex items-center"><b>Aadhar Card No : </b><span></span> </div>
+                                <div id="lblDob" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Date of Birth : </b><span></span> </div>
                                 <div id="lblAge" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Age : </b><span></span></div>
                                 <div id="lblGender" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Gender : </b><span></span> </div>
                                 <div id="lblBloodGrp" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Blood Group : </b><span></span> </div>
@@ -141,6 +142,8 @@
                                 <div id="lblSpouseName" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Spouse Name : </b><span></span></div>
                                 <div id="lblSpousePhNo" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Spouse Phone No : </b><span></span></div>
                                 <div id="lblReason" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Reason : </b><span></span></div>
+                                <div id="lblAttendingDoctor" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Attending Doctor : </b><span></span></div>
+                                <div id="lblRefferedByDoctor" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Counsellor : </b><span></span></div>
                         </div>
                         </div>
                     </div>

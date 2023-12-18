@@ -2,11 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
+use Carbon\Carbon;
 use config\constants;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 
 class Patient extends Model
@@ -41,7 +42,12 @@ class Patient extends Model
         'branchId',
         'is_active',
         'created_by',
-        'updated_by'
+        'updated_by',
+        'refferedByDoctorId',
+        'witnessHospitalId',
+        'witnessBankId',
+        'aadharCardNo',
+        'donorBankId'
     ];
 
     public static function addPatient(Request $request,$hcNo,$hospitalId,$branchId,$profileImage){
@@ -68,6 +74,7 @@ class Patient extends Model
         $docName=(isset($request->docName) && !empty($request->docName)) ?$request->docName : NULL;
         $docHpName=(isset($request->docHpName) && !empty($request->docHpName)) ?$request->docHpName : NULL;
         $reason=(isset($request->reason) && !empty($request->reason)) ?$request->reason : NULL;
+        $aadharCardNo=(isset($request->aadharCardNo) && !empty($request->aadharCardNo)) ?$request->aadharCardNo : NULL;
 
         return static::create(
             ['hcNo'=>$hcNo,
@@ -82,6 +89,7 @@ class Patient extends Model
              'patientHeight'=>$height,
              'phoneNo'=>$phoneNo,
              'email'=>$email,
+             'aadharCardNo'=>$aadharCardNo,
              'address'=>$address,
              'city'=>$city,
              'state'=>$state,
@@ -122,6 +130,7 @@ class Patient extends Model
         $docName=(isset($request->docName) && !empty($request->docName)) ?$request->docName : NULL;
         $docHpName=(isset($request->docHpName) && !empty($request->docHpName)) ?$request->docHpName : NULL;
         $reason=(isset($request->reason) && !empty($request->reason)) ?$request->reason : NULL;
+        $aadharCardNo=(isset($request->aadharCardNo) && !empty($request->aadharCardNo)) ?$request->aadharCardNo : NULL;
         
         $patientId="AES_DECRYPT(UNHEX('".$request->patientId."'), UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))";
         $where_sts="id=".$patientId;
@@ -137,6 +146,7 @@ class Patient extends Model
                     'patientWeight'=>$weight,
                     'patientHeight'=>$height,
                     'phoneNo'=>$phoneNo,
+                    'aadharCardNo'=>$aadharCardNo,
                     'email'=>$email,
                     'address'=>$address,
                     'city'=>$city,
@@ -164,6 +174,7 @@ class Patient extends Model
                 'patientWeight'=>$weight,
                 'patientHeight'=>$height,
                 'phoneNo'=>$phoneNo,
+                'aadharCardNo'=>$aadharCardNo,
                 'email'=>$email,
                 'address'=>$address,
                 'city'=>$city,
@@ -205,12 +216,14 @@ class Patient extends Model
     public function getAllPatient($hospitalId,$branchId,$pagination)
     {
         $skip=$pagination['page'] ==1 ?0:(($pagination['page'] * $pagination['size'])-$pagination['size']);
-        $where_sts="is_active=1 ".($hospitalId==0?"":" and hospitalId=".$hospitalId).($branchId==0?"":" and branchId=".$branchId)." ".(($pagination['filters_field'] =="" || $pagination['filters_value']=="")?"":" and ".$pagination['filters_field']." ".$pagination['filters_type']." '".$pagination['filters_value']."%'");
+        $where_sts="patients.is_active=1 ".($hospitalId==0?"":" and patients.hospitalId=".$hospitalId).($branchId==0?"":" and patients.branchId=".$branchId)." ".(($pagination['filters_field'] =="" || $pagination['filters_value']=="")?"":" and patients.".$pagination['filters_field']." ".$pagination['filters_type']." '".$pagination['filters_value']."%'");
+        $sorters_field="patients.".$pagination['sorters_field'];
 
-        $patientList['patientList']=DB::table('patients')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,hcNo,name,spouseName,bloodGroup,phoneNo,email,gender,profileImage")
+        $patientList['patientList']=DB::table('patients')->selectRaw("HEX(AES_ENCRYPT(patients.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,hcNo,patients.name,patients.spouseName,patients.bloodGroup,patients.phoneNo,patients.email,patients.gender,patients.profileImage,doctors.profileImage as doctorImage,COALESCE(doctors.name,0) as doctorName,COALESCE(doctors.doctorCodeNo,0) as doctorCodeNo")
+                                    ->leftJoin('doctors','doctors.id','=','patients.refferedByDoctorId')
                                     ->whereRaw($where_sts)
                                     ->skip($skip)->take($pagination['size']) //pagination
-                                    ->orderBy($pagination['sorters_field'],$pagination['sorters_dir']) 
+                                    ->orderBy($sorters_field,$pagination['sorters_dir']) 
                                    ->get();
         $lastPage=DB::table('patients')->whereRaw($where_sts)->count();
 
@@ -220,8 +233,11 @@ class Patient extends Model
     }
     public function getPatientById($id)
     {
-        $where_sts="id=".$id;
-        $patientDetails=DB::table('patients')->selectRaw("COALESCE(age,0) as age,COALESCE(bloodGroup,0) as bloodGroup,COALESCE(dob,'') as dob,COALESCE(gender,0) as gender,COALESCE(martialStatus,0) as martialStatus,COALESCE(patientWeight,'') as weight,COALESCE(patientHeight,'') as height,COALESCE(address,'') as address,COALESCE(city,'') as city,COALESCE(state,'') as state,COALESCE(pincode,'') as pincode,COALESCE(spouseName,'Not Provided') as spouseName,COALESCE(spousePhnNo,'') as spousePhnNo,COALESCE(refferedBy,'') as refferedBy,COALESCE(refDoctorName,'') as refDoctorName,COALESCE(refDrHospitalName,'') as refDrHospitalName,COALESCE(reason,'') as reason,COALESCE(hospitalId,'') as hospitalId,COALESCE(branchId,'') as branchId,COALESCE(is_active,'') as status,name,hcNo,phoneNo,email,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,profileImage")
+        $where_sts="patients.id=".$id;
+        $patientDetails=DB::table('patients')->selectRaw("COALESCE(patients.age,0) as age,COALESCE(patients.bloodGroup,0) as bloodGroup,COALESCE(patients.dob,'') as dob,COALESCE(patients.gender,0) as gender,COALESCE(patients.martialStatus,0) as martialStatus,COALESCE(patients.patientWeight,'') as weight,COALESCE(patients.patientHeight,'') as height,COALESCE(patients.address,'') as address,COALESCE(patients.city,'') as city,COALESCE(patients.state,'') as state,COALESCE(patients.pincode,'') as pincode,COALESCE(patients.spouseName,'Not Provided') as spouseName,COALESCE(patients.spousePhnNo,'') as spousePhnNo,COALESCE(patients.refferedBy,'') as refferedBy,COALESCE(patients.refDoctorName,'') as refDoctorName,COALESCE(patients.refDrHospitalName,'') as refDrHospitalName,COALESCE(reason,'') as reason,COALESCE(patients.hospitalId,'') as hospitalId,COALESCE(patients.branchId,'') as branchId,COALESCE(patients.is_active,'') as status,patients.name,patients.hcNo,patients.phoneNo,patients.email,HEX(AES_ENCRYPT(patients.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,patients.profileImage,HEX(AES_ENCRYPT(patients.refferedByDoctorId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as refferedByDoctorId,HEX(AES_ENCRYPT(patients.witnessHospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as witnessHospitalId,HEX(AES_ENCRYPT(patients.witnessBankId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as witnessBankId,HEX(AES_ENCRYPT(patients.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as dHopsitalId,HEX(AES_ENCRYPT(patients.branchId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as dBranchId,CONCAT(COALESCE(doctors.name,''),' ',COALESCE(doctors.doctorCodeNo,'')) as attendingDoctor,CONCAT(COALESCE(refferedByDoc.name,''),' ',COALESCE(refferedByDoc.doctorCodeNo,'')) as refferedById,COALESCE(patients.aadharCardNo,'') as aadharCardNo,HEX(AES_ENCRYPT(patients.donorBankId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as donorBankId")
+                                    ->leftJoin('assign_doctors','assign_doctors.patientId','=','patients.id')
+                                    ->leftJoin('doctors','doctors.id','=','assign_doctors.doctorId')
+                                    ->leftJoin('doctors as refferedByDoc','refferedByDoc.id','=','patients.refferedByDoctorId')
                                     ->whereRaw($where_sts)
                                    ->first();
         return $patientDetails;
@@ -252,9 +268,15 @@ class Patient extends Model
             $where_sts="patients.is_active=1 and patients.hcNo=".$hcNo;
         }
 
-        $patientDetails=DB::table('patients')->selectRaw("COALESCE(patients.age,'Not Provided') as age,COALESCE(patients.bloodGroup,'Not Provided') as bloodGroup,COALESCE(patients.dob,'Not Provided') as dob,COALESCE(patients.gender,'Not Provided') as gender,COALESCE(patients.martialStatus,'Not Provided') as martialStatus,COALESCE(patients.patientWeight,'Not Provided') as weight,COALESCE(patients.patientHeight,'Not Provided') as height,COALESCE(patients.address,'Not Provided') as address,COALESCE(patients.city,'Not Provided') as city,COALESCE(patients.state,'Not Provided') as state,COALESCE(patients.pincode,'Not Provided') as pincode,COALESCE(patients.spouseName,'Not Provided') as spouseName,COALESCE(patients.spousePhnNo,'Not Provided') as spousePhnNo,COALESCE(patients.refferedBy,'Not Provided') as refferedBy,COALESCE(patients.refDoctorName,'Not Provided') as refDoctorName,COALESCE(patients.refDrHospitalName,'Not Provided') as refDrHospitalName,COALESCE(patients.reason,'Not Provided') as reason,COALESCE(patients.is_active,'Not Provided') as status,patients.name,patients.hcNo,patients.phoneNo,patients.email,HEX(AES_ENCRYPT(patients.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,COALESCE(hospitalbranch.branchName,hospitalsettings.hospitalName) as hospitalName,hospitalsettings.address as hospitalAddress,profileImage")
+        $patientDetails=DB::table('patients')->selectRaw("COALESCE(patients.age,'Not Provided') as age,COALESCE(patients.bloodGroup,'Not Provided') as bloodGroup,COALESCE(patients.dob,'Not Provided') as dob,COALESCE(patients.gender,'Not Provided') as gender,COALESCE(patients.martialStatus,'Not Provided') as martialStatus,COALESCE(patients.patientWeight,'Not Provided') as weight,COALESCE(patients.patientHeight,'Not Provided') as height,COALESCE(patients.address,'Not Provided') as address,COALESCE(patients.city,'Not Provided') as city,COALESCE(patients.state,'Not Provided') as state,COALESCE(patients.pincode,'Not Provided') as pincode,COALESCE(patients.spouseName,'Not Provided') as spouseName,COALESCE(patients.spousePhnNo,'Not Provided') as spousePhnNo,COALESCE(patients.refferedBy,'Not Provided') as refferedBy,COALESCE(patients.refDoctorName,'Not Provided') as refDoctorName,COALESCE(patients.refDrHospitalName,'Not Provided') as refDrHospitalName,COALESCE(patients.reason,'Not Provided') as reason,COALESCE(patients.is_active,'Not Provided') as status,patients.name,patients.hcNo,patients.phoneNo,patients.email,HEX(AES_ENCRYPT(patients.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,COALESCE(hospitalbranch.branchName,hospitalsettings.hospitalName) as hospitalName,hospitalsettings.address as hospitalAddress,patients.profileImage,COALESCE(patients.aadharCardNo,'') as aadharCardNo,attendingDoc.name as attendingDoctor,counsellor.name as counsellor,witnessHosp.name as witnessHospital,witnessBank.name as witnessBank,donorbanks.name as donorBankName,donorbanks.address as donorBankAddress,COALESCE(witnessHosp.address,'') as witnessHospAddress,COALESCE(witnessBank.address,'') as witnessBankAddress,COALESCE(counsellor.address,'') as counsellorAddress,COALESCE(attendingDoc.address,'') as attendingDoctorAddress")
                                     ->join('hospitalsettings','hospitalsettings.id','=','patients.hospitalId')
                                     ->leftJoin('hospitalbranch','hospitalbranch.id','=','patients.branchId')
+                                    ->leftJoin('assign_doctors','assign_doctors.patientId','=','patients.id')
+                                    ->leftJoin('doctors as attendingDoc','attendingDoc.id','=','assign_doctors.doctorId')
+                                    ->leftJoin('doctors as counsellor','counsellor.id','=','patients.refferedByDoctorId')
+                                    ->leftJoin('doctors as witnessHosp','witnessHosp.id','=','patients.witnessHospitalId')
+                                    ->leftJoin('doctors as witnessBank','witnessBank.id','=','patients.witnessBankId')
+                                    ->leftJoin('donorbanks','donorbanks.id','=','patients.donorBankId')
                                     ->whereRaw($where_sts)
                                    ->first();
 
@@ -302,5 +324,44 @@ class Patient extends Model
                                    ->get();
 
         return $patientDetails;
+    }
+    public function getPatientDetailReport($request){
+        $user = new User;
+        $hospitalId=($request->hospitalId==NULL?$request->hospitalId:$user->getDecryptedId($request->hospitalId));
+        $branchId=($request->branchId==NULL?$request->branchId:$user->getDecryptedId($request->branchId));
+ 
+        $where_sts="patients.is_active=1 ".($hospitalId==0 || $hospitalId==null ?"":" and patients.hospitalId=".$hospitalId).($branchId==0|| $branchId==null?"":" and patients.branchId=".$branchId);
+
+        if($request->dateRange!=null && $request->dateRange!= ""){
+            $dateRange=explode("-",$request->dateRange);
+            $where_sts= $where_sts. " and ( patients.created_date >= '".Carbon::parse($dateRange[0])->toDateString()."' and patients.created_date <= '".Carbon::parse($dateRange[1])->toDateString()."' )";
+        }
+
+        return DB::table('patients')->selectRaw("ROW_NUMBER() OVER(ORDER BY patients.id) as sNo,COALESCE(age,'') as age,COALESCE(patients.bloodGroup,'') as bloodGroup,COALESCE(patients.gender,'') as gender,COALESCE(martialStatus,'') as martialStatus,COALESCE(patientWeight,'') as weight,COALESCE(patientHeight,'') as height,COALESCE(spouseName,'') as spouseName,COALESCE(spousePhnNo,'') as spousePhnNo,patients.name,hcNo,patients.phoneNo,patients.email,patients.created_date,COALESCE(doctors.name,'') as assignedDoctor")
+                                            ->leftJoin('assign_doctors','assign_doctors.patientId','=','patients.id')
+                                            ->leftJoin('doctors','doctors.id','=','assign_doctors.doctorId')
+                                            ->whereRaw($where_sts)
+                                            ->get();
+    }
+    public static function updatePatientRefferedBy(Request $request){
+        $user = new User;
+        $userId=$user->getDecryptedId($request->userId);
+        $refferedByDoctorId=$user->getDecryptedId($request->refferedByDoctorId);
+        $witnessHospitalId=$user->getDecryptedId($request->witnessHospitalId);
+        $witnessBankId=$user->getDecryptedId($request->witnessBankId);
+        $donorBankId=$user->getDecryptedId($request->donorBankId);
+
+        $patientId="AES_DECRYPT(UNHEX('".$request->patientId."'), UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))";
+        $where_sts="id=".$patientId;
+
+                return static::whereRaw($where_sts)->update(
+                    [
+                    'witnessHospitalId'=>$witnessHospitalId,
+                    'refferedByDoctorId'=>$refferedByDoctorId,
+                    'witnessBankId'=>$witnessBankId,
+                    'donorBankId'=>$donorBankId,
+                    'updated_by'=>$userId
+                    ]
+                );
     }
 }

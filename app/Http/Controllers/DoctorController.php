@@ -7,6 +7,7 @@ use App\Models\User;
 use config\constants;
 use App\Models\doctor;
 use App\Models\MixedTables;
+use App\Models\AssignDoctor;
 use Illuminate\Http\Request;
 use App\Models\HospitalBranch;
 use App\Models\DoctorSignature;
@@ -28,6 +29,14 @@ class DoctorController extends Controller
     public function searchIndex()
     {
         return View("pages.searchDoctor");
+    }
+    public function assignIndex()
+    {
+        return View("pages.addAssignDoctor");
+    }
+    public function listIndex()
+    {
+        return View("pages.searchAssignDoctor");
     }
     public function getAllDoctor(Request $request)
     {
@@ -76,7 +85,6 @@ class DoctorController extends Controller
                 $result['ShowModal']=1;
                 $result['Success']='Failure';
                 $result['Message']="Validation failed. Please fill the required field marked as *";
-                $result=json_encode($request);
                 return response()->json($result,200);
             }
             $hospitalId=(isset($request->hospitalId) && !empty($request->hospitalId)) ?$request->hospitalId : NULL;
@@ -92,8 +100,8 @@ class DoctorController extends Controller
             //Decrypt --- END
 
             //----------------Store Image ---Begin 
-            $url = URL::to("/");
-            $profileImage =$url ."/".config('constant.doctor_default_profileImage');
+            $url = request()->getSchemeAndHttpHost();//URL::to("/");
+            $profileImage =$url .config('constant.doctor_default_profileImage');
             if($request->hasfile('profileImage')){
                 $hospital_id_store=($hospitalId==NULL?0:$decrpt_hospitalId);
                 $img_location="images/doctors/";
@@ -126,8 +134,8 @@ class DoctorController extends Controller
                 $doctorsign_obj = new DoctorSignature;
                 $decrpt_userId=$user_obj->getDecryptedId($request->userId);
                  //----------------Store signature ---Begin 
-                    $url = URL::to("/");
-                    $signature =$url ."/".config('constant.doctor_default_profileImage');
+                    $url = request()->getSchemeAndHttpHost();//URL::to("/");
+                    $signature =$url .config('constant.doctor_default_profileImage');
                     $files = $request->file('signature');
 
                     if($request->hasFile('signature'))
@@ -221,8 +229,8 @@ class DoctorController extends Controller
             $profileImage="";
             if($request->isImageChanged==1)
             {
-                $url = URL::to("/");
-                $profileImage =$url ."/".config('constant.doctor_default_profileImage');
+                $url = request()->getSchemeAndHttpHost();//URL::to("/");
+                $profileImage =$url .config('constant.doctor_default_profileImage');
                 if($request->hasfile('profileImage')){
                     $hospital_id_store=($hospitalId==NULL?0:$decrpt_hospitalId);
                     $img_location="images/doctors/";
@@ -267,8 +275,8 @@ class DoctorController extends Controller
                 $decrpt_doctorId=$user_obj->getDecryptedId($request->doctorId);
 
              //----------------Store signature ---Begin 
-                 $url = URL::to("/");
-                 $signature =$url ."/".config('constant.doctor_default_profileImage');
+                 $url = request()->getSchemeAndHttpHost();//URL::to("/");
+                 $signature =$url .config('constant.doctor_default_profileImage');
                  $files = $request->file('signature');
 
                  if($request->hasFile('signature'))
@@ -380,4 +388,152 @@ class DoctorController extends Controller
             return response()->json($result,200);
         }
     }  
+    public function getUnAssignedPatientDoctor(Request $request,$hospitalId,$branchId){
+        try{
+            $doctor_obj =new AssignDoctor;
+            $patientList=$doctor_obj->getUnAssignedPatient($hospitalId,$branchId);
+            $doctor_obj = new doctor;
+            $doctorList = $doctor_obj->getDoctorByHospital($hospitalId,$branchId);
+
+            $result['Success']='Success';
+            $result['patientList']=$patientList;
+            $result['doctorList']=$doctorList;
+            return response()->json($result,200);
+        }catch(\Throwable $th){
+            $result['Success']='failure';
+            $result['Message']=$th->getMessage();
+            return response()->json($result,200);
+        }
+    }  
+    
+    public function addAssignDoctor(Request $request)
+    {
+        try{
+            $result=array();
+            DB::beginTransaction();
+            $validate=Validator::make($request->all(), [
+                'patientId'=>'required',
+                'doctorId'=>'required',
+                'userId'=>'required'
+            ]);
+            if($validate->fails()){
+                $result['ShowModal']=1;
+                $result['Success']='Failure';
+                $result['Message']="Validation failed. Please fill the required field marked as *";
+                return response()->json($result,200);
+            }
+            $assign_obj=new AssignDoctor;
+            $assign_result=$assign_obj->addAssignDoctor($request);
+            $id=$assign_result->id;
+            if($id<=0){
+                $result['ShowModal']=1;
+                $result['Success']='Failure';
+                $result['Message']="Please try again or contact support team.";
+            }
+            $result['ShowModal']=1;
+            $result['Success']='Success';
+            $result['Message']="Doctor assigned successfully";
+            DB::commit();
+            return response()->json($result,200);
+        }catch(\Throwable $th){
+            $result['ShowModal']=1;
+            $result['Success']='failure';
+            $result['Message']=$th->getMessage();
+            return response()->json($result,200);
+        }
+    }
+    public function getAllAssignedPatient(Request $request)
+    {
+        try{
+            $pagination['page']=(isset($request->page) && !empty($request->page)) ?$request->page : 1;
+            $pagination['size']=(isset($request->size) && !empty($request->size)) ?$request->size : 10;
+            $pagination['sorters_field']=(isset($request->sorters[0]['field']) && !empty($request->sorters[0]['field'])) ?$request->sorters[0]['field'] : "assign_doctors.created_date";
+            $pagination['sorters_dir']=(isset($request->sorters[0]['dir']) && !empty($request->sorters[0]['dir'])) ?$request->sorters[0]['dir'] : "desc";
+
+            $pagination['filters_field']=(isset($request->filters[0]['field']) && !empty($request->filters[0]['field'])) ?$request->filters[0]['field'] : "";
+            $pagination['filters_type']=(isset($request->filters[0]['type']) && !empty($request->filters[0]['type'])) ?$request->filters[0]['type'] : "";
+            $pagination['filters_value']=(isset($request->filters[0]['value']) && !empty($request->filters[0]['value'])) ?$request->filters[0]['value'] :"";
+
+            $hospitalId=(isset($request->hospitalId) && !empty($request->hospitalId)) ?$request->hospitalId : NULL;
+            $branchId=(isset($request->branchId) && !empty($request->branchId)) ?$request->branchId : 0;
+
+            //Decrypt --- BEGIN
+            $user = new User;
+            $decrpt_hospitalId=($hospitalId==NULL?$hospitalId:$user->getDecryptedId($hospitalId));
+            $decrpt_branchId=($branchId==NULL?$branchId:$user->getDecryptedId($branchId));
+            //Decrypt --- END
+
+            $assignDoctor_obj = new AssignDoctor;
+            $assignDoctorList=$assignDoctor_obj->getAllAssignedPatient($decrpt_hospitalId,$decrpt_branchId,$pagination);
+            
+            $result['last_page']=$assignDoctorList['last_page'];
+            $result['data']=$assignDoctorList['assignDoctorList'];
+            return response()->json($result,200);
+        }catch(\Throwable $th){
+            $result['Success']='failure';
+            $result['Message']=$th->getMessage();
+            return response()->json($result,200);
+        }
+    }
+    public function deleteAssignDoctor(Request $request,$id,$userId){
+        try{
+            $doctor_obj = new AssignDoctor;
+            $doctorDetails=$doctor_obj->deleteAssignDoctorById($id,$userId);
+            $result['Success']='Success';
+            $result['ShowModal']= 1;
+            $result['doctorDetails']=$doctorDetails;
+            return response()->json($result,200);
+        }catch(\Throwable $th){
+            $result['Success']='failure';
+            $result['Message']=$th->getMessage();
+            return response()->json($result,200);
+        }
+    } 
+    public function showAssignDoctorEdit(Request $request,$id){
+        try{
+            $doctor_obj = new AssignDoctor;
+            $assignDetails=$doctor_obj->getAssignDoctorById($id);
+
+            if($assignDetails!=null){
+                $doctor_obj = new doctor;
+                $assignDetails->doctorList = $doctor_obj->getDoctorByHospital($assignDetails->hospitalId,$assignDetails->branchId);
+            }
+            else{
+                $doctorList=null;
+            }
+
+            return view('pages.editAssignDoctor')->with('AssignDetails', $assignDetails);
+        }catch(\Throwable $th){
+            return Redirect::back()->withErrors($th->getMessage());
+        }
+    }
+    public function updateAssignDoctor(Request $request)
+    {
+        try{
+            $result=array();
+            DB::beginTransaction();
+            $validateUser=Validator::make($request->all(), [
+                'doctorId'=>'required',
+            ]);
+            if($validateUser->fails()){
+                $result['ShowModal']=1;
+                $result['Success']='Failure';
+                $result['Message']="Validation failed. Please fill the required field marked as *";
+                return response()->json($result,200);
+            }
+            $doctor_obj = new AssignDoctor;
+            $doctors = $doctor_obj->updateAssignDoctor($request); 
+
+            $result['ShowModal']=1;
+            $result['Success']='Success';
+            $result['Message']="Doctor updated successfully";
+            DB::commit();
+            return response()->json($result,200);
+        }catch(\Throwable $th){
+            $result['ShowModal']=1;
+            $result['Success']='failure';
+            $result['Message']=$th->getMessage();
+            return response()->json($result,200);
+        }
+    }
 }

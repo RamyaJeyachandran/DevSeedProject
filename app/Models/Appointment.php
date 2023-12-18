@@ -158,4 +158,55 @@ class Appointment extends Model
                                         ->where('appointments.id',$appointmentId)
                                     ->first();
     }
+    public static function getReportPatientWise($request)  
+    {
+        $user = new User;
+        $hospitalId=($request->hospitalId==NULL?$request->hospitalId:$user->getDecryptedId($request->hospitalId));
+        $branchId=($request->branchId==NULL?$request->branchId:$user->getDecryptedId($request->branchId));
+        $patientId=$user->getDecryptedId($request->patientId);
+        $doctorId=$user->getDecryptedId($request->doctorId);
+
+        $dateRange="";
+        $where_patientSts="patients.is_active=1 ";
+        $where_doctorSts="doctors.is_active=1 ";
+        $where_sts="appointments.is_active=1 ".($hospitalId==0?"":" and appointments.hospitalId=".$hospitalId).($branchId==0?"": " and appointments.branchId=".$branchId);
+
+        if($request->reportId==1)
+        {
+            $dateRange=explode("-",$request->dateRange);
+            $where_sts= $where_sts. " and ( appointments.appointmentDate >= '".Carbon::parse($dateRange[0])->toDateString()."' and appointments.appointmentDate <= '".Carbon::parse($dateRange[1])->toDateString()."' )";
+        }
+        else if($request->reportId== 2)
+        {
+            $where_sts= $where_sts. " and DATE_FORMAT(appointments.appointmentDate, '%Y-%m') = '".$request->monthYear."'";
+        }
+        else if($request->reportId== 3)
+        {
+            $where_sts= $where_sts." and DATE_FORMAT(appointments.appointmentDate, '%Y') = '".$request->yearId ."'";
+        }
+        if($patientId>0)
+        {
+            $where_patientSts= $where_patientSts." and patients.id=".$patientId;
+        }
+        if($doctorId>0)
+        {
+            $where_doctorSts= $where_doctorSts." and doctors.id=".$doctorId;
+        }
+        $patientDetails=DB::table('appointments')->selectRaw("ROW_NUMBER() OVER(ORDER BY appointments.id) as sNo,TIME_FORMAT(appointmentTime, '%h:%i %p') as appointmentTime,appointmentDate ,appointments.reason,patients.name as patientName,patients.hcNo,patients.phoneNo,patients.email,patients.gender,patients.martialStatus,CONCAT(patients.address,' ',patients.city,' ',patients.state) as address,doctors.name as doctorName,doctors.doctorCodeNo,patients.spouseName,doctors.phoneNo as doctorPhoneNo,doctors.email as doctorEmail,departments.name as department,doctors.designation")
+                                            ->join('doctors', function ($join) use ($where_doctorSts)  {
+                                                $join->on('doctors.id', '=', 'appointments.doctorId')
+                                                     ->whereRaw($where_doctorSts);
+                                            })
+                                            ->leftJoin('departments','departments.id','=','doctors.departmentId')
+                                            ->join('patients', function ($join) use ($where_patientSts) {
+                                                $join->on('patients.id', '=', 'appointments.patientId')
+                                                     ->whereRaw($where_patientSts);
+                                            })
+                                            ->whereRaw($where_sts)
+                                            // ->orderBy('patients.name','asc')
+                                            ->orderBy('appointments.appointmentDate','desc')
+                                            ->orderBy('appointments.appointmentTime','desc')
+                                            ->get();
+        return $patientDetails;
+    }
 }

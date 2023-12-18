@@ -40,10 +40,10 @@
                       @csrf
                       <div class="intro-x mt-2 xl:mt-10 text-danger dark:text-slate-500 text-center xl:text-left"> {{$errorMsg}} </div>
                         <div class="intro-x mt-8 input-form">
-                            <input type="text" class="form-control" name="email" placeholder="user name" minlength="2" required>
+                            <input type="text" class="form-control" name="email" placeholder="user name" minlength="10" maxlength="100" required>
                         </div>
                         <div class="intro-x mt-8 input-form">
-                            <input type="password" class="intro-x login__input form-control py-3 px-4 block mt-4" name="password" placeholder="Password" required>
+                            <input type="password" class="intro-x login__input form-control py-3 px-4 block mt-4" name="password" minlength="5" maxlength="15" placeholder="Password" required>
                         </div>
                         <div class="intro-x flex text-slate-600 dark:text-slate-500 text-xs sm:text-sm mt-4">
                             <div class="flex items-center mr-auto">

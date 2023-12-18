@@ -44,15 +44,15 @@ class HospitalBranchController extends Controller
                 return response()->json($result, 200);
             }
             //----------------Store Image ---Begin 
-            $url = URL::to("/");
+            $url = request()->getSchemeAndHttpHost();//URL::to("/");
             $logo =$url ."/".config('constant.hospital_default_logo');
             if($request->hasfile('logo')){
-                $img_location="images/hospitals/";
+                $img_location=config('constant.hospitalLogLocation');
                 $img_name =config('constant.prefix_hospital_logo').'_'.time().'.'.$request->logo->getClientOriginalExtension();
                 $request->logo->move(public_path($img_location), $img_name);
 
                 $logo =$img_location.$img_name;
-                $logo=$url ."/". $logo;
+                $logo=$url ."/seed/public/". $logo;
             }
             
             //-------------------Store Image ---End
@@ -184,15 +184,15 @@ class HospitalBranchController extends Controller
              $logo ="";
              if($request->isImageChanged==1)
              {
-                $url = URL::to("/");
+                $url = request()->getSchemeAndHttpHost();//URL::to("/");
                 $logo =$url ."/".config('constant.hospital_default_logo');
                 if($request->hasfile('logo')){
-                    $img_location="images/hospitals/";
+                    $img_location=config('constant.hospitalLogLocation');
                     $img_name =config('constant.prefix_hospital_logo').'_'.time().'.'.$request->logo->getClientOriginalExtension();
                     $request->logo->move(public_path($img_location), $img_name);
     
                     $logo =$img_location.$img_name;
-                    $logo=$url ."/". $logo;
+                    $logo=$url ."/seed/public/". $logo;
                 }
             }
              //-------------------Store Image ---End

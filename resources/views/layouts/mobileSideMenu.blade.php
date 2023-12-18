@@ -95,6 +95,12 @@
                                     <div class="menu__title"> Search Patient </div>
                                 </a>
                             </li>
+                            <li>
+                                <a id="aMobileRefferedBy" href="{{url('SearchPatient')}}" class="menu">
+                                    <div class="menu__icon"> <i data-lucide="external-link"></i> </div>
+                                    <div class="menu__title"> Reffered By </div>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <li>
@@ -146,13 +152,19 @@
                     <li>
                         <a  id="lnkMobileReport" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="settings"></i> </div>
-                            <div class="menu__title">  Report Settings <i data-lucide="chevron-down" class="menu__sub-icon "></i></div>
+                            <div class="menu__title">  Report <i data-lucide="chevron-down" class="menu__sub-icon "></i></div>
                         </a>
                         <ul  id="ulMobilePatientReport" class="">
                         <li>
                         <a  id="aMobilePatientReport" href="{{url('PatientReport')}}" class="menu">
+                            <div class="menu__icon"> <i data-lucide="user"></i> </div>
+                            <div class="menu__title"> Patient / Doctor Report  </div>
+                        </a>
+                        </li>
+                        <li>
+                        <a  id="aMobilePatientDetails" href="{{url('PatientDetails')}}" class="menu">
                             <div class="menu__icon"> <i data-lucide="user-check"></i> </div>
-                            <div class="menu__title"> Patient Cycle Report  </div>
+                            <div class="menu__title"> Patient Detail Report  </div>
                         </a>
                         </li>
                      </ul>
@@ -178,11 +190,17 @@
                         </ul>
                     </li>
                     <li>
+                        <a  id="lnkMobileDonor" href="{{url('DonorBank')}}" class="menu">
+                            <div class="menu__icon"> <i data-lucide="droplet"></i> </div>
+                            <div class="menu__title">  Donor Bank </div>
+                        </a>
+                    </li>
+                    <!-- <li>
                         <a  id="lnkMobileSubscribe" href="{{url('subscribe')}}" class="menu">
                             <div class="menu__icon"> <i data-lucide="plus-square"></i> </div>
                             <div class="menu__title"> Subscribe </div>
                         </a>
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>

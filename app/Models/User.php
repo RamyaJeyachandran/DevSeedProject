@@ -95,9 +95,9 @@ class User extends Authenticatable
         $result = DB::select($select_sts);
         return $result[0]->id;
     }
-    public function getEncryptedId($id)
+    public function getEncryptedId($decryptdId)
     {
-        $select_sts = "SELECT HEX(AES_ENCRYPT(" . $id . ",UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as id";
+        $select_sts = "SELECT HEX(AES_ENCRYPT(" . $decryptdId . ",UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as id";
         $result = DB::select($select_sts);
         return $result[0]->id;
     }
@@ -142,14 +142,14 @@ class User extends Authenticatable
         {
             switch ($userInfo->user_type_id) {
                 case 2:
-                    $profileDetails= DB::table('hospitalSettings')->selectRaw("logo as Image,hospitalName as Name,address,phoneNo,email,inChargePerson,inChargePhoneNo,IF(is_subscribed=0,'No','Yes') as is_subscribed,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id")
+                    $profileDetails= DB::table('hospitalsettings')->selectRaw("logo as Image,hospitalName as Name,address,phoneNo,email,inChargePerson,inChargePhoneNo,IF(is_subscribed=0,'No','Yes') as is_subscribed,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id")
                                                         ->where('id',$userInfo->user_id)
                                                         ->first();
                     break;
                 case 4:
-                    $profileDetails=DB::table('hospitalBranch')->selectRaw("hospitalBranch.logo  as Image,hospitalSettings.hospitalName,hospitalBranch.branchName as Name,hospitalBranch.address,hospitalBranch.phoneNo,hospitalBranch.email,hospitalBranch.contactPerson as inChargePerson,hospitalBranch.contactPersonPhNo as inChargePhoneNo,HEX(AES_ENCRYPT(hospitalBranch.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(hospitalBranch.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id")
-                                                ->join('hospitalSettings', 'hospitalSettings.id', '=', 'hospitalBranch.hospitalId')
-                                                ->where([['hospitalBranch.is_active','=',1],['hospitalBranch.id','=',$userInfo->user_id]])
+                    $profileDetails=DB::table('hospitalbranch')->selectRaw("hospitalbranch.logo  as Image,hospitalsettings.hospitalName,hospitalbranch.branchName as Name,hospitalbranch.address,hospitalbranch.phoneNo,hospitalbranch.email,hospitalbranch.contactPerson as inChargePerson,hospitalbranch.contactPersonPhNo as inChargePhoneNo,HEX(AES_ENCRYPT(hospitalbranch.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(hospitalbranch.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id")
+                                                ->join('hospitalsettings', 'hospitalsettings.id', '=', 'hospitalbranch.hospitalId')
+                                                ->where([['hospitalbranch.is_active','=',1],['hospitalbranch.id','=',$userInfo->user_id]])
                                                 ->first();
                     break;
                 case 5:

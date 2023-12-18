@@ -21,11 +21,11 @@
                     </div>
                     <div class="intro-y col-span-12 sm:col-span-4 form-control">
                     <label for="txtHospitalName" class="form-label">Hospital Name <span class="text-danger mt-2"> *</span></label>
-                                        <input id="txtHospitalName" type="text" name="hospitalName" class="form-control" required>
+                                        <input id="txtHospitalName" type="text" name="hospitalName"  maxlength="150" class="form-control" required>
                     </div>
                     <div class="intro-y col-span-12 sm:col-span-4 form-control">
                     <label for="txtPhoneNo" class="form-label">Phone No <span class="text-danger mt-2"> *</span></label>
-                                        <input id="txtPhoneNo" type="text" name="phoneNo" class="form-control" required>
+                    <input id="txtPhoneNo" type="text" name="phoneNo"  class="form-control"  pattern="(0|91)?(-)?[6-9][0-9]{9}" maxlength="13" title="Phone No format 9999999999 or 91-9999999999" required>
                     </div>
                     <div class="intro-y col-span-12 sm:col-span-4 form-control">
                     <label for="txtEmail" class="form-label">Email Id <span class="text-danger mt-2"> *</span></label>
@@ -34,7 +34,7 @@
                     </div>
                     <div class="intro-y col-span-12 sm:col-span-4 form-control">
                     <label for="txtPassword" class="form-label">Password <span class="text-danger mt-2"> *</span></label>
-                                        <input id="txtPassword" name="password"  type="password" class="form-control" required>
+                                        <input id="txtPassword" name="password"  type="password" minlength="5" maxlength="15" class="form-control" required>
                           
                     </div>
                     <div class="intro-y col-span-12 sm:col-span-4 form-control">
@@ -43,11 +43,11 @@
                     </div>
                     <div class="intro-y col-span-12 sm:col-span-4 form-control">
                     <label for="txtContact" class="form-label">Contact Person <span class="text-danger mt-2"> *</span></label>
-                                        <input id="txtContact" name="inChargePerson" type="text" class="form-control" required>
+                                        <input id="txtContact" name="inChargePerson" maxlength="150" type="text" class="form-control" required>
                     </div>
                     <div class="intro-y col-span-12 sm:col-span-4 form-control">
                     <label for="txtContactPhNo" class="form-label">Contact Person Phone No <span class="text-danger mt-2"> *</span></label>
-                                        <input id="txtContactPhNo" name="inChargePhoneNo" type="text" class="form-control" required>
+                                        <input id="txtContactPhNo" name="inChargePhoneNo"  type="text"  pattern="(0|91)?(-)?[6-9][0-9]{9}" maxlength="13" title="Phone number format 9999999999 or 91-9999999999" class="form-control" required>
                     </div>
                     <div class="intro-y col-span-12 sm:col-span-4 form-control">
                     </div>

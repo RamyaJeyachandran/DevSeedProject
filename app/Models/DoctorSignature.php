@@ -13,7 +13,7 @@ class DoctorSignature extends Model
 {
     public $timestamps = false;
     use HasFactory;
-    protected $table = 'doctorSignatures';
+    protected $table = 'doctorsignatures';
     protected $fillable = [
         'signature',
         'doctorId',
@@ -38,7 +38,7 @@ class DoctorSignature extends Model
     {
         $user = new User;
         $original_doctorId=$user->getDecryptedId($doctorId);
-        return DB::table('doctorSignatures')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,ROW_NUMBER() OVER(PARTITION BY doctorId) as sNo ,signature")
+        return DB::table('doctorsignatures')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,ROW_NUMBER() OVER(PARTITION BY doctorId) as sNo ,signature")
                                     ->where([['doctorId','=',$original_doctorId],['is_active','=',1]])
                                    ->get();
     }

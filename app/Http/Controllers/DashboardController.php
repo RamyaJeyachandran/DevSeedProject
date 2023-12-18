@@ -67,11 +67,7 @@ class DashboardController extends Controller
             return response()->json($result,200);
         }
     }
-
-    public function subscribe()
-    {
-        return view('pages.subscribe');
-    }
+  
     public function ResetPassword(Request $request,$userId)
     {   
         try{

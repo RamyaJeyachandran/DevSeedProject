@@ -69,7 +69,6 @@ class AppointmentController extends Controller
                 $result['ShowModal']=1;
                 $result['Success']='Failure';
                 $result['Message']="Validation failed. Please fill the required field marked as *";
-                $result=json_encode($request);
                 return response()->json($result,200);
             }
             $user = new User;
@@ -83,7 +82,7 @@ class AppointmentController extends Controller
             /*------------------------------ Add unregistered patient BEGIN --------------------*/
             if($request->tabNo==2){
                 $patient_obj=new Patient;
-                $url = URL::to("/");
+                $url = request()->getSchemeAndHttpHost();//URL::to("/");
                 $profileImage =$url ."/". config('constant.doctor_default_profileImage');
 
                 $hcNo=$patient_obj->generateHcNo($hospitalId);
@@ -93,7 +92,6 @@ class AppointmentController extends Controller
                     $result['ShowModal']=1;
                     $result['Success']='Failure';
                     $result['Message']="Please enter the valid patient information";
-                    $result=json_encode($request);
                     return response()->json($result,200);
                 }
                 $patientId=$addPatient->id;
@@ -109,7 +107,6 @@ class AppointmentController extends Controller
                     $result['ShowModal']=1;
                     $result['Success']='Failure';
                     $result['Message']="Please enter the valid patient information";
-                    $result=json_encode($request);
                     return response()->json($result,200);
             }
 
@@ -232,7 +229,6 @@ class AppointmentController extends Controller
                 $result['ShowModal']=1;
                 $result['Success']='Failure';
                 $result['Message']="Validation failed. Please fill the required field marked as *";
-                $result=json_encode($request);
                 return response()->json($result,200);
             }
             $user = new User;
@@ -246,7 +242,6 @@ class AppointmentController extends Controller
                     $result['ShowModal']=1;
                     $result['Success']='Failure';
                     $result['Message']="Invalid patient information";
-                    $result=json_encode($request);
                     return response()->json($result,200);
             }
             $appointment_obj=new Appointment;

@@ -44,12 +44,12 @@
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtName" class="form-label">Doctor Name <span class="text-danger mt-2"> *</span></label>
-                                <input id="txtName" name="name" type="text" class="form-control" required>
+                                <input id="txtName" name="name" type="text" class="form-control" maxlength="150" minlength="3" title="Please enter minimum 3 characters" required>
                             </div>
                             
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtPhoneNo" class="form-label">Phone No <span class="text-danger mt-2"> *</span></label>
-                                <input id="txtPhoneNo" name="phoneNo" type="text" class="form-control" required>
+                                <input id="txtPhoneNo" name="phoneNo" type="text" class="form-control" pattern="(0|91)?(-)?[6-9][0-9]{9}" maxlength="13" title="Phone No format 9999999999 or 91-9999999999" required>
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtEmail" class="form-label">Email Id <span class="text-danger mt-2"> *</span></label>
@@ -57,7 +57,7 @@
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtPassword" class="form-label">Password</label>
-                                <input id="txtPassword" name="password" type="password" class="form-control">
+                                <input id="txtPassword" name="password" type="password" minlength="5" maxlength="10" title="Please enter minimum 5 characters" class="form-control">
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4">
                                 <label for="txtDOB" class="form-label">Date of Birth</label>
@@ -77,11 +77,11 @@
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4">
                                 <label for="txteducation" class="form-label">Eductation</label>
-                                <input id="txteducation" name="education" type="text" class="form-control">
+                                <input id="txteducation" name="education" type="text" class="form-control" minlength="3" maxlength="150" title="Please enter minimum 3 characters">
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4">
                                 <label for="txtdesignation" class="form-label">Designation</label>
-                                <input id="txtdesignation" name="designation" type="text" class="form-control">
+                                <input id="txtdesignation" name="designation" type="text" class="form-control" minlength="3" maxlength="150" title="Please enter minimum 3 characters">
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4">
                                 <label for="ddlDepartment" class="form-label">Department</label>
@@ -91,7 +91,7 @@
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4">
                                 <label for="txtExperience" class="form-label">Experience</label>
-                                <input id="txtExperience" name="experience" type="text" class="form-control">
+                                <input id="txtExperience" name="experience" type="text" class="form-control" minlength="3" maxlength="150" title="Please enter minimum 3 characters">
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4">
                                 <label for="txtAddress" class="form-label">Address</label>

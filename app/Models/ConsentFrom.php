@@ -30,7 +30,7 @@ class ConsentFrom extends Model
         $where_sts="is_active=1 and hospitalId=".$orignal_hospitalId.((isset($orignal_branchId) && !empty($orignal_branchId)) ?" and branchId=".$new_branchId:"");
         
         return DB::table('consent_froms')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,formName,formContent")
-                                        //  ->whereRaw($where_sts)
+                                         ->whereRaw($where_sts)
                                          ->get();
     }    
 }

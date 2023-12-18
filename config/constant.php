@@ -23,7 +23,7 @@ return [
     'prefix_doctor_profile_image'=>'dr_',
     'prefix_doctor_signature'=>'sign_',
     'prefix_patient_profile_image'=>'p_',
-    'doctor_default_profileImage'=>"images/doctors/defaultProfileImage.png",
+    'doctor_default_profileImage'=>"/images/doctors/defaultProfileImage.png",
     'hospital_default_logo'=>"dist/images/logo.svg",
     'prefix_hospital_logo'=>'hs_',
     'liquefactionId'=>'21',
@@ -34,4 +34,6 @@ return [
     'agglutinationId'=> '73',
     'clumpingId'=> '77',
     'pusCellsId'=> '80',
+    'hospitalLogLocation'=>'images/hospitals/',
+    // 'currentUrlPostfix'=>'/seed/public',
 ];

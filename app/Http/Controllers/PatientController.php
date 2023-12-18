@@ -39,7 +39,6 @@ class PatientController extends Controller
                 $result['ShowModal']=1;
                 $result['Success']='Failure';
                 $result['Message']="Validation failed. Please fill the required field marked as *";
-                $result=json_encode($request);
                 return response()->json($result,200);
             }
 
@@ -54,7 +53,7 @@ class PatientController extends Controller
             //Decrypt --- END
 
              //----------------Store Image ---Begin 
-             $url = URL::to("/");
+             $url = request()->getSchemeAndHttpHost();//URL::to("/");
              $profileImage =$url ."/". config('constant.doctor_default_profileImage');
             if($request->profileImage!=NULL && $request->profileImage!="")
             {
@@ -189,7 +188,7 @@ class PatientController extends Controller
             //----------------Store Image ---Begin 
             $profileImage="";
             if($request->isImageChanged==1){
-                $url = URL::to("/");
+                $url =request()->getSchemeAndHttpHost();// URL::to("/");
                 $profileImage =$url ."/". config('constant.doctor_default_profileImage');
                 if($request->profileImage!=NULL && $request->profileImage!="")
                 {
@@ -204,7 +203,7 @@ class PatientController extends Controller
                     $fileName = config('constant.prefix_patient_profile_image').$patientId.'_'.uniqid(). '.png';
                     $profileImage = $folderPath . $fileName;
                     file_put_contents($profileImage, $image_base64);
-                    $url = URL::to("/");
+                    $url = request()->getSchemeAndHttpHost();//URL::to("/");
                     $profileImage=$url ."/". $profileImage;
                 }
             }

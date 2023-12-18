@@ -5,7 +5,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PatientController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DonorBankController;
+use App\Http\Controllers\RefferedByController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ConsentFromController;
 use App\Http\Controllers\SemenAnalysisController;
@@ -29,6 +32,10 @@ Route::get('/', function () {
 
 Route::post('login', [AuthController::class, 'loginUser']);
 Route::get('login/{errorMsg}', [AuthController::class, 'login']);
+ //Payment - Phonepe
+ Route::get('phonepe',[PaymentController::class,'phonePe']);
+ Route::any('phonepe-response',[PaymentController::class,'response'])->name('response');
+
 
 Route::group(['middleware' => 'customAuth'], function () {
     // Logout
@@ -55,6 +62,8 @@ Route::group(['middleware' => 'customAuth'], function () {
     Route::get('Patient', [PatientController::class, 'index']);
     Route::get('SearchPatient', [PatientController::class, 'searchIndex']);
     Route::get('showPatient/{id}', [PatientController::class, 'showEdit']);
+    Route::get('RefferedBy', [RefferedByController::class, 'index']);
+    Route::get('viewRefferedBy/{id}', [RefferedByController::class, 'showRefferedBy']);
 
     //Appointment
     Route::get('PatientAppointment', [AppointmentController::class, 'index']);
@@ -67,7 +76,6 @@ Route::group(['middleware' => 'customAuth'], function () {
     Route::get('SearchConsent', [ConsentFromController::class, 'searchIndex']);
     Route::get('ViewConsent', [ConsentFromController::class, 'viewIndex']);
 
-    Route::get('subscribe', [DashboardController::class, 'subscribe']);
     Route::get('ResetPassword/{id}', [DashboardController::class, 'ResetPassword']);
     Route::get('Profile/{id}', [DashboardController::class, 'userProfile']);
     
@@ -76,9 +84,19 @@ Route::group(['middleware' => 'customAuth'], function () {
     Route::get('PrintSemenAnalysis/{id}', [SemenAnalysisController::class, 'showPrint']);
     Route::get('SearchSemenAnalysis', [SemenAnalysisController::class, 'searchIndex']);
     Route::get('ShowSemenAnalysis/{id}', [SemenAnalysisController::class, 'showEdit']);
-       
+    
+    //Assign Doctor
+    Route::get('AssignDoctor', [DoctorController::class, 'assignIndex']);
+    Route::get('ListAssignedDoctor', [DoctorController::class, 'listIndex']);
+    Route::get('showAssignEdit/{id}', [DoctorController::class, 'showAssignDoctorEdit']);
+
     //Report
     Route::get('PatientReport', [ReportController::class, 'index']);
+    Route::get('PatientDetails', [ReportController::class, 'patientIndex']);  
 
+    //Payment
+    Route::get('subscribe', [PaymentController::class, 'subscribe']);
+
+    Route::get('DonorBank', [DonorBankController::class, 'index']);
 });
 // Auth::routes();
