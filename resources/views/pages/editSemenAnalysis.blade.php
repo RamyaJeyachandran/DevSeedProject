@@ -15,20 +15,10 @@
         <div class="mt-3">
             <button id="btnUpdSemenAnalysis" type="submit" class="btn btn-danger w-24 ml-2">Update</button>
         </div>
-        <div class="intro-y box mt-5">
-    <div id="boxed-tab" class="p-5">
-            <ul class="nav nav-boxed-tabs" role="tablist">
-                <li id="" class="nav-item flex-1" role="presentation">
-                    <button class="nav-link w-full py-2 active" data-tw-toggle="pill" data-tw-target="#tabPatientInfoContent"
-                        type="button" role="tab" aria-controls="tabPatientInfoContent" aria-selected="true">PATIENT INFORMATION</button>
-                </li>
-                <li id="tabDoctorInfo" class="nav-item flex-1" role="presentation">
-                    <button class="nav-link w-full py-2" data-tw-toggle="pill" data-tw-target="#tabDoctorInfoContent"
-                        type="button" role="tab" aria-controls="tabDoctorInfoContent" aria-selected="false">DOCTOR INFORMATION</button>
-                </li>
-            </ul>
-<div class="tab-content mt-5">
-    <div id="tabPatientInfoContent" class="tab-pane leading-relaxed active" role="tabpanel" aria-labelledby="tabPatientInfo">
+        <!-- <div class="intro-y box mt-5">
+    <div id="boxed-tab" class="p-5"> -->
+    <div class="intro-y box p-5 mt-5">
+                    <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5">   
     <input id="txtHospital" name="hospitalId" value="{{ session('hospitalId') }}"
         type="hidden" class="form-control"> <input id="txtBranch" name="branchId" value="{{ session('branchId') }}"
         type="hidden" class="form-control">
@@ -56,95 +46,8 @@
                     @endforeach
             </select>
         </div>
-    </div>
-    <div id="tabDoctorInfoContent" class="tab-pane leading-relaxed" role="tabpanel" aria-labelledby="tabSignature">
-                    <div class="mt-3">
-                    <label for="ddlScientist1" class="form-label">Scientist <span class="text-danger mt-2"> *</span></label>
-                        <select id="ddlScientist1" value="{{$semenanalysisDetails->leftScientistId}}" name="leftScientistId" class="form-select" required>
-                            <option value='0'>Select Doctor</option>
-                                @foreach ($semenanalysisDetails->doctorList as $doctorList)
-                                    <option value="{{ $doctorList->id }}" {{ ( $doctorList->id == $semenanalysisDetails->leftScientistId) ? 'selected' : '' }}>
-                                            {{ $doctorList->name }}
-                                    </option>
-                                @endforeach
-                        </select>
-                    </div>
-                    <div class="mt-3">
-                        <div class="flex">
-                        <!-- Code Begin -->
-                        <label class="form-label">Left Signature</label>
-                                                <div class=" pt-4">
-                                                    <div id="divLeftSignature" class="flex flex-wrap px-4">
-                                                    @foreach ($semenanalysisDetails->signatureDetails as $signatureDetails)
-                                                        <div class="w-24 h-24 relative image-fit mb-5 mr-5 cursor-pointer zoom-in">
-                                                            <img class="rounded-md" src="{{$signatureDetails->signature}}">
-                                                            <div title="Select this signature" class="tooltip w-5 h-5 flex items-center justify-center absolute rounded-full text-white bg-danger right-0 top-0 -mr-2 -mt-2">
-                                                            <input id="rdleftsignId{{$signatureDetails->sNo}}" class='form-check-input' type='radio' name='leftsigndoctorId' value="{{$signatureDetails->id}}" {{ ( $signatureDetails->id == $semenanalysisDetails->leftsigndoctorId) ? 'checked' : '' }}>  </div>
-                                                        </div>
-                                                    @endforeach
-                                                    </div>
-                                                </div>
-                        <!-- Code End -->
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                    <label for="ddlScientist2" class="form-label">Scientist <span class="text-danger mt-2"> *</span></label>
-                        <select id="ddlScientist2" value="{{$semenanalysisDetails->centerScientistId}}" name="centerScientistId" class="form-select" required>
-                            <option value='0'>Select Doctor</option>
-                                @foreach ($semenanalysisDetails->doctorList as $doctorList)
-                                    <option value="{{ $doctorList->id }}" {{ ( $doctorList->id == $semenanalysisDetails->centerScientistId) ? 'selected' : '' }}>
-                                            {{ $doctorList->name }}
-                                    </option>
-                                @endforeach
-                        </select>
-                    </div>
-                    <div class="mt-3">
-                        <div class="flex">
-                            <label class="form-label">Center Signature</label>
-                                                <div class=" pt-4">
-                                                    <div id="divCenterSignature" class="flex flex-wrap px-4">
-                                                    @foreach ($semenanalysisDetails->signatureDetails as $signatureDetails)
-                                                        <div class="w-24 h-24 relative image-fit mb-5 mr-5 cursor-pointer zoom-in">
-                                                            <img class="rounded-md" src="{{$signatureDetails->signature}}">
-                                                            <div title="Select this signature" class="tooltip w-5 h-5 flex items-center justify-center absolute rounded-full text-white bg-danger right-0 top-0 -mr-2 -mt-2">
-                                                            <input id="rdleftsignId{{$signatureDetails->sNo}}" class='form-check-input' type='radio' name='centersigndoctorId' value="{{$signatureDetails->id}}" {{ ( $signatureDetails->id == $semenanalysisDetails->centersigndoctorId) ? 'checked' : '' }}>  </div>
-                                                        </div>
-                                                    @endforeach
-                                                    </div>
-                                                </div>
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                    <label for="ddlMedicalDirector" class="form-label">Medical Director <span class="text-danger mt-2"> *</span></label>
-                        <select id="ddlMedicalDirector" value="{{$semenanalysisDetails->rightMedicalDirectorId}}" name="rightMedicalDirectorId" class="form-select" required>
-                            <option value='0'>Select Doctor</option>
-                                @foreach ($semenanalysisDetails->doctorList as $doctorList)
-                                    <option value="{{ $doctorList->id }}" {{ ( $doctorList->id == $semenanalysisDetails->rightMedicalDirectorId) ? 'selected' : '' }}>
-                                            {{ $doctorList->name }}
-                                    </option>
-                                @endforeach
-                        </select>
-                    </div>
-                    <div class="mt-3">
-                        <div class="flex">
-                            <label class="form-label">Right Signature</label>
-                                                <div class=" pt-4">
-                                                    <div id="divRightSignature" class="flex flex-wrap px-4">
-                                                    @foreach ($semenanalysisDetails->signatureDetails as $signatureDetails)
-                                                        <div class="w-24 h-24 relative image-fit mb-5 mr-5 cursor-pointer zoom-in">
-                                                            <img class="rounded-md" src="{{$signatureDetails->signature}}">
-                                                            <div title="Select this signature" class="tooltip w-5 h-5 flex items-center justify-center absolute rounded-full text-white bg-danger right-0 top-0 -mr-2 -mt-2">
-                                                            <input id="rdleftsignId{{$signatureDetails->sNo}}" class='form-check-input' type='radio' name='rightsigndoctorId' value="{{$signatureDetails->id}}" {{ ( $signatureDetails->id == $semenanalysisDetails->rightsigndoctorId) ? 'checked' : '' }}>  </div>
-                                                        </div>
-                                                    @endforeach
-                                                    </div>
-                                                </div>
-                        </div>
-                    </div>
-
-                </div>
-                
-</div>
+    <!-- </div>
+</div> -->
         
 </div>
 </div>
@@ -424,6 +327,35 @@
                 </div>
 
             </div>
+            <div class="intro-y box p-5 mt-5">
+<nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item active font-medium text-base  mr-auto" aria-current="page">Report Signature</li>
+                        </ol>
+                    </nav>
+    <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5">
+    <input id="txtReportSignId" name="reportSignId" value="{{ $semenanalysisDetails->reportSignId }}"  type="hidden" class="form-control">
+        <div class="intro-y col-span-12 sm:col-span-4 form-control">
+            <label id="lblLeftSign" for="txtLeftSign" class="form-label">Left Signature: {{ $semenanalysisDetails->leftDoctor }}</label>
+            <div id="txtLeftSign" class="box">
+                 <img id="ïmgLeftSign" src="{{ $semenanalysisDetails->leftSignature }}">
+            </div>
+        </div>
+        <div class="intro-y col-span-12 sm:col-span-4 form-control">
+            <label id="lblCenterSign" for="txtCenterSign" class="form-label">Center Signature: {{ $semenanalysisDetails->centerDoctor }} </label>
+            <div id="txtCenterSign" class="box ">
+            <img id="imgCenterSign" src="{{ $semenanalysisDetails->centerSignature }}">
+            </div>
+        </div>
+        <div class="intro-y col-span-12 sm:col-span-4 form-control">
+            <label id="lblRightSign" for="txtRightSign" class="form-label">Right Signature: {{ $semenanalysisDetails->rightDoctor }} </label>
+            <div id="txtRightSign" class="box ">
+            <img id="imgRightSign" src="{{ $semenanalysisDetails->rightSignature }}">
+            </div>
+        </div>
+    </div>
+</div>
+
     </div>
 
     </form>
@@ -469,5 +401,5 @@
 
     @push('js')
     <script src="{{ asset('dist/js/app.js')}}"></script>
-    <script  type="module" src="{{ asset('dist/js/patient.js')}}"></script>
+    <script  type="module" src="{{ asset('dist/js/semenAnalysis.js')}}"></script>
     @endpush

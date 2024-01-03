@@ -152,6 +152,7 @@
     </ul>
 </li>
 <li>
+@can('isNotAdmin')
 <li>
     <a id="lnkSemen" href="javascript:;" class="side-menu">
         <div class="side-menu__icon"> <i data-lucide="link-2"></i> </div>
@@ -162,23 +163,30 @@
     </a>
     <ul id="ulSemenAnalysis" class="">
         <li>
-            <a id="lnkSemenAnalysis" href="{{url('SemenAnalysis')}}" class="side-menu">
+            <a  href="{{url('SemenAnalysis')}}" class="side-menu">
                 <div class="side-menu__icon"> <i data-lucide="plus-circle"></i> </div>
                 <div class="side-menu__title">Add Semen Analysis </div>
             </a>
         </li>
         <li>
-            <a id="lnkSemenAnalysisSearch" href="{{url('SearchSemenAnalysis')}}" class="side-menu">
+            <a  href="{{url('SearchSemenAnalysis')}}" class="side-menu">
                 <div class="side-menu__icon"> <i data-lucide="search"></i> </div>
                 <div class="side-menu__title"> Search Semen Analysis  </div>
+            </a>
+        </li>
+        <li>
+            <a href="{{ url('ReportSignature') }}" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="pen-tool"></i> </div>
+                <div class="side-menu__title">Report Signature</div>
             </a>
         </li>
     </ul>
 
 </li>
+@endcan
 <li>
     <a id="lnkReport" href="javascript:;" class="side-menu">
-        <div class="side-menu__icon"> <i data-lucide="settings"></i> </div>
+        <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
         <div class="side-menu__title">
             Report 
             <div class="side-menu__sub-icon "> <i data-lucide="chevron-down"></i> </div>
@@ -235,13 +243,33 @@
         <div class="side-menu__title"> Donor Bank </div>
     </a>
 </li>
-@can('isAdminHospitalBranch')
+<!-- @can('isAdminHospitalBranch') -->
 <!-- <li>
     <a id="lnkSubscribe" href="{{url('subscribe')}}" class="side-menu">
         <div class="side-menu__icon"> <i data-lucide="plus-square"></i> </div>
         <div class="side-menu__title"> Subscribe </div>
     </a>
 </li> -->
+<!-- @endcan -->
+@can('isNotAdmin')
+<li>
+    <a id="lnkPrintSettings" href="javascript:;" class="side-menu">
+        <div class="side-menu__icon"> <i data-lucide="settings"></i> </div>
+        <div class="side-menu__title">
+            Settings
+            <div class="side-menu__sub-icon "> <i data-lucide="chevron-down"></i> </div>
+        </div>
+    </a>
+   
+    <ul id="ulPrintSettings" class="">
+        <li>
+            <a href="{{ url('PrintSettings') }}" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="printer"></i> </div>
+                <div class="side-menu__title"> Print Settings</div>
+            </a>
+        </li>      
+    </ul>
+</li>
 @endcan
 
 </ul>

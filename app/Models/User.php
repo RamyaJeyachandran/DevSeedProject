@@ -28,7 +28,8 @@ class User extends Authenticatable
         'is_login',
         'is_active',
         'user_id',
-        'created_by'
+        'created_by',
+        'colorId',
     ];
 
     /**
@@ -116,7 +117,7 @@ class User extends Authenticatable
     public function getUserInfo($id)
     {
         $userId = $this->getDecryptedId($id);
-        return DB::table('users')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,name,email")->where("id",$userId)->first();
+        return DB::table('users')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,name,email,COALESCE(colorId,'".config('constant.colorId')."') as colorId")->where("id",$userId)->first();
     }
     public function updatePassword($request){
         $original_userId = $this->getDecryptedId($request->userId);
@@ -165,5 +166,32 @@ class User extends Authenticatable
     public function userInformation($user_id){
         $original_id = $this->getDecryptedId($user_id);
         return DB::table('users')->where('id',$original_id)->first(); 
+    }
+    public function forgetPassword($request,$user_id){
+        $hashed_password = Hash::make($request->newPassword, [
+            'rounds' => 12,
+        ]);
+        return static::where('id',$user_id)->update(
+            [
+                'password' => $hashed_password,
+                'updated_by' => $user_id
+            ]
+        );     
+    }
+    public function setColorId($request){
+        $user_id= $this->getDecryptedId($request->userId);
+
+        return static::where('id',$user_id)->update(
+            [
+                'colorId' => $request->colorId,
+                'updated_by' => $user_id
+            ]
+        );     
+    }
+    public function hexToRgbMethod1($hex) {
+        $r = hexdec(substr($hex, 1, 2));
+        $g = hexdec(substr($hex, 3, 2));
+        $b = hexdec(substr($hex, 5, 2));
+        return array($r, $g, $b);
     }
 }

@@ -8,6 +8,7 @@ use config\constants;
 use App\Models\doctor;
 use App\Models\MixedTables;
 use App\Models\AssignDoctor;
+use App\Models\pageSettings;
 use Illuminate\Http\Request;
 use App\Models\HospitalBranch;
 use App\Models\DoctorSignature;
@@ -178,7 +179,13 @@ class DoctorController extends Controller
                         return response()->json($result, 200);
                     }else{
                         $user_details=$user_obj->createLogin($request,config('constant.doctor_user_type_id'),$doctorId,$request->name);
-                        $login_created=1;
+                        if ($user_details->id > 0) {
+                            $page_obj=new pageSettings;
+                            $page_result=$page_obj->addPageSettings($user_details->id, config('constant.pageSetting.marginRight'),config('constant.pageSetting.marginLeft'),config('constant.pageSetting.marginBottom'),config('constant.pageSetting.marginTop'));
+                            if ($page_result->id > 0) {
+                                $login_created = 1;
+                            }
+                        }
                     }
                 }
             }

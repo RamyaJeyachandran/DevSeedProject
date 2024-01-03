@@ -44,6 +44,7 @@ return new class extends Migration
 
             $table->bigInteger('patientId')->unsigned();
             $table->bigInteger('doctorId')->unsigned();
+            $table->bigInteger('reportSignId')->unsigned()->nullable();
             
             $table->bigInteger('leftScientistId')->unsigned()->nullable();
             $table->bigInteger('centerScientistId')->unsigned()->nullable();
@@ -72,6 +73,8 @@ return new class extends Migration
             $table->foreign('leftScientistId')->references('id')->on('doctors');
             $table->foreign('centerScientistId')->references('id')->on('doctors');
             $table->foreign('rightMedicalDirectorId')->references('id')->on('doctors');
+
+            $table->foreign('reportSignId')->references('id')->on('report_signatures');
         });
     }
 

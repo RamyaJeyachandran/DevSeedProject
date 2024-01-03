@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\HospitalSettings;
+use App\Models\pageSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -84,7 +85,11 @@ class HospitalSettingsController extends Controller
                     } else {
                         $user_details = $user_obj->createLogin($request, config('constant.hospital_user_type_id'), $hospitalId, $request->hospitalName);
                         if ($user_details->id > 0) {
-                            $login_created = 1;
+                            $page_obj=new pageSettings;
+                            $page_result=$page_obj->addPageSettings($user_details->id, config('constant.pageSetting.marginRight'),config('constant.pageSetting.marginLeft'),config('constant.pageSetting.marginBottom'),config('constant.pageSetting.marginTop'));
+                            if ($page_result->id > 0) {
+                                $login_created = 1;
+                            }
                         }
                     }
                 }

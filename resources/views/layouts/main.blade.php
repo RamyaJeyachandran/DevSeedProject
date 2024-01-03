@@ -9,6 +9,11 @@
         <!-- BEGIN: CSS Assets-->
         @yield('style')
         <!-- END: CSS Assets-->
+        <style>
+            :root{
+                --color-primary: {{ session('colorId')}};
+            }
+        </style>
     </head>
     <!-- END: Head -->
     <body class="py-5">

@@ -11,8 +11,10 @@ use App\Http\Controllers\DonorBankController;
 use App\Http\Controllers\RefferedByController;
 use App\Http\Controllers\AppointmentController;
 use App\Http\Controllers\ConsentFromController;
+use App\Http\Controllers\PageSettingsController;
 use App\Http\Controllers\SemenAnalysisController;
 use App\Http\Controllers\HospitalBranchController;
+use App\Http\Controllers\ReportSignatureController;
 use App\Http\Controllers\HospitalSettingsController;
 
 /*
@@ -25,12 +27,13 @@ use App\Http\Controllers\HospitalSettingsController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-
 Route::get('/', function () {
     return view('pages.login')->with('errorMsg', '');
 });
 
 Route::post('login', [AuthController::class, 'loginUser']);
+Route::get('ForgetPassword', [AuthController::class, 'forgetPassword']);
+
 Route::get('login/{errorMsg}', [AuthController::class, 'login']);
  //Payment - Phonepe
  Route::get('phonepe',[PaymentController::class,'phonePe']);
@@ -78,6 +81,7 @@ Route::group(['middleware' => 'customAuth'], function () {
 
     Route::get('ResetPassword/{id}', [DashboardController::class, 'ResetPassword']);
     Route::get('Profile/{id}', [DashboardController::class, 'userProfile']);
+    Route::get('ColourTheme/{id}', [DashboardController::class, 'getUserColourTheme']);
     
     //SemenAnalysis
     Route::get('SemenAnalysis', [SemenAnalysisController::class, 'index']);
@@ -98,5 +102,10 @@ Route::group(['middleware' => 'customAuth'], function () {
     Route::get('subscribe', [PaymentController::class, 'subscribe']);
 
     Route::get('DonorBank', [DonorBankController::class, 'index']);
+
+    //Settings
+    Route::get('PrintSettings', [PageSettingsController::class, 'index']);
+    Route::get('ReportSignature', [ReportSignatureController::class, 'index']);
+
 });
 // Auth::routes();

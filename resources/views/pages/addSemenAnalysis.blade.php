@@ -6,46 +6,16 @@
         <!-- BEGIN: Content --> 
     <div class="content"> @include('layouts.topBar') 
         <form id="frmSemenAnalysis">
-            <div class="mt-3"> 
-                <button id="btnSavesemenanalysis" type="submit" class="btn btn-primary w-24 ml-2">Save</button>
-                <button id="btnCancelanalysis" type="reset" class="btn btn-dark w-24">Cancel</button>
-            </div>
-<div class="intro-y box mt-5">
-    <div id="boxed-tab" class="p-5">
-            <ul class="nav nav-boxed-tabs" role="tablist">
-                <li id="" class="nav-item flex-1" role="presentation">
-                    <button class="nav-link w-full py-2 active" data-tw-toggle="pill" data-tw-target="#tabPatientInfoContent"
-                        type="button" role="tab" aria-controls="tabPatientInfoContent" aria-selected="true">PATIENT INFORMATION</button>
-                </li>
-                <li id="tabDoctorInfo" class="nav-item flex-1" role="presentation">
-                    <button class="nav-link w-full py-2" data-tw-toggle="pill" data-tw-target="#tabDoctorInfoContent"
-                        type="button" role="tab" aria-controls="tabDoctorInfoContent" aria-selected="false">DOCTOR INFORMATION</button>
-                </li>
-            </ul>
-<div class="tab-content mt-5">
-<!--Tab1-->
-<div id="tabPatientInfoContent" class="tab-pane leading-relaxed active" role="tabpanel" aria-labelledby="tabPatientInfo">
+           
+<!-- <div class="intro-y box mt-5">
+    <div id="boxed-tab" class="p-5"> -->
+    <div class="intro-y box p-5 mt-5">
+                    <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5">   
         <input id="txtHospital" name="hospitalId" value="{{ session('hospitalId') }}"
         type="hidden" class="form-control"> <input id="txtBranch" name="branchId" value="{{ session('branchId') }}"
         type="hidden" class="form-control">
         <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
 
-        @can('isAdmin')
-        <div class="intro-y col-span-12 sm:col-span-4 form-control">
-            <label for="ddlHospital" class="form-label">Hospital <span class="text-danger mt-2"> *</span></label>
-            <select id="ddlHospital" name="hospitalId" class="form-select">
-                <option value='0'>Select Hospital</option>
-                </select>
-        </div>
-    @endcan
-    @can('isAdminHospital')
-    <div id="divBranchddl" class="intro-y col-span-12 sm:col-span-4 form-control">
-        <label for="ddlBranch" class="form-label">Branch <span class="text-danger mt-2"> *</span></label>
-        <select id="ddlBranch" name="branchId" class="form-select">
-        <option value='0'>Select Branch</option>
-        </select>
-    </div>
-        @endcan
         <div id="divPatientddl" class="intro-y col-span-12 sm:col-span-4 form-control">
         <label for="ddlPatient" class="form-label">Patient <span class="text-danger mt-2"> *</span></label>
         <select id="ddlPatient" name="patientId" class="form-select" required>
@@ -63,46 +33,8 @@
         </select>
     </div>
 </div>
-<!-- Tab 2 -->
-<div id="tabDoctorInfoContent" class="tab-pane leading-relaxed" role="tabpanel" aria-labelledby="tabDoctorInfo">
-                <div class="mt-3">
-                    <label for="ddlScientist1" class="form-label">Scientist <span class="text-danger mt-2"> *</span></label>
-                        <select id="ddlScientist1" name="leftScientistId" class="form-select" required>
-                            <option value='0'>Select Doctor</option>
-                        </select>
-                    </div>
-                    <div class="mt-3">
-                        <label for="divLeftSignature" class="form-label">Left Signature</label>
-                        <div id="divLeftSignature" class="flex">
 
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                    <label for="ddlScientist2" class="form-label">Scientist <span class="text-danger mt-2"> *</span></label>
-                        <select id="ddlScientist2" name="centerScientistId" class="form-select" required>
-                            <option value='0'>Select Doctor</option>
-                        </select>
-                    </div>
-                    <div class="mt-3">
-                        <label for="divCenterSignature" class="form-label">Center Signature</label>
-                        <div id="divCenterSignature" class="flex">
-
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                    <label for="ddlMedicalDirector" class="form-label">Medical Director <span class="text-danger mt-2"> *</span></label>
-                        <select id="ddlMedicalDirector" name="rightMedicalDirectorId" class="form-select" required>
-                            <option value='0'>Select Doctor</option>
-                        </select>
-                    </div>
-                    <div class="mt-3">
-                        <label for="divRightSignature" class="form-label">Right Signature</label>
-                        <div id="divRightSignature" class="flex">
-
-                        </div>
-                    </div>
-</div>
-</div></div>
+<!-- </div></div> -->
 </div>
 <div class="intro-y box mt-5">
     <div id="boxed-tab" class="p-5">
@@ -352,7 +284,40 @@
     </div>
 
 </div>
+<div class="intro-y box p-5 mt-5">
+<nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item active font-medium text-base  mr-auto" aria-current="page">Report Signature</li>
+                        </ol>
+                    </nav>
+    <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5">
+    <input id="txtReportSignId" name="reportSignId"  type="hidden" class="form-control">
+        <div class="intro-y col-span-12 sm:col-span-4 form-control">
+            <label id="lblLeftSign" for="txtLeftSign" class="form-label">Left Signature </label>
+            <div id="txtLeftSign" class="box">
+                 <img id="ïmgLeftSign" src="">
+            </div>
+        </div>
+        <div class="intro-y col-span-12 sm:col-span-4 form-control">
+            <label id="lblCenterSign" for="txtCenterSign" class="form-label">Center Signature </label>
+            <div id="txtCenterSign" class="box ">
+            <img id="imgCenterSign" src="">
+            </div>
+        </div>
+        <div class="intro-y col-span-12 sm:col-span-4 form-control">
+            <label id="lblRightSign" for="txtRightSign" class="form-label">Right Signature </label>
+            <div id="txtRightSign" class="box ">
+            <img id="imgRightSign" src="">
+            </div>
+        </div>
+    </div>
 </div>
+<div class="mt-3"> 
+                <button id="btnSavesemenanalysis" type="submit" class="btn btn-primary w-24 ml-2">Save</button>
+                <button id="btnCancelanalysis" type="reset" class="btn btn-dark w-24">Cancel</button>
+            </div>
+</div>
+
 
 </form>
 <!-- END: Content -->
@@ -399,5 +364,5 @@
 
 @push('js')
 <script src="{{ asset('dist/js/app.js')}}"></script>
-<script type="module" src="{{ asset('dist/js/patient.js')}}"></script>
+<script type="module" src="{{ asset('dist/js/semenAnalysis.js')}}"></script>
 @endpush

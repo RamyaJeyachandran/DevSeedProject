@@ -17,6 +17,7 @@
                             <div class="menu__title"> Dashboard </div>
                         </a>
                     </li>
+                    @can('isAdmin')
                     <li>
                         <a id="lnkMobileHospital" href="javascript:;.html" class="menu">
                             <div class="menu__icon"> <i data-lucide="folder-plus"></i> </div>
@@ -37,6 +38,8 @@
                             </li>
                         </ul>
                     </li>
+                    @endcan
+                    @can('isAdminHospital')
                     <li>
                         <a  id="lnkMobileBranch" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="layers"></i> </div>
@@ -57,6 +60,8 @@
                             </li>
                         </ul>
                     </li>
+                    @endcan
+                    @can('isAdminHospitalBranch')
                     <li>
                         <a  id="lnkMobileDoctor" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="activity"></i> </div>
@@ -77,6 +82,7 @@
                             </li>
                         </ul>
                     </li>
+                    @endcan
                     <li>
                         <a  id="lnkMobilePatient" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="users"></i> </div>
@@ -129,6 +135,7 @@
                             </li>
                         </ul>
                     </li>
+                    @can('isNotAdmin')
                     <li>
                         <a  id="lnkMobileSemenAnalysis" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="link-2"></i> </div>
@@ -147,8 +154,15 @@
                                     <div class="menu__title"> Search Semen Analysis </div>
                                 </a>
                             </li>
+                            <li>
+                                <a  id="aMobileReportSign" href="{{ url('ReportSignature') }}" class="menu">
+                                    <div class="menu__icon"> <i data-lucide="pen-tool"></i> </div>
+                                    <div class="menu__title"> Report Signature</div>
+                                </a>
+                            </li>
                      </ul>
                     </li>
+                    @endcan
                     <li>
                         <a  id="lnkMobileReport" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="settings"></i> </div>
@@ -187,6 +201,12 @@
                                     <div class="menu__title"> Search Consent Form </div>
                                 </a>
                             </li>
+                            <li>
+                                <a id="aMobileViewConsent" href="{{url('ViewConsent')}}" class="menu">
+                                    <div class="menu__icon"> <i data-lucide="file-text"></i> </div>
+                                    <div class="menu__title"> Consent Form </div>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <li>
@@ -201,6 +221,23 @@
                             <div class="menu__title"> Subscribe </div>
                         </a>
                     </li> -->
+                    @can('isNotAdmin')
+                    <li>
+                        <a  id="lnkMobilePrint" href="javascript:;" class="menu">
+                            <div class="menu__icon"> <i data-lucide="settings"></i> </div>
+                            <div class="menu__title">  Settings  <i data-lucide="chevron-down" class="menu__sub-icon "></i> </div>
+                        </a>
+                        <ul  id="ulMobilePrint" class="">
+                            <li>
+                                <a  id="aMobilePrint" href="{{ url('PrintSettings') }}" class="menu">
+                                    <div class="menu__icon"> <i data-lucide="printer"></i> </div>
+                                    <div class="menu__title"> Print Settings</div>
+                                </a>
+                            </li>
+                            
+                        </ul>
+                    </li>
+                    @endcan
                 </ul>
             </div>
         </div>

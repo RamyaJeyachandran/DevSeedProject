@@ -18,12 +18,15 @@ import Chart from "chart.js/auto";
 window.addEventListener("load", (e) => {
     e.preventDefault();
     var pathname = window.location.pathname;
-    var base_url = window.location.origin;// publish +'/seed/public'
+    // var base_url = window.location.origin+'/seed/public';
+    // localStorage.setItem("base_url", base_url);
+    // var serverPath='/seed/public/index.php';
+    // var serverPath2='/seed/public';
+    var base_url = window.location.origin;
     localStorage.setItem("base_url", base_url);
-    var serverPath='';// '/seed/public/index.php';
-    var serverPath2='';// '/seed/public'
-    
-    
+    var serverPath='';
+    var serverPath2='';
+        
     function setMenu($lnkControl,$ulControl){
         $($lnkControl).addClass("side-menu--active");
         $($ulControl).addClass("side-menu__sub-open");
@@ -37,6 +40,7 @@ window.addEventListener("load", (e) => {
             $($aMobile).addClass("menu--active");
         }
     }
+   
     if(pathname==serverPath+'/Home' || pathname==serverPath2+'/Home')
 {
     $("[id*=lnkDashboard]").addClass("side-menu--active");
@@ -47,6 +51,7 @@ window.addEventListener("load", (e) => {
 {
     setMenu("[id*=lnkHospital]","[id*=ulHospital]");
     setMobileMenu("[id*=lnkMobileHospital]","[id*=ulMobileHospital]","[id*=aMobileHospital]","[id*=aMobileHpSearch]",0);
+    $("#divResetPassword").addClass('hidden');
 }
  if(pathname==serverPath+'/SearchHospital' || pathname==serverPath2+'/SearchHospital')//.indexOf('SearchHospital') != -1
 {
@@ -199,7 +204,7 @@ window.addEventListener("load", (e) => {
 }
  if(pathname==serverPath+'/SemenAnalysis' || pathname==serverPath2+'/SemenAnalysis')
 {
-    setMenu("[id*=lnkSemenAnalysis]","[id*=ulSemenAnalysis]");
+    setMenu("[id*=lnkSemen]","[id*=ulSemenAnalysis]");
     setMobileMenu("[id*=lnkMobileSemenAnalysis]","[id*=ulMobileSemenAnalysis]","[id*=aMobileSemenAnalysis]","[id*=aMobileSemenAnalysis]",0);
     let ddlBranch = document.getElementById('ddlBranch');
     let ddlHospital = document.getElementById('ddlHospital');
@@ -212,12 +217,12 @@ window.addEventListener("load", (e) => {
 }
  if(pathname.indexOf('PrintSemenAnalysis') != -1)
 {
-    setMenu("[id*=lnkSemenAnalysis]","[id*=ulSemenAnalysis]");
+    setMenu("[id*=lnkSemen]","[id*=ulSemenAnalysis]");
     setMobileMenu("[id*=lnkMobileSemenAnalysis]","[id*=ulMobileSemenAnalysis]","[id*=aMobileSemenAnalysis]","[id*=aMobileSemenAnalysis]",1);  
 }
  if(pathname==serverPath+'/SearchSemenAnalysis' || pathname==serverPath2+'/SearchSemenAnalysis')
 {
-    setMenu("[id*=lnkSemenAnalysisSearch]","[id*=ulSemenAnalysis]");
+    setMenu("[id*=lnkSemen]","[id*=ulSemenAnalysis]");
     setMobileMenu("[id*=lnkMobileSemenAnalysis]","[id*=ulMobileSemenAnalysis]","[id*=aMobileSemenAnalysis]","[id*=aMobileSemenAnalysis]",1); 
     $("#divDateSearch").addClass('hidden');
     $("input#tbSemen-html-filter-value-1").hide();
@@ -226,7 +231,7 @@ window.addEventListener("load", (e) => {
 }
  if(pathname.indexOf('ShowSemenAnalysis') != -1)
 {
-    setMenu("[id*=lnkSemenAnalysis]","[id*=ulSemenAnalysis]");
+    setMenu("[id*=lnkSemen]","[id*=ulSemenAnalysis]");
     setMobileMenu("[id*=lnkMobileSemenAnalysis]","[id*=ulMobileSemenAnalysis]","[id*=aMobileSemenAnalysis]","[id*=aMobileSemenAnalysis]",0); 
 }
  if(pathname==serverPath+'/PatientReport' || pathname==serverPath2+'/PatientReport')
@@ -2528,16 +2533,49 @@ function consentFormOnLoad(){
         $("#txtRegNo").val("");      
     });
     $( "#btnPrintConsent" ).on( "click", function() {
-      var divToPrint=document.getElementById('divConsentContent');
-      var newWin=window.open('','Print-Window');
-      newWin.document.open();
-      newWin.document.write('<html><body onload="window.print()">'+divToPrint.innerHTML+'</body></html>');
-      newWin.document.close();
-      setTimeout(function(){newWin.close();},10);            
+        var userId=$("#txtUser").val();
+        var base_url = localStorage.getItem("base_url");
+        var url=base_url+'/api/getPrintMargin/'+userId;
+        var token=$('#txtToken').val();
+        let options = {
+            method: 'GET',
+            headers: {
+                Accept: 'application/json',
+                Authorization: 'Bearer '+token,
+              },
+        }
+        fetch(url, options)
+            .then(function(response){ 
+                return response.json(); 
+            })
+            .then(function(data){ 
+                if(data.Success=='Success'){
+                    var printMarign=[];
+                    var ml=data.pageSettingsDetails.marginLeft-1;
+                    var mr=data.pageSettingsDetails.marginRight-1;
+                    var mb=data.pageSettingsDetails.marginBottom-1;
+                    var mt=data.pageSettingsDetails.marginTop-1;
+                    printMarign["marginRight"]=mr+'cm';
+                    printMarign["marginLeft"]=ml+'cm';
+                    printMarign["marginBottom"]=mb+'cm';
+                    printMarign["marginTop"]=mt+'cm';
+                   
+                    var divToPrint=document.getElementById('divConsentContent');
+                    var newWin=window.open('','Print-Window');
+                    var content='<html ><body topmargin="'+printMarign["marginTop"]+'" bottommargin="'+printMarign["marginBottom"]+'" rightmargin="'+printMarign["marginRight"]+'" leftmargin="'+printMarign["marginLeft"]+'" onload="window.print()">'+divToPrint.innerHTML+'</body></html>';
+                    newWin.document.open();
+                    newWin.document.write(content);
+                    newWin.document.close();
+                    setTimeout(function(){newWin.close();},10);  
+                }
+            })
+            .catch(function(error){
+                const errorDrModal = tailwind.Modal.getInstance(document.querySelector("#divConsentErrorModal"));
+                $('#divErrorHead span').text('Error');
+                $('#divErrorMsg span').text(error);
+                errorDrModal.show();
+            }); 
     });
-    // $('#btnSaveConsent').on("click",function(){
-    //     saveConsentForm();
-    // });
 }
 /*----------------- clear consent form -----------*/
     function clearConsentForm(){
@@ -2621,8 +2659,8 @@ function consentFormOnLoad(){
                                     //Get the checked Checkbox ---END
                                     let currentDate = new Date().toISOString().slice(0, 10).split('-').reverse().join('/'); 
                                     let display_formContent=value.formContent;
-                                     display_formContent=display_formContent.replaceAll("@hospitalName ", data.patientDetails.hospitalName);
-                                     display_formContent=display_formContent.replaceAll("@hospitalAddress ", data.patientDetails.hospitalAddress);
+                                     display_formContent=display_formContent.replaceAll("@hospitalName", data.patientDetails.hospitalName);
+                                     display_formContent=display_formContent.replaceAll("@hospitalAddress", data.patientDetails.hospitalAddress);
                                      display_formContent= display_formContent.replaceAll("@patientName", data.patientDetails.name);
                                      display_formContent= display_formContent.replaceAll("@patientPhoneNo", data.patientDetails.phoneNo);
                                      display_formContent= display_formContent.replaceAll("@patientAddress", data.patientDetails.address);
@@ -2652,6 +2690,7 @@ function consentFormOnLoad(){
                         data.selectedForm.forEach(element=> {
                             var chkSelectedId='#chk'+element['consentFormId'];
                             $(chkSelectedId).attr('checked', true);
+                            document.getElementById('btnPrintConsent').disabled = false;
 
                             index_id=selectedForm.indexOf(element['consentFormId']);
                             if(index_id<0){
@@ -3614,9 +3653,9 @@ $( "#tbAppointment-html-filter-field" ).on( "change", function() {
     }
 } );
 /*------------------------ View Patient Appointment Begin ------------------------------*/
-function viewPatientAppointment($appointmentId){
+function viewPatientAppointment(appointmentId){
     var base_url = localStorage.getItem("base_url");
-    var url=base_url+'/api/patientAppointmentInfo/'+$appointmentId;
+    var url=base_url+'/api/patientAppointmentInfo/'+appointmentId;
     var token=$('#txtToken').val();
     let options = {
         method: 'GET',
@@ -4397,76 +4436,60 @@ $( "#btnSemenSuccessPrint" ).on( "click", function() {
 /*---------------------- PRINT SEMEN ANALYSIS -------------------*/
 $( "#btnPrintSemenAnalysis" ).on( "click", function() {
      var contents = $("#divPrintSemenAnalysis").html();
-        var frame1 = $('<iframe />');
-        frame1[0].name = "frame1";
-        frame1.css({ "position": "absolute", "top": "-1000000px" });
-        $("body").append(frame1);
-        var frameDoc = frame1[0].contentWindow ? frame1[0].contentWindow : frame1[0].contentDocument.document ? frame1[0].contentDocument.document : frame1[0].contentDocument;
-        frameDoc.document.open();
-        //Create a new HTML document.
-        frameDoc.document.write('<html><head><title>DIV Contents</title>');
-        frameDoc.document.write('</head><body>');
-        //Append the external CSS file.
-        var styleLocation=localStorage.getItem("base_url")+"/dist/css/app.css";
-        frameDoc.document.write("<link rel='stylesheet' href='"+styleLocation+"' />");
-        //Append the DIV contents.
-        frameDoc.document.write(contents);
-        frameDoc.document.write('</body></html>');
-        frameDoc.document.close();
-        setTimeout(function () {
-            window.frames["frame1"].focus();
-            window.frames["frame1"].print();
-            frame1.remove();
-        }, 500);
-});
-/*--------------------------------------Update Semen analysis Begins------------------------------*/
-const semenanalysiseditform = document.getElementById('frmEditSemenAnalysis'); 
-if (semenanalysiseditform != null) {
-    semenanalysiseditform.addEventListener("submit", (epf) => {
-        epf.preventDefault();
-        const semenanalysisdata = new FormData(semenanalysiseditform);
-        const params = new URLSearchParams(semenanalysisdata);
+     var userId=$("#txtUser").val();
+        var base_url = localStorage.getItem("base_url");
+        var url=base_url+'/api/getPrintMargin/'+userId;
         var token=$('#txtToken').val();
         let options = {
-            method: "POST",
-            body: params,
+            method: 'GET',
             headers: {
                 Accept: 'application/json',
                 Authorization: 'Bearer '+token,
               },
-        };
-        var base_url = localStorage.getItem("base_url");
-        var url = base_url + '/api/updateSemenAnalysis';
-        const errorModal = tailwind.Modal.getInstance(document.querySelector("#warning-modal-preview"));
+        }
         fetch(url, options)
-            .then(function (response) {
-                return response.json();
+            .then(function(response){ 
+                return response.json(); 
             })
-            .then(function (data) {
-                if (data.Success == 'Success') {
-                    $('#divMsg span').text(data.Message);
+            .then(function(data){ 
+                if(data.Success=='Success'){
+                    var printMarign=[];
+                    var ml=data.pageSettingsDetails.marginLeft-1;
+                    var mr=data.pageSettingsDetails.marginRight-1;
+                    var mb=data.pageSettingsDetails.marginBottom-1;
+                    var mt=data.pageSettingsDetails.marginTop-1;
 
-                    if (data.ShowModal == 1) {
-                        const successEditModal = tailwind.Modal.getInstance(document.querySelector("#success-modal-preview"));
-                        successEditModal.show();
-                        document.getElementById("frmEditSemenAnalysis").reset();
-                    }
-                } else {
-                    $('#divErrorHead span').text(data.Success);
-                    $('#divErrorMsg span').text(data.Message);
-                    if (data.ShowModal == 1) {
-                        errorModal.show();
-                    }
+                    var frame1 = $('<iframe />');
+                    var style='<head><style>table { width: 100%; font-size:12px } table, th, td { border: 1px solid black;border-collapse: collapse;}</style></head>';
+                    frame1[0].name = "frame1";
+                    frame1.css({ "position": "absolute", "top": "-1000000px" });
+                    $("body").append(frame1);
+                    var frameDoc = frame1[0].contentWindow ? frame1[0].contentWindow : frame1[0].contentDocument.document ? frame1[0].contentDocument.document : frame1[0].contentDocument;
+                    frameDoc.document.open();
+                    //Create a new HTML document.
+                    frameDoc.document.write('<html>'+style);//<head><title>DIV Contents</title></head>
+                    frameDoc.document.write('<body topmargin="'+mt+'" bottommargin="'+mb+'" rightmargin="'+mr+'" leftmargin="'+ml+'">');
+                    //Append the external CSS file.
+                    // var styleLocation=localStorage.getItem("base_url")+"/dist/css/app.css";
+                    // frameDoc.document.write("<link rel='stylesheet' href='"+styleLocation+"' />");
+                    //Append the DIV contents.
+                    frameDoc.document.write(contents);
+                    frameDoc.document.write('</body></html>');
+                    frameDoc.document.close();
+                    setTimeout(function () {
+                        window.frames["frame1"].focus();
+                        window.frames["frame1"].print();
+                        frame1.remove();
+                    }, 500);
                 }
             })
-            .catch(function (error) {
+            .catch(function(error){
+                const errorDrModal = tailwind.Modal.getInstance(document.querySelector("#divPrintSAErrorModal"));
                 $('#divErrorHead span').text('Error');
                 $('#divErrorMsg span').text(error);
-                errorModal.show();
-            });
-    });
-}
-/*-------------------------------------------------Update semen analysis update Ends -----------------------------*/
+                errorDrModal.show();
+            });        
+});
 /* Get Patient and Doctor for Semen Analysis -- BEGIN */
 function getPatientDoctor(){
     let ddlPatient = document.getElementById('ddlPatient');
@@ -4911,7 +4934,7 @@ $("#ddlScientist2").on('change',function() {
     getSignatureValue('ddlScientist2','divCenterSignature','ddlCenterSignDoctorId','centersigndoctorId');
 });
 $("#ddlMedicalDirector").on('change',function() {
-    getSignatureValue('ddlMedicalDirector','divRightSignature','ddlCenterSignDoctorId','rightsigndoctorId');
+    getSignatureValue('ddlMedicalDirector','divRightSignature','ddlRightSignDoctorId','rightsigndoctorId');
 });
 function getSignatureValue(ddlCtrl,divName,ddlSignCtrl,ddlSignCtrlName){
     var base_url = localStorage.getItem("base_url");
@@ -5294,7 +5317,8 @@ $('#ddlReport').on('change',function(){
         frameDoc.document.open();
         //Create a new HTML document.
         frameDoc.document.write('<html><head><title>'+title+'</title>');
-        frameDoc.document.write('</head><body>');
+        // frameDoc.document.write('<style> @media print { @page {margin: 0;}}</style>');
+        frameDoc.document.write('</head><body leftmargin="20px" rightmargin="20px" bottommargin="20px" topmargin="20px">');
         //Append the external CSS file.
         var styleLocation=localStorage.getItem("base_url")+"/dist/css/app.css";
         frameDoc.document.write("<link rel='stylesheet' href='"+styleLocation+"' />");
@@ -6493,17 +6517,6 @@ function setDonor(){
                 "stroke-width": 1.5,
                 nameAttr: "data-lucide",
             });
-        });
-         // Export
-         $("#tbDonor-export-xlsx").on("click", function (event) {
-            window.XLSX = xlsx;
-            table.download("xlsx", "DonorBankList.xlsx", {
-                sheetName: "DonorBanks",
-            });
-        });
-         // Print
-         $("#tbDonor-print").on("click", function (event) {
-            table.print();
         });
     }
 }

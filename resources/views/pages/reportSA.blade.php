@@ -11,11 +11,12 @@
                     <h2 class="text-lg font-medium mr-auto">
                     </h2>
                     <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
-                        <button id="btnPrintSemenAnalysis" type="button" class="btn btn-dark shadow-md mr-2"><i data-lucide="printer" class="w-4 h-4 mr-2"></i> Print</button>
+                        <button id="btnPrintSemenAnalysis" type="button" class="btn btn-danger shadow-md mr-2"><i data-lucide="printer" class="w-4 h-4 mr-2"></i> Print</button>
                         <div class="dropdown ml-auto sm:ml-0">
                         <button onclick="window.location='{{ url("SemenAnalysis") }}'" class="btn btn-primary shadow-md mr-2">
                             Add Semen Analysis
                         </button>
+                        <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -61,7 +62,7 @@
                         </tr>
                         </tbody>
             </table>
-            <p>&nbsp;</p>
+           <br>
             <table class="table table-bordered">
                 <tbody>
                     <tr>
@@ -369,24 +370,24 @@
                         </td>
                     </tr>
                     <tr>
-                        <td valign="top" width="200" Height="200">
+                        <td valign="top" width="200" Height="150">
                             <p class="uppercase font-bold">Scientist</p>
                             @if($analysisDetails->leftSignature != '')
-                            <img class="rounded-full" src="{{$analysisDetails->leftSignature}}">
+                            <img class="rounded-full image-fit" src="{{$analysisDetails->leftSignature}}">
                             <p>{{$analysisDetails->leftDoctor}}</p>
                             @endif
                         </td>
-                        <td valign="top" width="150" Height="200">
+                        <td valign="top" width="150" Height="150">
                             <p class="uppercase font-bold">Scientist</p>
                             @if($analysisDetails->centerSignature != '')
-                            <img class="rounded-full" src="{{$analysisDetails->centerSignature}}">
+                            <img class="rounded-full image-fit" src="{{$analysisDetails->centerSignature}}">
                             <p>{{$analysisDetails->centerDoctor}}</p>
                             @endif
                         </td>
-                        <td valign="top" width="150" Height="200">
+                        <td valign="top" width="150" Height="150">
                             <p class="uppercase font-bold">Medical Director</p>
                             @if($analysisDetails->rightSignature != '')
-                            <img class="rounded-full" src="{{$analysisDetails->rightSignature}}">
+                            <img class="rounded-full image-fit" src="{{$analysisDetails->rightSignature}}">
                             <p>{{$analysisDetails->rightDoctor}}</p>
                             @endif
                         </td>
@@ -400,9 +401,24 @@
 </div>
 
 </div>
+   <!-- BEGIN: Error Modal Content --> 
+   <div id="divPrintSAErrorModal" class="modal" data-tw-backdrop="static" tabindex="-1" aria-hidden="true"> 
+    <div class="modal-dialog"> 
+        <div class="modal-content"> 
+            <div class="modal-body p-0"> 
+                <div class="p-5 text-center"> <i data-lucide="x-circle" class="w-16 h-16 text-warning mx-auto mt-3"></i> 
+                <div id="divErrorHead"class="text-3xl mt-5"><span></span></div> 
+                <div id="divErrorMsg" class="text-slate-500 mt-2"><span></span></div> </div> 
+                <div class="px-5 pb-8 text-center"> 
+                    <button type="button" data-tw-dismiss="modal" class="btn w-24 btn-primary">Ok</button> 
+                </div> 
+            </div> 
+        </div> 
+    </div> 
+</div> <!-- END: Error Modal Content --> 
 @endsection
 
 @push('js')
 <script src="{{ asset('dist/js/app.js')}}"></script>
-<script type="module" src="{{ asset('dist/js/patient.js')}}"></script>
+<script type="module" src="{{ asset('dist/js/semenAnalysis.js')}}"></script>
 @endpush

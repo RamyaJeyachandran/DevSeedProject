@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Redirect;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\DashboardController;
+use config\constants;
 use URL;
 
 class AuthController extends Controller
@@ -54,6 +55,17 @@ class AuthController extends Controller
             $request->session()->put('userType',$user_type_id);
             $request->session()->put('userId', $userId);
             $request->session()->put('userName',Auth::user()->name);
+            /*Theme ---BEGIN */
+            $request->session()->put('colorId',config('constant.default_colorRbg'));
+            if(Auth::user()->colorId!=null){
+                $color_array=$user->hexToRgbMethod1(Auth::user()->colorId);
+                if(count($color_array)==3)
+                {
+                    $rgbColor=$color_array[0].' '.$color_array[1].' '.$color_array[2];
+                    $request->session()->put('colorId', $rgbColor);
+                }
+            }
+            /*Theme ---END */
 
             $token_name="Token".$id."-".Carbon::now()->rawFormat("m/d/Y H:i:s");
             $decrypt_token_name=Hash::make($token_name, ['rounds' => 12,]);
@@ -123,10 +135,15 @@ class AuthController extends Controller
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+        return view('pages.login')->with('errorMsg', '');
+        // return redirect('/index.php');
     }
     public function login(Request $request, $errorMsg)
     {     
         return view('pages.login')->with('errorMsg', $errorMsg);
+    }
+    public function forgetPassword(Request $request)
+    {     
+        return view('pages.forgetPassword');
     }
 }

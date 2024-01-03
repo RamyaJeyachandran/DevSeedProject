@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\PageSettingsController;
+use App\Http\Controllers\ReportSignatureController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\LoginController;
 use App\Http\Controllers\CommonController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ReportController;
@@ -28,8 +28,10 @@ use App\Http\Controllers\HospitalSettingsController;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
+Route::post('forgetPassword', [DashboardController::class, 'forgetPassword']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
+
   //Hospital api
   Route::post('addHospital', [HospitalSettingsController::class, 'saveHospitalSettings']);
   Route::get('hospitalList', [HospitalSettingsController::class, 'getAllHospitalSettings']);
@@ -47,6 +49,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::post('addDoctor', [DoctorController::class, 'registerDoctor']);
   Route::get('doctorList', [DoctorController::class, 'getAllDoctor']);
   Route::get('getDoctorCommonData', [CommonController::class, 'getDoctorddl']);
+  Route::get('departmentList', [CommonController::class, 'loadDepartment']);
   Route::get('doctorInfo/{id}', [DoctorController::class, 'getDoctorById']);
   Route::post('updateDoctor', [DoctorController::class, 'updateDoctor']);
   Route::get('deleteDoctor/{id}/{userId}', [DoctorController::class, 'deleteDoctor']);
@@ -106,6 +109,19 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::get('donorBankList', [DonorBankController::class, 'getAllDonorBank']);
   Route::post('addDonorBank', [DonorBankController::class, 'addDonorBank']);
   Route::get('deleteDonorBank/{id}/{userId}', [DonorBankController::class, 'deleteDonorBank']);
+
+  //Print Settings
+  Route::post('updatePageSettings', [PageSettingsController::class, 'updatePageSettings']);
+  Route::get('getPrintMargin/{userId}', [PageSettingsController::class, 'getPrintMarginByUserId']);
+
+  Route::post('colorTheme', [DashboardController::class, 'setColorTheme']);
+
+  //Report Signature
+  Route::get('reportSignatureList', [ReportSignatureController::class, 'getAllSignature']);
+  Route::post('addReportSignature', [ReportSignatureController::class, 'addReportSignature']);
+  Route::get('setDefaultSignature/{userId}/{reportSignId}/{isDefault}', [ReportSignatureController::class, 'updateDefaultSignature']);
+  Route::get('defaultReportSign/{hospitalId}/{branchId}', [ReportSignatureController::class, 'getReportSignByHospital']);
+  
 });
 
 // Route::get('convertToHash/{id}',[loginController::class,'convertToHash']);

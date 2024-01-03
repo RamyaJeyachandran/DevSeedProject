@@ -18,3 +18,8 @@
         transform: rotate(360deg);
     }
 }
+/* @media print {
+    @page {
+      margin: 0mm;
+    }
+  } */

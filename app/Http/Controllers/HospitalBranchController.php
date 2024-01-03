@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use URL;
 use App\Models\User;
 use config\constants;
+use App\Models\pageSettings;
 use Illuminate\Http\Request;
 use App\Models\HospitalBranch;
 use Illuminate\Support\Facades\DB;
@@ -84,7 +85,13 @@ class HospitalBranchController extends Controller
                     }else{
                         $user_obj = new User;
                         $user_details=$user_obj->createLogin($request,config('constant.branch_user_type_id'),$branchId,$request->branchName);
-                        $login_created=1;
+                        if ($user_details->id > 0) {
+                            $page_obj=new pageSettings;
+                                $page_result=$page_obj->addPageSettings($user_details->id, config('constant.pageSetting.marginRight'),config('constant.pageSetting.marginLeft'),config('constant.pageSetting.marginBottom'),config('constant.pageSetting.marginTop'));
+                                if ($page_result->id > 0) {
+                                    $login_created = 1;
+                                }
+                        }
                     }
                 }
             }

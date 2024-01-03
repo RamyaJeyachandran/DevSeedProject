@@ -2,6 +2,7 @@
 @section('title','Consent Form')
 @section ('style')
 <link rel="stylesheet" href="{{ asset('dist/css/app.css') }}" />
+<link rel="stylesheet" href="{{ asset('dist/css/loading.css') }}" />
 
 @endsection 
 @section('content')

@@ -159,5 +159,21 @@ class CommonController extends Controller
         }
 
     }
+    public function loadDepartment(Request $request)
+    {
+        try {
+            $mixedTable = new MixedTables;
+            $departmentList = $mixedTable->getDepartment();
+            $result['departmentList'] = $departmentList;
+            $result['Success'] = 'Success';
+            $result['Message'] = "Fetched Successfully";
+            return response()->json($result, 200);
+        } catch (\Throwable $th) {
+            $result['Success'] = 'failure';
+            $result['Message'] = $th->getMessage();
+            return response()->json($result, 200);
+        }
+    }
+
 
 }

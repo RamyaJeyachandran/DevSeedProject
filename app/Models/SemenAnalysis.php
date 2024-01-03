@@ -50,6 +50,8 @@ class semenanalysis extends Model
         'centerScientistId',
         'rightMedicalDirectorId',
 
+        'reportSignId',
+
         'is_active',
         'created_by',
         'updated_by'
@@ -58,14 +60,23 @@ class semenanalysis extends Model
     public function  getSemenAnalysisById($id)
     {
         $where_sts = "semenanalysis.id=" . $id;
-        $semenanalysisDetails = DB::table('semenanalysis')->selectRaw("COALESCE(semenanalysis.liquefaction,0) as liquefaction,COALESCE(semenanalysis.appearance,0) as appearance,COALESCE(semenanalysis.ph,0) as ph,COALESCE(semenanalysis.volume,'') as volume,COALESCE(semenanalysis.viscosity,0) as viscosity,COALESCE(semenanalysis.abstinence,0) as abstinence,COALESCE(semenanalysis.medication,'') as medication,COALESCE(semenanalysis.spermconcentration,'') as spermconcentration,COALESCE(semenanalysis.agglutination,0) as agglutination,COALESCE(semenanalysis.clumping,0) as clumping,COALESCE(semenanalysis.granulardebris,0) as granulardebris,COALESCE(semenanalysis.totalmotility,'') as totalmotility,COALESCE(semenanalysis.rapidprogressivemovement,'') as rapidprogressivemovement,COALESCE(semenanalysis.sluggishprogressivemovement,'') as sluggishprogressivemovement, COALESCE(semenanalysis.nonprogressive,'') as nonprogressive,COALESCE(semenanalysis.nonmotile,'') as nonmotile,COALESCE(semenanalysis.normalsperms,'') as normalsperms,COALESCE(semenanalysis.headdefects,'') as headdefects,COALESCE(neckandmidpiecedefects,'') as neckandmidpiecedefects,COALESCE(semenanalysis.taildefects,'') as taildefects,COALESCE(semenanalysis.cytoplasmicdroplets,'') as cytoplasmicdroplets,COALESCE(semenanalysis.epithelialcells,0) as epithelialcells,COALESCE(semenanalysis.puscells,0) as puscells,COALESCE(semenanalysis.rbc,'') as rbc,COALESCE(semenanalysis.impression,'') as impression,COALESCE(semenanalysis.comments,'') as comments,HEX(AES_ENCRYPT(semenanalysis.patientId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as patientId,HEX(AES_ENCRYPT(semenanalysis.doctorId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as doctorId,HEX(AES_ENCRYPT(COALESCE(semenanalysis.leftsigndoctorId,0),UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as leftsigndoctorId,HEX(AES_ENCRYPT(COALESCE(semenanalysis.centersigndoctorId,0),UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512))))  as centersigndoctorId,HEX(AES_ENCRYPT(COALESCE(semenanalysis.rightsigndoctorId,0),UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512))))  as rightsigndoctorId,HEX(AES_ENCRYPT(semenanalysis.id,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as semenanalysisId,HEX(AES_ENCRYPT(patients.hospitalId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as hospitalId,HEX(AES_ENCRYPT(patients.branchId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as branchId,patients.name,patients.hcNo,patients.spouseName,HEX(AES_ENCRYPT(semenanalysis.leftScientistId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as leftScientistId,HEX(AES_ENCRYPT(semenanalysis.centerScientistId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as centerScientistId,HEX(AES_ENCRYPT(semenanalysis.rightMedicalDirectorId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as rightMedicalDirectorId")
+        $semenanalysisDetails = DB::table('semenanalysis')->selectRaw("COALESCE(semenanalysis.liquefaction,0) as liquefaction,COALESCE(semenanalysis.appearance,0) as appearance,COALESCE(semenanalysis.ph,0) as ph,COALESCE(semenanalysis.volume,'') as volume,COALESCE(semenanalysis.viscosity,0) as viscosity,COALESCE(semenanalysis.abstinence,0) as abstinence,COALESCE(semenanalysis.medication,'') as medication,COALESCE(semenanalysis.spermconcentration,'') as spermconcentration,COALESCE(semenanalysis.agglutination,0) as agglutination,COALESCE(semenanalysis.clumping,0) as clumping,COALESCE(semenanalysis.granulardebris,0) as granulardebris,COALESCE(semenanalysis.totalmotility,'') as totalmotility,COALESCE(semenanalysis.rapidprogressivemovement,'') as rapidprogressivemovement,COALESCE(semenanalysis.sluggishprogressivemovement,'') as sluggishprogressivemovement, COALESCE(semenanalysis.nonprogressive,'') as nonprogressive,COALESCE(semenanalysis.nonmotile,'') as nonmotile,COALESCE(semenanalysis.normalsperms,'') as normalsperms,COALESCE(semenanalysis.headdefects,'') as headdefects,COALESCE(neckandmidpiecedefects,'') as neckandmidpiecedefects,COALESCE(semenanalysis.taildefects,'') as taildefects,COALESCE(semenanalysis.cytoplasmicdroplets,'') as cytoplasmicdroplets,COALESCE(semenanalysis.epithelialcells,0) as epithelialcells,COALESCE(semenanalysis.puscells,0) as puscells,COALESCE(semenanalysis.rbc,'') as rbc,COALESCE(semenanalysis.impression,'') as impression,COALESCE(semenanalysis.comments,'') as comments,HEX(AES_ENCRYPT(semenanalysis.patientId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as patientId,HEX(AES_ENCRYPT(semenanalysis.doctorId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as doctorId,HEX(AES_ENCRYPT(COALESCE(semenanalysis.leftsigndoctorId,0),UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as leftsigndoctorId,HEX(AES_ENCRYPT(COALESCE(semenanalysis.centersigndoctorId,0),UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512))))  as centersigndoctorId,HEX(AES_ENCRYPT(COALESCE(semenanalysis.rightsigndoctorId,0),UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512))))  as rightsigndoctorId,HEX(AES_ENCRYPT(semenanalysis.id,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as semenanalysisId,HEX(AES_ENCRYPT(patients.hospitalId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as hospitalId,HEX(AES_ENCRYPT(patients.branchId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as branchId,patients.name,patients.hcNo,patients.spouseName,HEX(AES_ENCRYPT(semenanalysis.leftScientistId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as leftScientistId,HEX(AES_ENCRYPT(semenanalysis.centerScientistId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as centerScientistId,HEX(AES_ENCRYPT(semenanalysis.rightMedicalDirectorId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as rightMedicalDirectorId,COALESCE(leftSign.signature,'') as leftSignature,COALESCE(centerSign.signature,'') as centerSignature,COALESCE(rightSign.signature,'') as rightSignature
+        ,COALESCE(leftDoctor.name,'') as leftDoctor,COALESCE(centerDoctor.name,'') as centerDoctor,COALESCE(rightDoctor.name,'') as rightDoctor,HEX(AES_ENCRYPT(semenanalysis.reportSignId,UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))) as reportSignId")
             ->join("patients","patients.id","=","semenanalysis.patientId")
+            ->leftJoin('report_signatures','semenanalysis.reportSignId','=','report_signatures.id')
+            ->leftJoin('doctorsignatures as leftSign', 'report_signatures.leftSignId','=','leftSign.id')
+            ->leftJoin('doctorsignatures as centerSign', 'report_signatures.centerSignId','=','centerSign.id')
+            ->leftJoin('doctorsignatures as rightSign', 'report_signatures.rightSignId','=','rightSign.id')
+            ->leftJoin('doctors as leftDoctor', 'report_signatures.leftDoctorId','=','leftDoctor.id')
+            ->leftJoin('doctors as centerDoctor', 'report_signatures.centerDoctorId','=','centerDoctor.id')
+            ->leftJoin('doctors as rightDoctor', 'report_signatures.rightDoctorId','=','rightDoctor.id')
             ->whereRaw($where_sts)
             ->first();
         return $semenanalysisDetails;
     }
     public function  getSemenAnalysisByIdForPrint($id)
     {
+      
         $where_sts = "semenanalysis.id=" . $id;
         $semenanalysisDetails = DB::table('semenanalysis')->selectRaw("COALESCE(semenanalysis.liquefaction,'') as liquefaction,
         COALESCE(semenanalysis.appearance,'') as appearance,
@@ -106,12 +117,13 @@ class semenanalysis extends Model
             ->whereRaw($where_sts)
             ->join("patients","patients.id","=","semenanalysis.patientId")
             ->join("doctors","doctors.id","=","semenanalysis.doctorId")
-            ->leftJoin('doctorsignatures as leftSign', 'semenanalysis.leftsigndoctorid','=','leftSign.id')
-            ->leftJoin('doctorsignatures as centerSign', 'semenanalysis.centersigndoctorid','=','centerSign.id')
-            ->leftJoin('doctorsignatures as rightSign', 'semenanalysis.rightsigndoctorid','=','rightSign.id')
-            ->leftJoin('doctors as leftDoctor', 'semenanalysis.leftScientistId','=','leftDoctor.id')
-            ->leftJoin('doctors as centerDoctor', 'semenanalysis.centerScientistId','=','centerDoctor.id')
-            ->leftJoin('doctors as rightDoctor', 'semenanalysis.rightMedicalDirectorId','=','rightDoctor.id')
+            ->leftJoin('report_signatures','semenanalysis.reportSignId','=','report_signatures.id')
+            ->leftJoin('doctorsignatures as leftSign', 'report_signatures.leftSignId','=','leftSign.id')
+            ->leftJoin('doctorsignatures as centerSign', 'report_signatures.centerSignId','=','centerSign.id')
+            ->leftJoin('doctorsignatures as rightSign', 'report_signatures.rightSignId','=','rightSign.id')
+            ->leftJoin('doctors as leftDoctor', 'report_signatures.leftDoctorId','=','leftDoctor.id')
+            ->leftJoin('doctors as centerDoctor', 'report_signatures.centerDoctorId','=','centerDoctor.id')
+            ->leftJoin('doctors as rightDoctor', 'report_signatures.rightDoctorId','=','rightDoctor.id')
             ->first();
         return $semenanalysisDetails;
     }
@@ -163,14 +175,15 @@ class semenanalysis extends Model
         $comments = (isset($request->comments) && !empty($request->comments)) ? $request->comments : NULL;
 
         
-        $leftsigndoctorId = (isset($request->leftsigndoctorId) && !empty($request->leftsigndoctorId)) ? $user->getDecryptedId($request->leftsigndoctorId) : NULL;
-        $centersigndoctorId = (isset($request->centersigndoctorId) && !empty($request->centersigndoctorId)) ? $user->getDecryptedId($request->centersigndoctorId) : NULL;
-        $rightsigndoctorId = (isset($request->rightsigndoctorId) && !empty($request->rightsigndoctorId)) ? $user->getDecryptedId($request->rightsigndoctorId) : NULL;
+        // $leftsigndoctorId = (isset($request->leftsigndoctorId) && !empty($request->leftsigndoctorId)) ? $user->getDecryptedId($request->leftsigndoctorId) : NULL;
+        // $centersigndoctorId = (isset($request->centersigndoctorId) && !empty($request->centersigndoctorId)) ? $user->getDecryptedId($request->centersigndoctorId) : NULL;
+        // $rightsigndoctorId = (isset($request->rightsigndoctorId) && !empty($request->rightsigndoctorId)) ? $user->getDecryptedId($request->rightsigndoctorId) : NULL;
 
-        $leftScientistId = (isset($request->leftScientistId) && !empty($request->leftScientistId)) ? $user->getDecryptedId($request->leftScientistId) : NULL;
-        $centerScientistId = (isset($request->centerScientistId) && !empty($request->centerScientistId)) ? $user->getDecryptedId($request->centerScientistId) : NULL;
-        $rightMedicalDirectorId = (isset($request->rightMedicalDirectorId) && !empty($request->rightMedicalDirectorId)) ? $user->getDecryptedId($request->rightMedicalDirectorId) : NULL;
+        // $leftScientistId = (isset($request->leftScientistId) && !empty($request->leftScientistId)) ? $user->getDecryptedId($request->leftScientistId) : NULL;
+        // $centerScientistId = (isset($request->centerScientistId) && !empty($request->centerScientistId)) ? $user->getDecryptedId($request->centerScientistId) : NULL;
+        // $rightMedicalDirectorId = (isset($request->rightMedicalDirectorId) && !empty($request->rightMedicalDirectorId)) ? $user->getDecryptedId($request->rightMedicalDirectorId) : NULL;
 
+        $reportSignId= $user->getDecryptedId($request->reportSignId);
 
         return static::create(
             [
@@ -202,12 +215,13 @@ class semenanalysis extends Model
                 'comments' => $comments,
                 'patientId' => $patientId,
                 'doctorId' => $doctorId,
-                'leftsigndoctorId' => $leftsigndoctorId,
-                'centersigndoctorId' => $centersigndoctorId,
-                'rightsigndoctorId' => $rightsigndoctorId,
-                'leftScientistId' => $leftScientistId,
-                'centerScientistId' => $centerScientistId,
-                'rightMedicalDirectorId' => $rightMedicalDirectorId,
+                'reportSignId'=>$reportSignId,
+                // 'leftsigndoctorId' => $leftsigndoctorId,
+                // 'centersigndoctorId' => $centersigndoctorId,
+                // 'rightsigndoctorId' => $rightsigndoctorId,
+                // 'leftScientistId' => $leftScientistId,
+                // 'centerScientistId' => $centerScientistId,
+                // 'rightMedicalDirectorId' => $rightMedicalDirectorId,
                 'created_by' => $userId
             ]
         );

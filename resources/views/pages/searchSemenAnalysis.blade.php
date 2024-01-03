@@ -105,7 +105,7 @@
 
         @push('js')
         <script type="module" src="{{ asset('dist/js/app.js')}}"></script>
-        <script  type="module" src="{{ asset('dist/js/patient.js')}}"></script>
+        <script  type="module" src="{{ asset('dist/js/semenAnalysis.js')}}"></script>
         @endpush
 
 

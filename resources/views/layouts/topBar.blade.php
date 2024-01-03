@@ -37,6 +37,9 @@
                                     <a href="{{ url('ResetPassword') }}/{{ session('userId')}}" class="dropdown-item hover:bg-white/5"> <i data-lucide="lock" class="w-4 h-4 mr-2"></i> Reset Password </a>
                                 </li>
                                 <li>
+                                    <a href="{{ url('ColourTheme') }}/{{ session('userId')}}" class="dropdown-item hover:bg-white/5"> <i data-lucide="zap" class="w-4 h-4 mr-2"></i>Color Theme </a>
+                                </li>
+                                <li>
                                     <hr class="dropdown-divider border-white/[0.08]">
                                 </li>
                                 <li>

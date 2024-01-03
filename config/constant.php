@@ -35,5 +35,15 @@ return [
     'clumpingId'=> '77',
     'pusCellsId'=> '80',
     'hospitalLogLocation'=>'images/hospitals/',
+    'pageSetting' =>[
+        'marginRight' =>'1',
+        'marginLeft'=> '1',
+        'marginBottom' => '1',
+        'marginTop'=>'1'
+    ],
+    'labSignature'=>'images/labStaff/',
+    'prefix_labStaff'=>'ls_',
+    'colorId'=>'#1e40af',
+    'default_colorRbg'=>'30 64 175',
     // 'currentUrlPostfix'=>'/seed/public',
 ];

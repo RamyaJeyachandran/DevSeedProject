@@ -11,26 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('doctors', function (Blueprint $table) {
+        Schema::create('report_signatures', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('doctorCodeNo');
-            $table->string('name');
-            $table->string('profileImage')->nullable();
-            $table->datetime('dob')->nullable();
-            $table->string('gender')->nullable();
-            $table->string('phoneNo');
-            $table->string('email');
-            $table->string('education')->nullable();
-            $table->string('designation')->nullable();
-            $table->bigInteger('departmentId')->unsigned()->nullable();;
-            $table->string('experience')->nullable();
-            $table->string('address')->nullable();
-            $table->string('bloodGroup')->nullable();
-            $table->string('appointmentInterval')->nullable();
+            $table->bigInteger('leftDoctorId')->unsigned()->nullable();
+            $table->bigInteger('leftSignId')->unsigned()->nullable();
 
+            $table->bigInteger('rightDoctorId')->unsigned()->nullable();
+            $table->bigInteger('rightSignId')->unsigned()->nullable();
 
-            $table->bigInteger('hospitalId')->unsigned()->nullable();
+            $table->bigInteger('centerDoctorId')->unsigned()->nullable();
+            $table->bigInteger('centerSignId')->unsigned()->nullable();
+
+            $table->boolean('isDefault');
+
+            $table->bigInteger('hospitalId')->unsigned();
             $table->bigInteger('branchId')->unsigned()->nullable();
+
 
             $table->boolean('is_active')->default(1);
             $table->timestamp('created_date')->default(DB::raw('CURRENT_TIMESTAMP'));
@@ -40,10 +36,15 @@ return new class extends Migration
 
             $table->foreign('created_by')->references('id')->on('users');
             $table->foreign('updated_by')->references('id')->on('users');
-            $table->foreign('departmentId')->references('id')->on('departments');
-            
             $table->foreign('hospitalId')->references('id')->on('hospitalsettings');
             $table->foreign('branchId')->references('id')->on('hospitalBranch');
+            
+            $table->foreign('leftDoctorId')->references('id')->on('doctors');
+            $table->foreign('rightDoctorId')->references('id')->on('doctors');
+            $table->foreign('centerDoctorId')->references('id')->on('doctors');
+            $table->foreign('leftSignId')->references('id')->on('doctorsignatures');
+            $table->foreign('rightSignId')->references('id')->on('doctorsignatures');
+            $table->foreign('centerSignId')->references('id')->on('doctorsignatures');
         });
     }
 
@@ -52,6 +53,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('doctors');
+        Schema::dropIfExists('report_signatures');
     }
 };
