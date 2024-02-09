@@ -9,6 +9,7 @@
     "/dist/js/patient.js": "/dist/js/patient.js",
     "/dist/js/settings.js": "/dist/js/settings.js",
     "/dist/js/semenAnalysis.js": "/dist/js/semenAnalysis.js",
+    "/dist/js/prePost.js": "/dist/js/prePost.js",
     "/dist/css/loading.css": "/dist/css/loading.css",
     "/dist/css/app.css": "/dist/css/app.css",
     "/dist/json/location.json": "/dist/json/location.json",
@@ -47,6 +48,9 @@
     "/dist/images/food-beverage-9.jpg": "/dist/images/food-beverage-9.jpg",
     "/dist/images/illustration.svg": "/dist/images/illustration.svg",
     "/dist/images/logo.svg": "/dist/images/logo.svg",
+    "/dist/images/logoUi.jpeg": "/dist/images/logoUi.jpeg",
+    "/dist/images/logoUI.png": "/dist/images/logoUI.png",
+    "/dist/images/logo_stech.png": "/dist/images/logo_stech.png",
     "/dist/images/map-marker-dark.svg": "/dist/images/map-marker-dark.svg",
     "/dist/images/map-marker-region-dark.svg": "/dist/images/map-marker-region-dark.svg",
     "/dist/images/map-marker-region.svg": "/dist/images/map-marker-region.svg",
@@ -92,5 +96,8 @@
     "/dist/images/profile-7.jpg": "/dist/images/profile-7.jpg",
     "/dist/images/profile-8.jpg": "/dist/images/profile-8.jpg",
     "/dist/images/profile-9.jpg": "/dist/images/profile-9.jpg",
+    "/dist/images/stechLogo.jpeg": "/dist/images/stechLogo.jpeg",
+    "/dist/images/stechLogo1.png": "/dist/images/stechLogo1.png",
+    "/dist/images/stechLogo2.png": "/dist/images/stechLogo2.png",
     "/dist/images/woman-illustration.svg": "/dist/images/woman-illustration.svg"
 }

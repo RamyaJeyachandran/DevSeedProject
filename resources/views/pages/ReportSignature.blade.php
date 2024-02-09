@@ -90,8 +90,8 @@
                                 </div>
                             </div>
                             <div class="intro-y col-span-12 justify-center sm:justify-end mt-5">
-                                <button id="btnSaveReportSign" type=submit class="btn btn-primary w-24 ml-2">Save</button>
-                                <button id="btnCancelReportSign" type="reset" class="btn btn-dark w-24">Reset</button> 
+                                <button id="btnSaveReportSign" type=submit class="btn btn-primary w-24 ml-2"><i data-lucide="save" class="w-4 h-4 mr-2"></i>Save</button>
+                                <button id="btnCancelReportSign" type="reset" class="btn btn-dark w-24"><i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>Cancel</button> 
                             </div>
                         </div></div>
                         </form>

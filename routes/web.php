@@ -5,17 +5,20 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\PatientController;
-use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DonorBankController;
 use App\Http\Controllers\RefferedByController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\BankWitnessController;
 use App\Http\Controllers\ConsentFromController;
+use App\Http\Controllers\PrePostWashController;
+use App\Http\Controllers\NormalValuesController;
 use App\Http\Controllers\PageSettingsController;
 use App\Http\Controllers\SemenAnalysisController;
 use App\Http\Controllers\HospitalBranchController;
 use App\Http\Controllers\ReportSignatureController;
 use App\Http\Controllers\HospitalSettingsController;
+use App\Http\Controllers\ReportImageCaputreController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,14 +33,17 @@ use App\Http\Controllers\HospitalSettingsController;
 Route::get('/', function () {
     return view('pages.login')->with('errorMsg', '');
 });
-
 Route::post('login', [AuthController::class, 'loginUser']);
-Route::get('ForgetPassword', [AuthController::class, 'forgetPassword']);
+Route::get('ForgetPassword/{companyId}', [AuthController::class, 'forgetPassword']);
 
-Route::get('login/{errorMsg}', [AuthController::class, 'login']);
+Route::get('login/{errorMsg}/{companyId}', [AuthController::class, 'login']);
  //Payment - Phonepe
- Route::get('phonepe',[PaymentController::class,'phonePe']);
- Route::any('phonepe-response',[PaymentController::class,'response'])->name('response');
+//  Route::get('phonepe',[PaymentController::class,'phonePe']);
+//  Route::any('phonepe-response',[PaymentController::class,'response'])->name('response');
+
+Route::get('stech', function () {
+    return view('pages.stechLogin')->with('errorMsg', '');
+});
 
 
 Route::group(['middleware' => 'customAuth'], function () {
@@ -82,6 +88,7 @@ Route::group(['middleware' => 'customAuth'], function () {
     Route::get('ResetPassword/{id}', [DashboardController::class, 'ResetPassword']);
     Route::get('Profile/{id}', [DashboardController::class, 'userProfile']);
     Route::get('ColourTheme/{id}', [DashboardController::class, 'getUserColourTheme']);
+    Route::get('SefDefaultHospital/{id}', [DashboardController::class, 'getDefaultSetting']);
     
     //SemenAnalysis
     Route::get('SemenAnalysis', [SemenAnalysisController::class, 'index']);
@@ -99,13 +106,22 @@ Route::group(['middleware' => 'customAuth'], function () {
     Route::get('PatientDetails', [ReportController::class, 'patientIndex']);  
 
     //Payment
-    Route::get('subscribe', [PaymentController::class, 'subscribe']);
+    // Route::get('subscribe', [PaymentController::class, 'subscribe']);
 
     Route::get('DonorBank', [DonorBankController::class, 'index']);
 
     //Settings
     Route::get('PrintSettings', [PageSettingsController::class, 'index']);
     Route::get('ReportSignature', [ReportSignatureController::class, 'index']);
+    Route::get('ImageCaptureSettings', [ReportImageCaputreController::class, 'index']);
+    Route::get('BankWitness', [BankWitnessController::class, 'index']);
+    Route::get('SetNormalValues', [NormalValuesController::class, 'index']);
+
+    //PrePost Wash
+    Route::get('PrePostAnalysis', [PrePostWashController::class, 'index']);
+    Route::get('SearchPrePostAnalysis', [PrePostWashController::class, 'searchIndex']);
+    Route::get('ShowPrePostAnalysis/{id}', [PrePostWashController::class, 'showEdit']);
+    Route::get('PrintPrePostAnalysis/{id}', [PrePostWashController::class, 'showPrint']);
 
 });
 // Auth::routes();

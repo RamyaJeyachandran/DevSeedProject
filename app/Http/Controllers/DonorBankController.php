@@ -13,9 +13,16 @@ use Illuminate\Support\Facades\Validator;
 
 class DonorBankController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return View("pages.donorBank");
+        if($request->session()->get('isSetDefault')==1){
+            return View("pages.donorBank");
+        }
+        else{
+            return redirect()->action(
+                [DashboardController::class, 'getDefaultSetting'], ['id' =>  $request->session()->get('userId')]
+            );
+        }
     }
     public function getAllDonorBank(Request $request)
     {
@@ -113,7 +120,7 @@ class DonorBankController extends Controller
             $donorBankDetails=$donor_obj->deleteDonorBankById($id,$userId);
             $result['Success']='Success';
             $result['ShowModal']= 1;
-            $result['donorBankDetails']=$donorBankDetails;
+            // $result['donorBankDetails']=$donorBankDetails;
             return response()->json($result,200);
         }catch(\Throwable $th){
             $result['Success']='failure';

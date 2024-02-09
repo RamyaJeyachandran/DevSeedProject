@@ -23,3 +23,51 @@
       margin: 0mm;
     }
   } */
+  
+  /* Tooltip text */
+.box .tooltiptext {
+  /* vertically center */
+  top:50%;
+  transform:translateY(-15%);
+  
+  /* move to right */
+  left:100%;
+  margin-left:50px; /* and add a small left margin */
+  
+  /* basic styles */
+  width:auto;
+  padding:10px;
+  border-radius:10px;
+  background:#fff;
+  color: black;
+  text-align:center;
+
+  display:none; /* hide by default */
+  /* visibility: hidden;
+  width: auto;
+  background-color: #fff;
+  color: black;
+  text-align: center;
+  padding: 10px 10px;
+  border-radius: 6px;
+ 
+  position: relative;
+  z-index: 1;
+  display: none; */
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.box:hover .tooltiptext {
+  visibility: visible;
+  display: inline-block;
+}
+.box .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  top: 50%;
+  right: 100%; /* To the left of the tooltip */
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent white transparent transparent;
+}

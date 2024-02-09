@@ -15,9 +15,16 @@ use Illuminate\Support\Facades\Validator;
 
 class AppointmentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return View("pages.addAppointment");
+        if($request->session()->get('isSetDefault')==1){
+            return View("pages.addAppointment");
+        }
+        else{
+            return redirect()->action(
+                [DashboardController::class, 'getDefaultSetting'], ['id' =>  $request->session()->get('userId')]
+            );
+        }
     }
     public function searchIndex()
     {
@@ -82,8 +89,17 @@ class AppointmentController extends Controller
             /*------------------------------ Add unregistered patient BEGIN --------------------*/
             if($request->tabNo==2){
                 $patient_obj=new Patient;
+                //Check Phone No --- BEGIN
+                $chkPhoneNo=$patient_obj->checkPhoneNo($request->phoneNo,$hospitalId,$branchId);
+                if($chkPhoneNo!=NULL){
+                    $result['ShowModal']=1;
+                    $result['Success']='Phone No already exists.';
+                    $result['Message']="Phone No registered patient number : ".$chkPhoneNo->hcNo;
+                    return response()->json($result,200);
+                }
+              //Check Phone No --- END
                 $url = request()->getSchemeAndHttpHost();//URL::to("/");
-                $profileImage =$url ."/". config('constant.doctor_default_profileImage');
+                $profileImage =$url .config('constant.imageStoreLocation'). config('constant.doctor_default_profileImage');
 
                 $hcNo=$patient_obj->generateHcNo($hospitalId);
                 $addPatient=$patient_obj->addAppointmentPatient($request,$hcNo,$hospitalId,$branchId,$userId,$profileImage);
@@ -98,10 +114,20 @@ class AppointmentController extends Controller
                 $patientMsg='Patient created successfully. Patient Registered Number : '.$hcNo;
             }
              /*------------------------------ Add unregistered patient END --------------------*/
+            $appointment_obj=new Appointment;
+
             if($request->tabNo==1){
                 $patientId=$user->getDecryptedId($request->patientId);
+                 //Check patient appointment on that day
+                $chkPatientAppointment=$appointment_obj->checkPatientAppointment($request->appointmentDate,$patientId,$doctorId,0);
+                if($chkPatientAppointment!=NULL){
+                    DB::rollback();
+                    $result['ShowModal']=1;
+                    $result['Success']='Appointment already exists.';
+                    $result['Message']="Patient appointment time : ".$chkPatientAppointment->appointmentTime;
+                    return response()->json($result,200);
+                }
             }
-
             if($patientId==0){
                 DB::rollback();
                     $result['ShowModal']=1;
@@ -109,8 +135,16 @@ class AppointmentController extends Controller
                     $result['Message']="Please enter the valid patient information";
                     return response()->json($result,200);
             }
-
-            $appointment_obj=new Appointment;
+            //Check doctor schedule on that day
+            $chkDoctorSchedule=$appointment_obj->checkDoctorAppointment($request->appointmentDate,$request->appointmentTime,$doctorId,0);
+            if($chkDoctorSchedule!=NULL){
+                DB::rollback();
+                $result['ShowModal']=1;
+                $result['Success']='Doctor have another appointment at that time.';
+                $result['Message']="Appointment Interval 10 minutes.Please choose another time.";
+                return response()->json($result,200);
+            }
+           
             $appointment_res=$appointment_obj->addAppointment($request,$patientId,$doctorId,$hospitalId,$branchId,$userId);
             $id=$appointment_res->id;
             DB::commit();
@@ -237,7 +271,7 @@ class AppointmentController extends Controller
             $patientId=$user->getDecryptedId($request->patientId);
             $appointmentId=$user->getDecryptedId($request->appointmentId);
 
-            if($patientId==0){
+            if($patientId==0 || $appointmentId==0){
                 DB::rollback();
                     $result['ShowModal']=1;
                     $result['Success']='Failure';
@@ -245,6 +279,17 @@ class AppointmentController extends Controller
                     return response()->json($result,200);
             }
             $appointment_obj=new Appointment;
+                //Check doctor schedule on that day
+            $chkDoctorSchedule=$appointment_obj->checkDoctorAppointment($request->appointmentDate,$request->appointmentTime,$doctorId,$appointmentId);
+            if($chkDoctorSchedule!=NULL){
+                DB::rollback();
+                $result['ShowModal']=1;
+                $result['Success']='Doctor have another appointment at that time.';
+                $result['Message']="Appointment Interval 10 minutes.Please choose another time.";
+                $result['data']=$chkDoctorSchedule;
+                return response()->json($result,200);
+            }
+
             $appointment_res=$appointment_obj->updateAppointment($request,$appointmentId,$doctorId,$userId);
             DB::commit();
             $result['Success']='Success';

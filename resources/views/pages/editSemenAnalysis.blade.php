@@ -13,7 +13,7 @@
         <form id="frmEditSemenAnalysis">
 
         <div class="mt-3">
-            <button id="btnUpdSemenAnalysis" type="submit" class="btn btn-danger w-24 ml-2">Update</button>
+            <button id="btnUpdSemenAnalysis" type="submit" class="btn btn-danger w-24 ml-2"><i data-lucide="edit" class="w-4 h-4 mr-2"></i>Update</button>
         </div>
         <!-- <div class="intro-y box mt-5">
     <div id="boxed-tab" class="p-5"> -->
@@ -25,15 +25,23 @@
         <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
         <div class="intro-y col-span-12 sm:col-span-6 form-control">
             <label for="txtPatientName" class="form-label">Patient Name</label>
-            <input id="txtPatientName" value="{{ $semenanalysisDetails->name }}" class="w-full" disabled>
+            <input id="txtPatientName" value="{{ $semenanalysisDetails->name }}" type="text" class="form-control" disabled>
+        </div>
+        <div class="intro-y col-span-12 sm:col-span-6 form-control">
+            <label for="txtSeqNo" class="form-label">Patient Sequence No</label>
+            <input id="txtSeqNo" value="{{ $semenanalysisDetails->patientSeqNo }}" type="number" class="form-control" disabled>
         </div>
         <div class="intro-y col-span-12 sm:col-span-6 form-control">
             <label for="txtHcNo" class="form-label">Patient Register No </label>
-            <input id="txtHcNo"  value="{{ $semenanalysisDetails->hcNo }}" class="w-full" disabled>
+            <input id="txtHcNo"  value="{{ $semenanalysisDetails->hcNo }}" type="text" class="form-control" disabled>
+        </div>
+        <div class="intro-y col-span-12 sm:col-span-6 form-control">
+            <label for="txtPhoneNo" class="form-label">Patient Phone No </label>
+            <input id="txtPhoneNo"  value="{{ $semenanalysisDetails->phoneNo }}" type="text" class="form-control" disabled>
         </div>
         <div class="intro-y col-span-12 sm:col-span-6 form-control">
             <label for="txtSpouseName" class="form-label">Spouse Name </label>
-            <input id="txtSpouseName"  value="{{ $semenanalysisDetails->spouseName==''?'Not Provided':$semenanalysisDetails->spouseName }}" class="w-full" disabled>
+            <input id="txtSpouseName"  value="{{ $semenanalysisDetails->spouseName==''?'Not Provided':$semenanalysisDetails->spouseName }}" type="text" class="form-control" disabled>
         </div>
         <div class="intro-y col-span-12 sm:col-span-6 form-control">
             <label for="ddlDoctor" class="form-label">Doctor <span class="text-danger mt-2"> *</span></label>
@@ -309,17 +317,11 @@
                                 </div>
                                 <div class="mt-3">
                                     <label for="txtimpression" class="form-label">Impression</label>
-                                    <div class="input-group">
-                                    <input id="txtimpression" name="impression" class="form-control" value="{{$semenanalysisDetails->impression}}" placeholder="Enter Volume" aria-describedby="txtimpressionGroup">
-                            <div id="txtimpressionGroup" class="input-group-text"></div>
-                        </div>
+                                    <textarea id="txtImpression" name="impression" class="form-control">{{ $semenanalysisDetails->impression }}</textarea>
                                 </div>
                                 <div class="mt-3">
                                     <label for="txtcomments" class="form-label">Comments</label>
-                                    <div class="input-group">
-                                    <input id="txtcomments" name="comments" class="form-control" value="{{$semenanalysisDetails->comments}}" placeholder="Enter Volume" aria-describedby="txtcommentsGroup">
-                            <div id="txtcommentsGroup" class="input-group-text"></div>
-                        </div>
+                                    <textarea id="txtcomments" name="comments" class="form-control">{{ $semenanalysisDetails->comments }}</textarea>
                                 </div>
                             </div>
                         </div>

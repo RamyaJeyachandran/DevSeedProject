@@ -13,31 +13,40 @@ use config\constants;
 
 class ConsentFromController extends Controller
 {
-    public function index(Request $request,$hcNo=0){
+    public function index(Request $request,$patientId=0){
         try{
-            return view('pages.consentForm')->with('hcNo', $hcNo);
+            if($request->session()->get('isSetDefault')==1){
+                $patient_obj = new Patient;
+                $patientList = $patient_obj->getPatientByHospitalId($request->session()->get('hospitalId'),$request->session()->get('branchId'));
+                return view('pages.consentForm')->with('patientId', $patientId)->with('patientList',$patientList);
+            }
+            else{
+                return redirect()->action(
+                    [DashboardController::class, 'getDefaultSetting'], ['id' =>  $request->session()->get('userId')]
+                );
+            }
         }catch(\Throwable $th){
             return view('pages.error')->with('errorMsg',$th->getMessage())->with('errorNo','401');
         }
     }
     public function searchIndex()
     {
-        return view('pages.SearchConsentForm');
+        return view('pages.searchConsentForm');
     }
     public function viewIndex()
     {
         return view('pages.viewConsentForm');
     }
-    public function getFormList(Request $request,$hospitalId,$branchId,$hcNo){
+    public function getFormList(Request $request,$hospitalId,$branchId,$patientId){
         try{
             $patientDetails=NULL;
             $selectedFormDetails=NULL;
-            if($hcNo>0){
+            if($patientId!=0){
                 $patient_obj = new Patient;
-                $patientDetails=$patient_obj->getPatientByHcNo($hcNo,$hospitalId,$branchId);
+                $patientDetails=$patient_obj->getPatientByPatientId($patientId,$hospitalId,$branchId);
                 if($patientDetails!=NULL){
                     $consent_obj = new patientConsentForm;
-                    $selectedFormDetails=$consent_obj->getSelectedConsentForm($patientDetails->patientId);
+                    $selectedFormDetails=$consent_obj->getSelectedConsentForm($patientId);
                 }else{
                     $result['Success']='No record found';
                     $result['ShowModal']=1;

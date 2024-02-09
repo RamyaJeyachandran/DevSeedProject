@@ -13,6 +13,7 @@ class ConsentFrom extends Model
     use HasFactory;
     protected $fillable = [
         'formName',
+        'formTitle',
         'formContent',
         'hospitalId',
         'branchId',
@@ -29,7 +30,7 @@ class ConsentFrom extends Model
         $new_branchId=(isset($orignal_branchId) && !empty($orignal_branchId)) ?$orignal_branchId : NULL;
         $where_sts="is_active=1 and hospitalId=".$orignal_hospitalId.((isset($orignal_branchId) && !empty($orignal_branchId)) ?" and branchId=".$new_branchId:"");
         
-        return DB::table('consent_froms')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,formName,formContent")
+        return DB::table('consent_froms')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,formName,formContent,formTitle")
                                          ->whereRaw($where_sts)
                                          ->get();
     }    

@@ -16,9 +16,16 @@ use Illuminate\Support\Facades\Validator;
 
 class PatientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return View("pages.addPatient");
+        if($request->session()->get('isSetDefault')==1){
+            return View("pages.addPatient");
+        }
+        else{
+            return redirect()->action(
+                [DashboardController::class, 'getDefaultSetting'], ['id' =>  $request->session()->get('userId')]
+            );
+        }
     }
     public function searchIndex()
     {
@@ -65,7 +72,7 @@ class PatientController extends Controller
                 $fileName = config('constant.prefix_patient_profile_image').$decrpt_hospitalId.'_'.uniqid(). '.png';
                 $profileImage = $folderPath . $fileName;
                 file_put_contents($profileImage, $image_base64);
-                $profileImage=$url ."/". $profileImage;
+                $profileImage=$url .config('constant.imageStoreLocation'). $profileImage;
             }
              //-------------------Store Image ---End
 
@@ -204,7 +211,7 @@ class PatientController extends Controller
                     $profileImage = $folderPath . $fileName;
                     file_put_contents($profileImage, $image_base64);
                     $url = request()->getSchemeAndHttpHost();//URL::to("/");
-                    $profileImage=$url ."/". $profileImage;
+                    $profileImage=$url .config('constant.imageStoreLocation'). $profileImage;
                 }
             }
              //-------------------Store Image ---End

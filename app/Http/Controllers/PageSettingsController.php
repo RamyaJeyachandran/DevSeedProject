@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HospitalBranch;
+use App\Models\HospitalSettings;
 use App\Models\pageSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +27,23 @@ class PageSettingsController extends Controller
             $decrypt_userId = $user_obj->getDecryptedId($userId);
             $page_obj = new pageSettings;
             $pageSettingsDetails = $page_obj->getPageSettingsByUserId($decrypt_userId);
+
+            //Hospital details
+            $user_obj = new User;
+            $hospitalId = $user_obj->getDecryptedId($request->session()->get('hospitalId'));
+            $branchId = $user_obj->getDecryptedId($request->session()->get('branchId'));
+            $pageSettingsDetails->isHospital=1;
+            if($branchId==null)
+            {
+                $branch_obj=new HospitalBranch;
+                $pageSettingsDetails->branchAddress=$branch_obj->getHospitalBranchById($branchId);
+                $pageSettingsDetails->isHospital=0;
+            }else{
+                $hospital_obj=new HospitalSettings;
+                $pageSettingsDetails->hospitalAddress=$hospital_obj->getHospitalSettingsById($hospitalId);
+            }
+            
+
             $result['Success']='Success';
             $result['pageSettingsDetails']=$pageSettingsDetails;
             return response()->json($result,200);

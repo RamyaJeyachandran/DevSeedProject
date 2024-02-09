@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BankWitness;
 use App\Models\donorBank;
 use URL;
 use App\Models\User;
@@ -35,6 +36,9 @@ class RefferedByController extends Controller
            
             $donor_obj=new donorBank;
             $patientDetails->donorBankList=$donor_obj->getDonorBankByHospital($patientDetails->dHopsitalId,$patientDetails->dBranchId);
+
+            $witness_obj=new BankWitness;
+            $patientDetails->bankWitnessList=$witness_obj->getBankWitnessByHospital($patientDetails->dHopsitalId,$patientDetails->dBranchId);
 
             return view('pages.addRefferedBy')->with('patientDetails', $patientDetails);
         }catch(\Throwable $th){

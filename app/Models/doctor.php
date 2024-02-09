@@ -32,7 +32,8 @@ class doctor extends Model
         'designation',
         'experience',
         'departmentId',
-        'doctorCodeNo'
+        'doctorCodeNo',
+        'appointmentInterval'
     ];
     public static function checkPhoneNo($phoneNo,$hospitalId,$branchId){
         $phoneNoList=DB::table('doctors')->select('doctorCodeNo')->where("phoneNo","=",$phoneNo)->where(function($q)use($phoneNo,$hospitalId,$branchId)  {
@@ -56,7 +57,7 @@ class doctor extends Model
                                             ->where('is_active',1)
                                              ->groupBy('doctorId');
 
-        $doctorList['doctorList']=DB::table('doctors')->selectRaw("HEX(AES_ENCRYPT(doctors.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,doctors.doctorCodeNo,doctors.name,doctors.profileImage,doctors.bloodGroup,doctors.phoneNo,doctors.email,doctors.gender,doctors.education,doctors.designation,COALESCE(departments.name,'') as department,doctors.experience,COALESCE(total_signature,0) as total_signature")
+        $doctorList['doctorList']=DB::table('doctors')->selectRaw("HEX(AES_ENCRYPT(doctors.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,doctors.doctorCodeNo,doctors.name,doctors.profileImage,doctors.bloodGroup,doctors.phoneNo,doctors.email,doctors.gender,doctors.education,doctors.designation,COALESCE(departments.name,'') as department,doctors.experience,COALESCE(total_signature,0) as total_signature,doctors.appointmentInterval")
                                      ->leftJoin('departments', 'departments.id', '=', 'doctors.departmentId')
                                      ->leftJoinSub($signature_sub_table, 'signature_sub', function (JoinClause $join)
                                                 {
@@ -78,7 +79,7 @@ class doctor extends Model
         $user = new User;
         $original_id=$user->getDecryptedId($id);
 
-        $patientDetails=DB::table('doctors')->selectRaw("COALESCE(doctors.bloodGroup,0) as bloodGroup,COALESCE(doctors.dob,'') as dob,COALESCE(doctors.gender,0) as gender,COALESCE(doctors.education,'') as education,COALESCE(doctors.designation,'') as designation,COALESCE(doctors.departmentId,0) as departmentId,COALESCE(doctors.experience,'') as experience,COALESCE(doctors.address,'') as address,COALESCE(doctors.is_active,'') as status,doctors.name,doctors.doctorCodeNo,doctors.phoneNo,doctors.email,doctors.profileImage,HEX(AES_ENCRYPT(doctors.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as doctorId,COALESCE(departments.name,'') as department,HEX(AES_ENCRYPT(doctors.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(doctors.branchId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as branchId")
+        $patientDetails=DB::table('doctors')->selectRaw("COALESCE(doctors.bloodGroup,0) as bloodGroup,COALESCE(doctors.dob,'') as dob,COALESCE(doctors.gender,0) as gender,COALESCE(doctors.education,'') as education,COALESCE(doctors.designation,'') as designation,COALESCE(doctors.departmentId,0) as departmentId,COALESCE(doctors.experience,'') as experience,COALESCE(doctors.address,'') as address,COALESCE(doctors.is_active,'') as status,doctors.name,doctors.doctorCodeNo,doctors.phoneNo,doctors.email,doctors.profileImage,HEX(AES_ENCRYPT(doctors.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as doctorId,COALESCE(departments.name,'') as department,HEX(AES_ENCRYPT(doctors.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(doctors.branchId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as branchId,doctors.appointmentInterval")
                                     ->leftJoin('departments', 'departments.id', '=', 'doctors.departmentId')
                                     ->where('doctors.id',$original_id)
                                    ->first();
@@ -120,6 +121,7 @@ class doctor extends Model
         $departmentId=(isset($request->department) && !empty($request->department)) ?$request->department : NULL;
         $address=(isset($request->address) && !empty($request->address)) ?$request->address : NULL;
         $experience=(isset($request->experience) && !empty($request->experience)) ?$request->experience : NULL;
+        $appointmentInterval=(isset($request->appointmentInterval) && !empty($request->appointmentInterval)) ?$request->appointmentInterval : NULL;
 
         return static::create(
             ['doctorCodeNo'=>$doctorCodeNo,
@@ -135,6 +137,7 @@ class doctor extends Model
              'email'=>$email,
              'address'=>$address,
              'experience'=>$experience,
+             'appointmentInterval'=>$appointmentInterval,
              'hospitalId'=>$hospitalId,
              'branchId'=>$branchId,
              'created_by'=>$userId
@@ -156,6 +159,7 @@ class doctor extends Model
         $departmentId=(isset($request->departmentId) && !empty($request->departmentId) && $request->departmentId!=0) ?$request->departmentId : NULL;
         $address=(isset($request->address) && !empty($request->address)) ?$request->address : NULL;
         $experience=(isset($request->experience) && !empty($request->experience)) ?$request->experience : NULL;
+        $appointmentInterval=(isset($request->appointmentInterval) && !empty($request->appointmentInterval)) ?$request->appointmentInterval : NULL;
 
         $doctorId="AES_DECRYPT(UNHEX('".$request->doctorId."'), UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))";
         $where_sts="id=".$doctorId;
@@ -175,6 +179,7 @@ class doctor extends Model
                 'email'=>$email,
                 'address'=>$address,
                 'experience'=>$experience,
+                'appointmentInterval'=>$appointmentInterval,
                 'updated_by'=>$userId
                 ]
             );
@@ -192,6 +197,7 @@ class doctor extends Model
                 'email'=>$email,
                 'address'=>$address,
                 'experience'=>$experience,
+                'appointmentInterval'=>$appointmentInterval,
                 'updated_by'=>$userId
                 ]
             );
@@ -209,6 +215,7 @@ class doctor extends Model
                 'email'=>$email,
                 'address'=>$address,
                 'experience'=>$experience,
+                'appointmentInterval'=>$appointmentInterval,
                 'updated_by'=>$userId
                 ]
             );
@@ -227,6 +234,7 @@ class doctor extends Model
                 'email'=>$email,
                 'address'=>$address,
                 'experience'=>$experience,
+                'appointmentInterval'=>$appointmentInterval,
                 'updated_by'=>$userId
                 ]
             );
@@ -260,7 +268,7 @@ class doctor extends Model
     public function getLogoByHospitalId($id){
         $user = new User;
         // $original_id=$user->getDecryptedId($id);
-       return DB::table('doctors')->selectRaw("HEX(AES_ENCRYPT(doctors.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(doctors.branchId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as branchId,doctors.profileImage,doctors.name as doctorName,hospitalsettings.logo,COALESCE(hospitalbranch.branchName,hospitalsettings.hospitalName)  as name")
+       return DB::table('doctors')->selectRaw("HEX(AES_ENCRYPT(doctors.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(COALESCE(doctors.branchId,0),UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as branchId,doctors.profileImage,doctors.name as doctorName,hospitalsettings.logo,COALESCE(hospitalbranch.branchName,hospitalsettings.hospitalName)  as name")
                                     ->Join('hospitalsettings', 'hospitalsettings.id', '=', 'doctors.hospitalId')
                                     ->leftJoin('hospitalbranch', function($join)
                                     {

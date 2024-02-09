@@ -3,34 +3,40 @@
 @section ('style')
 <link rel="stylesheet" href="{{ asset('dist/css/app.css') }}" />
 <link rel="stylesheet" href="{{ asset('dist/css/loading.css') }}" />
-
 @endsection 
 @section('content')
     @include('layouts.mobileSideMenu')
     <div class="flex mt-[4.7rem] md:mt-0">
     @include('layouts.sideMenu')
                 <!-- BEGIN: Content -->
+                
                 <div class="content">
                     @include('layouts.topBar')
                     <input id="txtHospital" name="hospitalId" value="{{ session('hospitalId') }}" type="hidden" class="form-control">
                     <input id="txtBranch" name="branchId" value="{{ session('branchId') }}" type="hidden" class="form-control">
-                <div id="loading"></div>
-                    
                     <div id="divRegPanel" class="intro-y box p-5 mt-5">
                     <div class="flex flex-col sm:flex-row sm:items-end xl:items-start">
-                            <div class="sm:flex items-center sm:mr-4 mt-2 xl:mt-0">
-                                <label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Patient Registered Number </label>
-                                <input id="txtRegNo" type="number" value="{{$hcNo}}" class="form-control sm:w-40 2xl:w-full mt-2 sm:mt-0">
-                            </div>
-                            <div class="mt-2 xl:mt-0">
-                                <button id="btnGo" type="button" class="btn btn-primary w-full sm:w-16" >Go</button>
-                                <button id="btnRegNoClear" type="button" class="btn btn-dark w-full sm:w-16" >Clear</button>
-                            </div>
+                    <div class="w-full mt-3 xl:mt-0 flex-1">
+                    <label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2 font-bold">Patient Name</label>
+                                            <div class="sm:grid grid-cols-4 gap-2  mt-3">
+                                <select id="ddlPatientList" class="form-control" data-placeholder="Type here to search patient" required>
+                                <option value='0'>Select Patient</option>
+                                @foreach ($patientList as $patient)
+                                    <option value="{{ $patient->id }}"> 
+                                        {{ $patient->name }}
+                                    </option>
+                                @endforeach  
+                                </select>
+                                <input id="txtPatient" name="patientId" value="{{ $patientId}}" type="hidden" class="form-control">
+
+                                                <button id="btnGo" type="button" class="btn btn-primary mt-2 sm:mt-0"> Go </button>
+                                            </div>
+                                        </div>
                     </div>                    
                 </div>
                 <div id="divNewPanel" class="intro-y box p-5 mt-5">
                     <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
-                        <button id="btnNewConsent"  type="button" class="btn btn-primary shadow-md mr-2">Consent Form</button>
+                        <button id="btnNewConsent"  type="button" class="btn btn-primary shadow-md mr-2"><i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i>Consent Form</button>
                     </div>
                 </div>
 
@@ -85,7 +91,7 @@
                     <div class="intro-x cursor-pointer box relative flex items-center p-5 ">
                                     <div class="ml-2 overflow-hidden">
                                         <button id="btnSaveConsent" type="submit" class="btn btn-primary" ><i data-lucide="save" class="w-4 h-4 mr-2"></i>Save</button>
-                                            <button id="btnPrintConsent" type="button" class="btn btn-primary" ><i data-lucide="printer" class="w-4 h-4 mr-2"></i>Print</button>
+                                            <button id="btnPrintConsent" type="button" class="btn btn-danger" ><i data-lucide="printer" class="w-4 h-4 mr-2"></i>Print</button>
                                             <!-- <button id="btnPrintAllConsent" type="button" class="btn btn-primary" ><i data-lucide="printer" class="w-4 h-4 mr-2"></i>Print All</button> -->
                                         </div>
                                     </div>

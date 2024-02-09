@@ -9,33 +9,18 @@
     <form id="frmPatientDetailReport">
 <div class="intro-y box p-5 mt-5">
     <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5">
-         <div class="intro-y col-span-12 justify-center sm:justify-end mt-5">
-            <button id="btnReportGo" type="submit" class="btn btn-primary w-24 ml-2">Go</button>
-            <button id="btnReportPatientReset" type="reset" class="btn btn-dark w-24">Reset</button> 
-        </div>
+         
                     <input id="txtHospital" name="hospitalId" value="{{ session('hospitalId') }}" type="hidden" class="form-control">
                     <input id="txtBranch" name="branchId" value="{{ session('branchId') }}" type="hidden" class="form-control">
-                    @can('isAdmin')
-                    <div class="intro-y col-span-12 sm:col-span-6 form-control">
-                                <label for="ddlHospital" class="form-label">Hospital </label>
-                                <select id="ddlHospital" name="hospitalId" class="form-select">
-                                    <option value='0'>Select Hospital</option>
-                                </select>
-                            </div>
-                    @endcan
-                    @can('isAdminHospital')
-                            <div id="divBranchddl" class="intro-y col-span-12 sm:col-span-6 form-control">
-                                <label for="ddlBranch" class="form-label">Branch </label>
-                                <select id="ddlBranch" name="branchId" class="form-select">
-                                    <option value='0'>Select Branch</option>
-                                </select>
-                            </div>
-                        @endcan
+                    <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
         <div class="intro-y col-span-12 sm:col-span-6 form-control">
             <label for="txtRegisteredDate" class="form-label">Patient Registered Date </label>
             <input id="txtRegisteredDate" name="dateRange" type="text" data-daterange="true" class="datepicker form-control"> 
         </div>
-       
+        <div class="intro-y col-span-12 justify-center sm:justify-end mt-5">
+            <button id="btnReportGo" type="submit" class="btn btn-primary w-24 ml-2">Go</button>
+            <button id="btnReportPatientReset" type="reset" class="btn btn-dark w-24">Reset</button> 
+        </div>
     </div>
 </div>
 

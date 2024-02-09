@@ -16,17 +16,21 @@
         type="hidden" class="form-control">
         <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
 
-        <div id="divPatientddl" class="intro-y col-span-12 sm:col-span-4 form-control">
+        <div id="divPatientddl" class="intro-y col-span-12 sm:col-span-6 form-control">
         <label for="ddlPatient" class="form-label">Patient <span class="text-danger mt-2"> *</span></label>
         <select id="ddlPatient" name="patientId" class="form-select" required>
             <option value='0'>Select Patient</option>
             </select>
     </div>
-    <div id="divSpouse" class="intro-y col-span-12 sm:col-span-4 form-control">
-        <label for="txtSpouseName" class="form-label">Spouse Name </label>
-        <input id="txtSpouseName" name="spouseName" class="w-full" disabled>
+    <div class="intro-y col-span-12 sm:col-span-6 form-control">
+        <label for="txtSequenceNo" class="form-label">Patient Sequence No </label>
+        <input id="txtSequenceNo" name="seqNo" type="number" class="form-control" disabled>
     </div>
-    <div id="divDoctorddl" class="intro-y col-span-12 sm:col-span-4 form-control">
+    <div id="divSpouse" class="intro-y col-span-12 sm:col-span-6 form-control">
+        <label for="txtSpouseName" class="form-label">Spouse Name </label>
+        <input id="txtSpouseName" name="spouseName" type="text" class="form-control" disabled>
+    </div>
+    <div id="divDoctorddl" class="intro-y col-span-12 sm:col-span-6 form-control">
         <label for="ddlDoctor" class="form-label">Prescribed By <span class="text-danger mt-2"> *</span></label>
         <select id="ddlDoctor" name="doctorId" class="form-select" required>
             <option value='0'>Select Doctor</option>
@@ -263,19 +267,11 @@
                     </div>
                     <div class="mt-3">
                         <label for="txtimpression" class="form-label">Impression</label>
-                        <div class="input-group">
-                            <input id="txtimpression" name="impression" class="form-control"
-                                placeholder="Enter Impression" aria-describedby="txtimpressionGroup">
-                            <div id="txtimpressionGroup" class="input-group-text"></div>
-                        </div>
+                        <textarea id="txtImpression" name="impression" class="form-control"></textarea>
                     </div>
                     <div class="mt-3">
                         <label for="txtcomments" class="form-label">Comments</label>
-                        <div class="input-group">
-                            <input id="txtcomments" name="comments" class="form-control" placeholder="Enter Comments"
-                                aria-describedby="txtcommentsGroup">
-                            <div id="txtcommentsGroup" class="input-group-text"></div>
-                        </div>
+                        <textarea id="txtcomments" name="comments" class="form-control"></textarea>
                     </div>
 
                 </div>
@@ -313,8 +309,8 @@
     </div>
 </div>
 <div class="mt-3"> 
-                <button id="btnSavesemenanalysis" type="submit" class="btn btn-primary w-24 ml-2">Save</button>
-                <button id="btnCancelanalysis" type="reset" class="btn btn-dark w-24">Cancel</button>
+                <button id="btnSavesemenanalysis" type="submit" class="btn btn-primary w-24 ml-2"><i data-lucide="save" class="w-4 h-4 mr-2"></i>Save</button>
+                <button id="btnCancelanalysis" type="reset" class="btn btn-dark w-24"><i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>Cancel</button>
             </div>
 </div>
 

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\NormalValues;
 use App\Models\User;
 
 use App\Models\doctor;
@@ -18,9 +19,16 @@ use Illuminate\Support\Facades\Validator;
 
 class SemenAnalysisController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('pages.addSemenAnalysis');
+        if($request->session()->get('isSetDefault')==1){
+            return view('pages.addSemenAnalysis');
+        }
+        else{
+            return redirect()->action(
+                [DashboardController::class, 'getDefaultSetting'], ['id' =>  $request->session()->get('userId')]
+            );
+        }
     }
     public function searchIndex()
     {
@@ -29,11 +37,13 @@ class SemenAnalysisController extends Controller
     public function showPrint(Request $request,$id)
     {
         try{
-            $id_orignal = "AES_DECRYPT(UNHEX('" . $id . "'), UNHEX(SHA2('" . config('constant.mysql_custom_encrypt_key') . "',512)))";
+            $user_obj = new User;
+            $id_orignal = $user_obj->getDecryptedId($id);
             $analysis_obj = new semenanalysis;
             $analysisDetails=$analysis_obj->getSemenAnalysisByIdForPrint($id_orignal);
-            
-
+            $normal_obj=new NormalValues;
+            $analysisDetails->normalValues=$normal_obj->getNormalValueByHospital($analysisDetails->hospitalId,$analysisDetails->branchId);
+           
             return view('pages.reportSA')->with('analysisDetails', $analysisDetails);
         }catch(\Throwable $th){
             return Redirect::back()->withErrors($th->getMessage());
@@ -123,8 +133,8 @@ class SemenAnalysisController extends Controller
             $doctor_obj=new doctor;
             $semenanalysisDetails->doctorList=$doctor_obj->getDoctorByHospital($semenanalysisDetails->hospitalId,$semenanalysisDetails->branchId);
 
-            $doctor_obj = new DoctorSignature;
-            $semenanalysisDetails->signatureDetails=$doctor_obj->getDoctorSignatureByDoctorId($semenanalysisDetails->doctorId);
+            // $doctor_obj = new DoctorSignature;
+            // $semenanalysisDetails->signatureDetails=$doctor_obj->getDoctorSignatureByDoctorId($semenanalysisDetails->doctorId);
 
             return view('pages.editSemenAnalysis')->with('semenanalysisDetails', $semenanalysisDetails);
         } catch (\Throwable $th) {
@@ -203,11 +213,29 @@ class SemenAnalysisController extends Controller
     {
         try {
             $semenanalysis_obj=new semenanalysis;
-            $semenanalysisDetails=$semenanalysis_obj->deleteSemenAnalysisById($id,$userId);
+            $semenanalysis_obj->deleteSemenAnalysisById($id,$userId);
 
             $result['Success']='Success';
             $result['ShowModal']=1;
-            $result['appointmentDetails']=$semenanalysisDetails;
+            return response()->json($result, 200);
+        } catch (\Throwable $th) {
+            $result['Success'] = 'failure';
+            $result['Message'] = $th->getMessage();
+            return response()->json($result, 200);
+        }
+    }
+    public function getPatientSequenceNo(Request $request,$patientId)
+    {
+        try {
+            $user = new User;
+            $id_orignal = $user->getDecryptedId($patientId);
+
+            $semenanalysis_obj=new semenanalysis;
+            $seqNo=$semenanalysis_obj->getPatientSequenceCount($id_orignal);
+            $seqNo=$seqNo+1;
+
+            $result['Success'] = 'Success';
+            $result['seqNo'] = $seqNo;
             return response()->json($result, 200);
         } catch (\Throwable $th) {
             $result['Success'] = 'failure';

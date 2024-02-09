@@ -6,7 +6,7 @@
         <link href="{{ asset('dist/images/logo.svg')}}" rel="shortcut icon">
         <title>Forget Password</title>
         <!-- BEGIN: CSS Assets-->
-        <link rel="stylesheet" href="dist/css/app.css" />
+        <link rel="stylesheet" href="{{ asset('dist/css/app.css')}}" />
         <!-- END: CSS Assets-->
     </head>
     <!-- END: Head -->
@@ -16,11 +16,13 @@
                 <!-- BEGIN: Register Info -->
                 <div class="hidden xl:flex flex-col min-h-screen">
                     <a href="" class="-intro-x flex items-center pt-5">
+                        @if($companyId==1)
                         <img alt="SEED" class="w-6" src="{{ asset('dist/images/logo.svg')}}">
                         <span class="text-white text-lg ml-3"> SEED </span> 
+                        @endif
                     </a>
                     <div class="my-auto">
-                       
+                    <img alt="Agnai SEED" class="-intro-x w-1/2 -mt-16" src="{{$logo}}">
                     </div>
                 </div>
                 <!-- END: Register Info -->
@@ -32,6 +34,7 @@
                            Forget Password
                         </h2>
                         <div class="intro-x mt-8">
+                        <input id="txtCompany" name="companyId" value="2" type="hidden" class="form-control">
                             <input id="txtEmail" name="emailId" type="email" class="intro-x login__input form-control py-3 px-4 block" placeholder="example@gmail.com">
                             <input id="txtPassword" name="newPassword" type="password" class="intro-x login__input form-control py-3 px-4 block mt-4" placeholder="New Password">
                             <input id="txtConfirmPassword" name="confirmPassword" type="password" class="intro-x login__input form-control py-3 px-4 block mt-4" placeholder="Confirm Password">
@@ -39,7 +42,7 @@
                         
                         <div class="intro-x mt-5 xl:mt-8 text-center xl:text-left">
                             <button type="submit" class="btn btn-primary align-top">Reset Password</button>
-                            <a href='{{ url("/") }}' class="btn btn-outline-secondary  align-top">Sign in</a>
+                            <a href='{{$companyId==2 ? url("/stech") : url("/") }}' class="btn btn-outline-secondary  align-top">Sign in</a>
                         </div>
                         </form>
                     </div>
@@ -75,7 +78,7 @@
     </div> 
 </div> <!-- END: Error Modal Content --> 
         <!-- BEGIN: JS Assets-->
-        <script src="dist/js/app.js"></script>
+        <script src="{{ asset('dist/js/app.js')}}"></script>
         <script  type="module" src="{{ asset('dist/js/forgetPassword.js')}}"></script>
         <!-- END: JS Assets-->
     </body>

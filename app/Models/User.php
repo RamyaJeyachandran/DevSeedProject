@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use config\constants;
+use Carbon\Carbon;
 
 class User extends Authenticatable
 {
@@ -30,6 +31,10 @@ class User extends Authenticatable
         'user_id',
         'created_by',
         'colorId',
+        'defaultHospitalId',
+        'defaultBranchId',
+        'lastActivityDateTime',
+        'sessionId'
     ];
 
     /**
@@ -117,7 +122,7 @@ class User extends Authenticatable
     public function getUserInfo($id)
     {
         $userId = $this->getDecryptedId($id);
-        return DB::table('users')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,name,email,COALESCE(colorId,'".config('constant.colorId')."') as colorId")->where("id",$userId)->first();
+        return DB::table('users')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,name,email,HEX(AES_ENCRYPT(user_id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as user_id,user_type_id,COALESCE(colorId,'".config('constant.colorId')."') as colorId,HEX(AES_ENCRYPT(COALESCE(defaultHospitalId,0),UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as defaultHospitalId,HEX(AES_ENCRYPT(COALESCE(defaultBranchId,0),UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as defaultBranchId")->where("id",$userId)->first();
     }
     public function updatePassword($request){
         $original_userId = $this->getDecryptedId($request->userId);
@@ -193,5 +198,75 @@ class User extends Authenticatable
         $g = hexdec(substr($hex, 3, 2));
         $b = hexdec(substr($hex, 5, 2));
         return array($r, $g, $b);
+    }
+    public static function getHospitalList(){
+        return DB::table('hospitalsettings')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,hospitalName")->where('is_active','=',1)->get();
+    }
+    public static function getBranchListByHospitalId($hospitalId){
+        $user = new User;
+        $orignal_hospitalId=$user->getDecryptedId($hospitalId);
+        
+        return DB::table('hospitalbranch')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,branchName")
+                                          ->where([['is_active','=',1],['hospitalId','=',$orignal_hospitalId]])
+                                          ->get();
+    }
+    public function updateDefaultHospital($request){
+        $user_id= $this->getDecryptedId($request->userId);
+        $hosptialId= $this->getDecryptedId($request->hospitalId);
+        $branchId= (isset($request->branchId) && !empty($request->branchId)) ?$this->getDecryptedId($request->branchId) : NULL;
+
+        return static::where('id',$user_id)->update(
+            [
+                'defaultHospitalId' => $hosptialId,
+                'defaultBranchId' => $branchId,
+                'updated_by' => $user_id
+            ]
+        );     
+    }
+    public function updateSessionDetails($user_id,$sessionId){
+
+        return static::where('id',$user_id)->update(
+            [
+                'sessionId'=>$sessionId,
+                'lastActivityDateTime' => Carbon::now(),
+                'is_login'=>1,
+                'updated_by' => $user_id
+            ]
+        );     
+    }
+    public function updateIsLogin($user_id){
+
+        return static::where('id',$user_id)->update(
+            [
+                'is_login'=>0,
+                'sessionId'=>'',
+                'lastActivityDateTime' => Carbon::now(),
+                'updated_by' => $user_id
+            ]
+        );     
+    }
+    public static function getLastActivityDateTime($user_id){
+        return DB::table('users')->selectRaw("lastActivityDateTime,DATE(lastActivityDateTime) as lastActivityDate,TIME(lastActivityDateTime) as lastActivityTime,sessionId")
+                                          ->where([['is_active','=',1],['id','=',$user_id]])
+                                          ->first();
+    }
+    public static function setMenuSession($request,$user_type_id)
+    {
+        $isAdmin=$user_type_id == 1;
+        $request->session()->put('isAdmin', $isAdmin);
+        $isHospital=$user_type_id == 2;
+        $request->session()->put('isHospital', $isHospital);
+        $isBranch=$user_type_id == 4;
+        $request->session()->put('isBranch', $isBranch);
+        $isDoctor=$user_type_id == 5;
+        $request->session()->put('isDoctor', $isDoctor);
+        $isAdminHospital=($user_type_id == 1 || $user_type_id == 2);
+        $request->session()->put('isAdminHospital', $isAdminHospital);
+        $isNotAdmin=($user_type_id == 2 || $user_type_id == 3 || $user_type_id == 4 || $user_type_id == 5);
+        $request->session()->put('isNotAdmin', $isNotAdmin);
+        $isHospitalBranch=($user_type_id == 2 || $user_type_id == 4);
+        $request->session()->put('isHospitalBranch', $isHospitalBranch);
+        $isAdminHospitalBranch=($user_type_id == 1 || $user_type_id == 2 || $user_type_id == 4);
+        $request->session()->put('isAdminHospitalBranch', $isAdminHospitalBranch);
     }
 }

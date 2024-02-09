@@ -22,7 +22,7 @@
                                         @can('isAdminHospitalBranch')
                                         <img class="w-10 rounded-full" src="{{ session('logo') }}">
                                         @endcan
-                                        <span class="hidden xl:block text-white text-lg ml-3">  {{Auth::user()->name}} </span>
+                                        <span class="hidden xl:block text-white text-lg ml-3"> {{session('userName')}} </span>
                                     </a>
                                 </li>
                                 <li>
@@ -36,6 +36,13 @@
                                 <li>
                                     <a href="{{ url('ResetPassword') }}/{{ session('userId')}}" class="dropdown-item hover:bg-white/5"> <i data-lucide="lock" class="w-4 h-4 mr-2"></i> Reset Password </a>
                                 </li>
+                                @can('isAdminHospital')
+                                @if(session('branchLimit') < 2)
+                                <li>
+                                    <a href="{{ url('SefDefaultHospital') }}/{{ session('userId')}}" class="dropdown-item hover:bg-white/5"> <i data-lucide="git-branch" class="w-4 h-4 mr-2"></i> Set Default Hospital </a>
+                                </li>
+                                @endif
+                                @endcan
                                 <li>
                                     <a href="{{ url('ColourTheme') }}/{{ session('userId')}}" class="dropdown-item hover:bg-white/5"> <i data-lucide="zap" class="w-4 h-4 mr-2"></i>Color Theme </a>
                                 </li>

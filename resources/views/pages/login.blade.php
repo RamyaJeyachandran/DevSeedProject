@@ -19,6 +19,9 @@
                         <img alt="Agnai SEED" class="w-6" src="{{ asset('dist/images/logo.svg')}}">
                         <span class="text-white text-lg ml-3"> SEED </span> 
                     </a>
+                    <div class="my-auto">
+                        <img alt="Agnai SEED" class="-intro-x w-1/2 -mt-16" src="{{ asset('dist/images/logoUI.png')}}">
+                    </div>
                 </div>
                 <!-- END: Login Info -->
                 <!-- BEGIN: Login Form -->
@@ -38,6 +41,7 @@
 @endif
                       <form method="post" action='{{ url("login") }}' class="validate-form">
                       @csrf
+                      <input id="txtCompany" name="companyId" value="1" type="hidden" class="form-control">
                       <div class="intro-x mt-2 xl:mt-10 text-danger dark:text-slate-500 text-center xl:text-left"> {{$errorMsg}} </div>
                         <div class="intro-x mt-8 input-form">
                             <input type="text" class="form-control" name="email" placeholder="user name" minlength="10" maxlength="100" required>
@@ -50,7 +54,7 @@
                                 <input id="remember-me" type="checkbox" class="form-check-input border mr-2">
                                 <label class="cursor-pointer select-none" for="remember-me">Remember me</label>
                             </div>
-                            <a href='{{ url("ForgetPassword") }}'>Forgot Password?</a> 
+                            <a href='{{ url("ForgetPassword/1") }}'>Forgot Password?</a> 
                         </div>
                         <div class="intro-x mt-5 xl:mt-8 text-center xl:text-left">
                             <button type="submit" class="btn btn-primary py-3 px-4 w-full xl:w-32 xl:mr-3 align-top">Login</button>

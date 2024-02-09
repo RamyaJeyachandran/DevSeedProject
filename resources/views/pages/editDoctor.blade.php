@@ -53,6 +53,24 @@
                                 <input id="txtEmail" value="{{$doctorDetails->email}}" name="email" type="email" class="form-control" placeholder="example@gmail.com" required>
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4">
+                                    <label for="ddlAppointmentInterval" class="form-label">Appointment slot interval</label>
+                                <select id="ddlAppointmentInterval" name="appointmentInterval" class="form-select" required>
+                                    <option value='0' {{ ( '0'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>Select Appointment Interval</option>
+                                    <option value='5' {{ ( '5'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>5 minutes</option>
+                                    <option value='10' {{ ( '10'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>10 minutes</option>
+                                    <option value='15' {{ ( '15'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>15 minutes</option>
+                                    <option value='20' {{ ( '20'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>20 minutes</option>
+                                    <option value='25' {{ ( '25'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>25 minutes</option>
+                                    <option value='30' {{ ( '30'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>30 minutes</option>
+                                    <option value='35' {{ ( '35'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>35 minutes</option>
+                                    <option value='40' {{ ( '40'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>40 minutes</option>
+                                    <option value='45' {{ ( '45'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>45 minutes</option>
+                                    <option value='50' {{ ( '50'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>50 minutes</option>
+                                    <option value='55' {{ ( '55'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>55 minutes</option>
+                                    <option value='60' {{ ( '60'== $doctorDetails->appointmentInterval) ? 'selected' : '' }}>60 minutes</option>
+                                </select>
+                            </div>
+                            <div class="intro-y col-span-12 sm:col-span-4">
                                 <label for="txtDOB" class="form-label">Date of Birth</label>
                                 <input id="txtDOB" value="{{$doctorDetails->dob}}"name="dob" type="text" class="datepicker form-control " data-single-mode="true"> 
                             </div>

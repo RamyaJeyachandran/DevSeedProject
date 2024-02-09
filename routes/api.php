@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\PageSettingsController;
-use App\Http\Controllers\ReportSignatureController;
+use App\Http\Controllers\ChatGPTController;
+use App\Http\Controllers\NormalValuesController;
+use App\Http\Controllers\PrePostWashController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CommonController;
@@ -12,11 +13,15 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DonorBankController;
 use App\Http\Controllers\RefferedByController;
 use App\Http\Controllers\AppointmentController;
+use App\Http\Controllers\BankWitnessController;
 use App\Http\Controllers\ConsentFromController;
+use App\Http\Controllers\PageSettingsController;
 use App\Http\Controllers\SemenAnalysisController;
 use App\Http\Controllers\HospitalBranchController;
 use App\Http\Controllers\DoctorSignatureController;
+use App\Http\Controllers\ReportSignatureController;
 use App\Http\Controllers\HospitalSettingsController;
+use App\Http\Controllers\ReportImageCaputreController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,8 +35,8 @@ use App\Http\Controllers\HospitalSettingsController;
 */
 Route::post('forgetPassword', [DashboardController::class, 'forgetPassword']);
 
-Route::group(['middleware' => 'auth:sanctum'], function () {
-
+Route::group(['middleware' => ['api.customAuth']], function () {
+  // Route::group(['middleware' => ['auth:sanctum','api.customAuth']], function () {
   //Hospital api
   Route::post('addHospital', [HospitalSettingsController::class, 'saveHospitalSettings']);
   Route::get('hospitalList', [HospitalSettingsController::class, 'getAllHospitalSettings']);
@@ -63,7 +68,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::get('deleteBranch/{id}/{userId}', [HospitalBranchController::class, 'deleteBranch']);
   Route::post('updateBranch', [HospitalBranchController::class, 'updateBranchHospital']);
   //Consent Form
-  Route::get('consentFormList/{hospitalId}/{branchId}/{hcNo}', [ConsentFromController::class, 'getFormList']);
+  Route::get('consentFormList/{hospitalId}/{branchId}/{patientId}', [ConsentFromController::class, 'getFormList']);
   Route::post('savePatientConsent', [ConsentFromController::class, 'saveConsentForm']);
   Route::get('patientConsentList', [ConsentFromController::class, 'getPatientConsentDetails']);
   //Appointment
@@ -93,7 +98,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::get('getPatientDoctor/{hospitalId}/{branchId}', [SemenAnalysisController::class, 'getPatientDoctor']);
   Route::get('SemenAnalysisList', [SemenAnalysisController::class, 'getAllSemenAnalysis']);
   Route::get('deleteSemenAnalysis/{id}/{userId}', [SemenAnalysisController::class, 'deleteSemenAnalysis']);
-
+  Route::get('patientSemenSequenceNo/{patientId}', [SemenAnalysisController::class, 'getPatientSequenceNo']);
   //Report
   Route::post('reportPatientWise', [ReportController::class, 'getReportPatientWise']);
   Route::post('reportPatientDetails', [ReportController::class, 'getPatientDetailReport']);
@@ -115,13 +120,34 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
   Route::get('getPrintMargin/{userId}', [PageSettingsController::class, 'getPrintMarginByUserId']);
 
   Route::post('colorTheme', [DashboardController::class, 'setColorTheme']);
+  Route::post('setDefaultHospital', [DashboardController::class, 'setDefaultHospital']);
+  Route::get('setImageCapture/{userId}/{isSet}', [ReportImageCaputreController::class, 'setDefaultImageCapture']);
 
   //Report Signature
   Route::get('reportSignatureList', [ReportSignatureController::class, 'getAllSignature']);
   Route::post('addReportSignature', [ReportSignatureController::class, 'addReportSignature']);
   Route::get('setDefaultSignature/{userId}/{reportSignId}/{isDefault}', [ReportSignatureController::class, 'updateDefaultSignature']);
   Route::get('defaultReportSign/{hospitalId}/{branchId}', [ReportSignatureController::class, 'getReportSignByHospital']);
+
+  //BankWitness
+  Route::get('bankWitnessList', [BankWitnessController::class, 'getAllBankWitness']);
+  Route::post('addBankWitness', [BankWitnessController::class, 'addBankWitness']);
+  Route::get('deleteBankWitness/{id}/{userId}', [BankWitnessController::class, 'deleteWitness']);
+
+  //NormalValues
+  Route::post('updateNormalValues', [NormalValuesController::class, 'updateNormalValue']);
   
+  //PrePostWash
+  Route::post('addPrePostWash', [PrePostWashController::class, 'savePrePostWash']);
+  Route::get('PrePostWashList', [PrePostWashController::class, 'getAllprePostWash']);
+  Route::get('deletePrePostWash/{id}/{userId}', [PrePostWashController::class, 'deletePrePostWash']);
+  Route::post('updatePrePostWash', [PrePostWashController::class, 'updatePrePostAnalysis']);
+  Route::get('patientPrePostSequenceNo/{patientId}', [PrePostWashController::class, 'getPatientSequenceNo']);
+  Route::get('getPrePostPatientDoctor/{hospitalId}/{branchId}', [PrePostWashController::class, 'getPrePostPatientDoctor']);
+
+  //Chat
+  // Route::get('chat/{message}', [ChatGPTController::class, 'askToChatGpt']);
+  // Route::get('chatHistory', [ChatGPTController::class, 'getChatHistory']);
 });
 
 // Route::get('convertToHash/{id}',[loginController::class,'convertToHash']);

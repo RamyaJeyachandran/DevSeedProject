@@ -14,17 +14,28 @@ import Tabulator from "tabulator-tables";
     window.addEventListener("load", (e) => {
         e.preventDefault();
         var pathname = window.location.pathname;
-         // var base_url = window.location.origin+'/seed/public';
-        // localStorage.setItem("base_url", base_url);
-        // var serverPath='/seed/public/index.php';
-        // var serverPath2='/seed/public';
+        //Local Path
         var base_url = window.location.origin;
         localStorage.setItem("base_url", base_url);
         var serverPath='';
         var serverPath2='';
+
+        //server Path
+        //  var base_url = window.location.origin+'/seed/public';
+        // localStorage.setItem("base_url", base_url);
+        // var serverPath='/seed/public/index.php';
+        // var serverPath2='/seed/public';
        
+
+        if(document.getElementById("divYear")!=null)
+        {
+            document.getElementById("divYear").innerHTML = '@'+new Date().getFullYear() + ' Agnai Solutions';
+        }
+       if(pathname!=serverPath2+'/SetNormalValues' && pathname!=serverPath+'/SetNormalValues')
+       {
         setMenu("[id*=lnkSemen]","[id*=ulSemenAnalysis]");
         setMobileMenu("[id*=lnkMobileSemenAnalysis]","[id*=ulMobileSemenAnalysis]","[id*=aMobileSemenAnalysis]");
+       }
         switch(pathname)
         {
             case serverPath+'/SemenAnalysis':
@@ -39,6 +50,12 @@ import Tabulator from "tabulator-tables";
                 $("input#tbSemen-html-filter-value-1").hide();
                 $("#tbSemen-html-filter-value-1-label").hide();
                 setSemenAnalysisTabulator();
+                break;
+            case serverPath+'/SetNormalValues':
+            case serverPath2+'/SetNormalValues':
+                setMenu("[id*=lnkPrintSettings]","[id*=ulPrintSettings]");
+                setMobileMenu("[id*=lnkMobilePrint]","[id*=ulMobilePrint]","[id*=aMobilePrint]");
+                cancelNormalValue();
                 break;
         }
     });
@@ -346,26 +363,36 @@ $( "#btnPrintSemenAnalysis" ).on( "click", function() {
            })
            .then(function(data){ 
                if(data.Success=='Success'){
-                   var printMarign=[];
-                   var ml=data.pageSettingsDetails.marginLeft-1;
-                   var mr=data.pageSettingsDetails.marginRight-1;
-                   var mb=data.pageSettingsDetails.marginBottom-1;
-                   var mt=data.pageSettingsDetails.marginTop-1;
+                   let pixelsmt = (96 * data.pageSettingsDetails.marginTop) / 2.54;
+                   let pixelsmr = (96 * data.pageSettingsDetails.marginRight) / 2.54;
+                   let pixelsmb = (96 * data.pageSettingsDetails.marginBottom) / 2.54;
+                   let pixelsml = (96 * data.pageSettingsDetails.marginLeft) / 2.54;
+                   let isHeaderDisplay=data.pageSettingsDetails.isHeaderDisplay;
 
+                   var title='';
+                   if(isHeaderDisplay==1)
+                   {
+                        var isHospital=data.pageSettingsDetails.isHospital;
+                        var hospitalDetails=isHospital==1?data.pageSettingsDetails.hospitalAddress:data.pageSettingsDetails.branchAddress;
+                        if(isHospital==1)
+                        {
+                            title='<center>'+hospitalDetails.hospitalName+'<br>'+hospitalDetails.address+'<br>'+hospitalDetails.email+', '+hospitalDetails.phoneNo+'</center><br>';
+                        }else{
+                            title='<center>'+hospitalDetails.branchName+'<br>'+hospitalDetails.address+'<br>'+hospitalDetails.email+', '+hospitalDetails.phoneNo+'</center><br>';
+                        }
+                   }
                    var frame1 = $('<iframe />');
-                   var style='<head><style>table { width: 100%; font-size:12px } table, th, td { border: 1px solid black;border-collapse: collapse;} img {width: 80%;height: 50%;}</style></head>';
+                   var style='<head><style>@media print {@page {size: auto; margin: 0mm;} body{margin: '+pixelsmt+'px '+pixelsmr+'px '+pixelsmb+'px '+pixelsml+'px ;}}table { width: 100%; font-size:12px } table, th, td { border: 1px solid black;border-collapse: collapse;} img {width: 50%;height: 30%;}</style></head>';
                    frame1[0].name = "frame1";
                    frame1.css({ "position": "absolute", "top": "-1000000px" });
                    $("body").append(frame1);
                    var frameDoc = frame1[0].contentWindow ? frame1[0].contentWindow : frame1[0].contentDocument.document ? frame1[0].contentDocument.document : frame1[0].contentDocument;
                    frameDoc.document.open();
                    //Create a new HTML document.
-                   frameDoc.document.write('<html>'+style);//<head><title>DIV Contents</title></head>
-                   frameDoc.document.write('<body topmargin="'+mt+'" bottommargin="'+mb+'" rightmargin="'+mr+'" leftmargin="'+ml+'">');
-                   //Append the external CSS file.
-                //    var styleLocation=localStorage.getItem("base_url")+"/dist/css/app.css";
-                //    frameDoc.document.write("<link rel='stylesheet' href='"+styleLocation+"' />");
+                   frameDoc.document.write('<html>'+style);
+                   frameDoc.document.write('<body >');
                    //Append the DIV contents.
+                   frameDoc.document.write(title);
                    frameDoc.document.write(contents);
                    frameDoc.document.write('</body></html>');
                    frameDoc.document.close();
@@ -468,6 +495,9 @@ if (semenanalysiseditform != null) {
                     $('#divErrorMsg span').text(data.Message);
                     if (data.ShowModal == 1) {
                         errorModal.show();
+                    }else if(data.ShowModal==2)
+                    {
+                       logoutSession(data.Message);
                     }
                 }
             })
@@ -553,10 +583,20 @@ function semenAnalysisFormOnLoad(base_url) {
             .then(response => response.json())
             .then(function (result) {
                 var patientList=result.patientDetails;
-                $('#txtSpouseName').val(patientList.spouseName);
+                if(patientList!=null)
+                {
+                    $('#txtSpouseName').val(patientList.spouseName);
+                }else{
+                    $('#txtSpouseName').val("");
+                }
+            });
+            url = base_url + '/api/patientSemenSequenceNo/'+patientId;
+            fetch(url,options)
+            .then(response => response.json())
+            .then(function (result) {
+                $('#txtSequenceNo').val(result.seqNo);
             });
         });
-
 }
 /* --------------- Semen Analysis Add form submit Begins ------------------------*/
 
@@ -567,6 +607,7 @@ if (semenanalysisform != null) {
         e.preventDefault();
         const semenanalysisdata = new FormData(semenanalysisform);
         const params = new URLSearchParams(semenanalysisdata);
+        params.append('seqNo', $('#txtSequenceNo').val());
         var token=$('#txtToken').val();
         let options = {
             method: "POST",
@@ -598,6 +639,9 @@ if (semenanalysisform != null) {
                     $('#divErrorMsg span').text(data.Message);
                     if (data.ShowModal == 1) {
                         errorModal.show();
+                    }else if(data.ShowModal==2)
+                    {
+                       logoutSession(data.Message);
                     }
                 }
             })
@@ -646,7 +690,6 @@ function getPatientDoctor(){
                 doctorList.forEach(function(value, key) {
                     $("#ddlDoctor").append($("<option></option>").val(value.id).html(value.name)); 
                 });
-                console.log(doctorList);
             }
     });
 }
@@ -680,4 +723,196 @@ function loadReportSign()
     });
 }
 /*-----------------------------------ADD SEMEN ANALYSIS ----------------END------------------------- */
+
+/*---------- Normal value BEGIN----------- */
+function cancelNormalValue(){
+    document.getElementById('btnEditNormalValue').style.visibility ="visible";
+    document.getElementById("btnUpdNormalValue").style.visibility = "hidden";
+    document.getElementById("btnCancelNormalValue").style.visibility ="hidden";
+
+    document.getElementById('txtliquefaction').disabled = true;
+    document.getElementById('txtapperance').disabled = true;
+    document.getElementById('txtph').disabled = true;
+    document.getElementById('txtvolume').disabled = true;
+
+    document.getElementById('txtviscosity').disabled = true;
+    document.getElementById('txtabstinence').disabled = true;
+    document.getElementById('txtmedication').disabled = true;
+    document.getElementById('txtspermConcentration').disabled = true;
+
+    document.getElementById('txtagglutination').disabled = true;
+    document.getElementById('txtclumping').disabled = true;
+    document.getElementById('txtgranularDebris').disabled = true;
+    document.getElementById('txttotalMotility').disabled = true;
+
+    document.getElementById('txtrapidProgressiveMovement').disabled = true;
+    document.getElementById('txtsluggishProgressiveMovement').disabled = true;
+    document.getElementById('txtnonProgressive').disabled = true;
+    document.getElementById('txtnonMotile').disabled = true;
+
+    document.getElementById('txtnormalSperms').disabled = true;
+    document.getElementById('txtheadDefects').disabled = true;
+    document.getElementById('txtneckMidPieceDefects').disabled = true;
+    document.getElementById('txttailDeffects').disabled = true;
+
+    document.getElementById('txtcytoplasmicDroplets').disabled = true;
+    document.getElementById('txtepithelialCells').disabled = true;
+    document.getElementById('txtpusCells').disabled = true;
+    document.getElementById('txtRBC').disabled = true;
+    window.scrollTo(0, 0);
+}
+$( "#btnEditNormalValue" ).on( "click", function() {
+    document.getElementById('btnEditNormalValue').style.visibility ="hidden";
+    document.getElementById("btnUpdNormalValue").style.visibility = "visible";
+    document.getElementById("btnCancelNormalValue").style.visibility ="visible";
+
+    document.getElementById('txtliquefaction').disabled = false;
+    document.getElementById('txtapperance').disabled = false;
+    document.getElementById('txtph').disabled = false;
+    document.getElementById('txtvolume').disabled = false;
+
+    document.getElementById('txtviscosity').disabled = false;
+    document.getElementById('txtabstinence').disabled = false;
+    document.getElementById('txtmedication').disabled = false;
+    document.getElementById('txtspermConcentration').disabled = false;
+
+    document.getElementById('txtagglutination').disabled = false;
+    document.getElementById('txtclumping').disabled = false;
+    document.getElementById('txtgranularDebris').disabled = false;
+    document.getElementById('txttotalMotility').disabled = false;
+
+    document.getElementById('txtrapidProgressiveMovement').disabled = false;
+    document.getElementById('txtsluggishProgressiveMovement').disabled = false;
+    document.getElementById('txtnonProgressive').disabled = false;
+    document.getElementById('txtnonMotile').disabled = false;
+
+    document.getElementById('txtnormalSperms').disabled = false;
+    document.getElementById('txtheadDefects').disabled = false;
+    document.getElementById('txtneckMidPieceDefects').disabled = false;
+    document.getElementById('txttailDeffects').disabled = false;
+
+    document.getElementById('txtcytoplasmicDroplets').disabled = false;
+    document.getElementById('txtepithelialCells').disabled = false;
+    document.getElementById('txtpusCells').disabled = false;
+    document.getElementById('txtRBC').disabled = false;
+});
+$( "#btnCancelNormalValue" ).on( "click", function() {
+    cancelNormalValue();
+});
+/* Save normal values */
+const normalValueForm = document.getElementById('frmNormalValues');
+if(normalValueForm!=null){
+normalValueForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const printSettingdata = new FormData(normalValueForm);
+     var token=$('#txtToken').val();
+    let options = {
+        method: "POST",
+        body: printSettingdata,
+        headers: {
+            Accept: 'application/json',
+            Authorization: 'Bearer '+token,
+          },
+    };
+    var base_url = localStorage.getItem("base_url");
+    var url=base_url+'/api/updateNormalValues';
+    const errorModal = tailwind.Modal.getInstance(document.querySelector("#divNormalValueErrorModal"));
+    fetch(url, options)
+        .then(function(response){ 
+            return response.json(); 
+        })
+        .then(function(data){ 
+            if(data.Success=='Success'){
+                $('#divMsg span').text(data.Message);
+                if (data.ShowModal==1) {
+                    const successModal = tailwind.Modal.getInstance(document.querySelector("#divNormalValueSuccessModal"));
+                    successModal.show();    
+                    cancelNormalValue();
+                }                   
+            }else{
+                $('#divErrorHead span').text(data.Success);
+                $('#divErrorMsg span').text(data.Message);
+                if (data.ShowModal==1) {
+                    errorModal.show();
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
+                 }
+            }
+        })
+        .catch(function(error){
+            $('#divErrorHead span').text('Error');
+            $('#divErrorMsg span').text(error);
+            errorModal.show();
+        });
+});
+}
+
+/*---------- Normal value END----------- */
+$( "#tbSemen-html-filter-field" ).on( "change", function() {
+    $("#tbSemen-html-filter-value").val("");
+    $("#tbSemen-html-filter-value-1").val("");
+    var field=$( "#tbSemen-html-filter-field" ).val();
+    if(field=='created_date'){
+        $("#divDateSearch").removeClass("hidden").removeAttr("style");
+        $("input#tbSemen-html-filter-value-1").show();
+        $("#tbSemen-html-filter-value-1-label").show();
+
+        $("#divValueSearch").addClass('hidden');
+        $("input#tbSemen-html-filter-value").hide();
+        $("#tbSemen-html-filter-value-label").hide();
+    }else{
+        $("#divValueSearch").removeClass("hidden").removeAttr("style");
+        $("input#tbSemen-html-filter-value").show();
+        $("#tbSemen-html-filter-value-label").show();
+
+        $("#divDateSearch").addClass('hidden');      
+        $("input#tbSemen-html-filter-value-1").hide();
+        $("#tbSemen-html-filter-value-1-label").hide();
+    }
+} );
+/*----------------------------------- Delete Patient Semen Analysis By ID BEGINS -------------------------*/
+function deleteSemenAnalysis(semenId,userId){
+    var base_url = localStorage.getItem("base_url");
+    var url=base_url+'/api/deleteSemenAnalysis/'+semenId+'/'+userId;
+    var token=$('#txtToken').val();
+    let options = {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            Authorization: 'Bearer '+token,
+          },
+    }
+    const errorModal = tailwind.Modal.getInstance(document.querySelector("#divSemenErrorModal"));
+    fetch(url, options)
+        .then(function(response){ 
+            return response.json(); 
+        })
+        .then(function(data){ 
+            if(data.Success=='Success'){
+                if (data.ShowModal==1) {
+                    const deleteModal = tailwind.Modal.getInstance(document.querySelector("#divDeleteSemen"));
+                    deleteModal.hide();
+                    setSemenAnalysisTabulator();
+                }                   
+            }else{
+                $('#divErrorHead span').text(data.Success);
+                $('#divErrorMsg span').text(data.Message);
+                if (data.ShowModal==1) {
+                    errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
+                }
+            }
+        })
+        .catch(function(error){
+            $('#divErrorHead span').text('Error');
+            $('#divErrorMsg span').text(error);
+            errorModal.show();
+        });       
+}
+
+/*----------------------------------- Delete Patient Semen Analysis By ID END -------------------------*/
+
 })();

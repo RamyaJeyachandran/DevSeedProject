@@ -132,6 +132,7 @@
                                 <div id="divDesignation" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Designation :</b><span></span> </div>
                                 <div id="divDepartment" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Department :</b><span></span> </div>
                                 <div id="divExperience" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Experience : </b><span></span></div>
+                                <div id="divAppointmentInterval" class="truncate sm:whitespace-normal flex items-center mt-3"><b>Appointment Interval : </b><span></span></div>
                             </div>
                         </div>
                         </div>

@@ -102,7 +102,7 @@ class Appointment extends Model
             $where_sts=$where_sts." and appointments.appointmentDate ='".Carbon::parse(now())->toDateString()."'";
         }
         $appointmentList['where_sts']=$where_sts;
-        $appointmentList['appointmentList']=DB::table('appointments')->selectRaw("concat(appointmentDate, ' ', appointmentTime) as appointmentDateTime,HEX(AES_ENCRYPT(appointments.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,HEX(AES_ENCRYPT(appointments.patientId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,HEX(AES_ENCRYPT(appointments.doctorId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as doctorId,appointments.appointmentDate,appointments.appointmentTime,appointments.status,appointments.reason,COALESCE(departments.name,'') as departmentName,patients.profileImage,patients.hcNo,patients.name as patientName,patients.phoneNo,patients.email,patients.address,doctors.name as doctorName,CASE WHEN appointments.status ='Started' THEN 'success' WHEN appointments.status ='Finished'  THEN 'danger' WHEN appointments.status ='Created'  THEN 'info' WHEN appointments.status ='Pending'  THEN 'pending' WHEN appointments.status ='ReSchedule'  THEN 'gray-600' WHEN appointments.status ='OnGoing'  THEN 'dark' WHEN appointments.status ='Cancelled'  THEN 'warning' ELSE 'primary' END as statusColor")
+        $appointmentList['appointmentList']=DB::table('appointments')->selectRaw("concat(appointmentDate, ' / ', TIME_FORMAT(appointmentTime, '%h:%i %p')) as appointmentDateTime,HEX(AES_ENCRYPT(appointments.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,HEX(AES_ENCRYPT(appointments.patientId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,HEX(AES_ENCRYPT(appointments.doctorId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as doctorId,appointments.appointmentDate,appointments.appointmentTime,appointments.status,appointments.reason,COALESCE(departments.name,'') as departmentName,patients.profileImage,patients.hcNo,patients.name as patientName,patients.phoneNo,patients.email,patients.address,doctors.name as doctorName,CASE WHEN appointments.status ='Started' THEN 'success' WHEN appointments.status ='Finished'  THEN 'danger' WHEN appointments.status ='Created'  THEN 'info' WHEN appointments.status ='Pending'  THEN 'pending' WHEN appointments.status ='ReSchedule'  THEN 'gray-600' WHEN appointments.status ='OnGoing'  THEN 'dark' WHEN appointments.status ='Cancelled'  THEN 'warning' ELSE 'primary' END as statusColor")
                                     ->join('doctors', function($join) use ($whereDoctor_sts)
                                         {
                                             $join->on('doctors.id', '=', 'appointments.doctorId')
@@ -203,10 +203,35 @@ class Appointment extends Model
                                                      ->whereRaw($where_patientSts);
                                             })
                                             ->whereRaw($where_sts)
-                                            // ->orderBy('patients.name','asc')
-                                            ->orderBy('appointments.appointmentDate','desc')
-                                            ->orderBy('appointments.appointmentTime','desc')
+                                            ->orderBy('sNo','asc')
+                                            // ->orderBy('appointments.appointmentDate','desc')
+                                            // ->orderBy('appointments.appointmentTime','desc')
                                             ->get();
         return $patientDetails;
+    }
+    public static function checkPatientAppointment($appointmentDate,$patientId,$doctorId,$id){
+        $where_sts="appointments.appointmentDate = '".Carbon::parse($appointmentDate)->toDateString()."'";
+        if($id!=0)
+        {
+            $where_sts=$where_sts." and id != ".$id;
+        }
+        $phoneNoList=DB::table('appointments')->select('id','appointmentTime')
+                    ->where([['is_active','=',1],['patientId','=',$patientId],['doctorId','=',$doctorId]])
+                    ->whereRaw($where_sts)
+                    ->first();
+         return $phoneNoList; 
+    }
+    public static function checkDoctorAppointment($appointmentDate,$appointmentTime,$doctorId,$id){
+        $appointmentDate = Carbon::parse($appointmentDate);
+        $where_sts="appointments.appointmentDate = '".Carbon::parse($appointmentDate)->toDateString()."' and ('". $appointmentTime."' between appointmentTime and ADDTIME(appointmentTime, '".config('constant.doctorDefaultTimeSlot')."'))";
+        if($id!=0)
+        {
+            $where_sts=$where_sts." and id != ".$id;
+        }
+        $phoneNoList=DB::table('appointments')->select('id','appointmentTime')
+                                   ->where([['is_active','=',1],['doctorId','=',$doctorId]])
+                                   ->whereRaw($where_sts)
+                                   ->first();
+         return $phoneNoList; 
     }
 }

@@ -13,7 +13,7 @@
                     @include('layouts.topBar')
                     <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
                     <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
-                        <button onclick="window.location='{{ url("SemenAnalysis") }}'" class="btn btn-primary shadow-md mr-2">Add Semen Analysis</button>
+                        <button onclick="window.location='{{ url("SemenAnalysis") }}'" class="btn btn-primary shadow-md mr-2"><i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i>Add Semen Analysis</button>
                         <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control" disabled>
                     </div>
                 </div>
@@ -53,7 +53,7 @@
                             </div>
                         </form>
                         <div class="flex mt-5 sm:mt-0">
-                            <button id="tbSemen-print" class="btn btn-primary w-1/2 sm:w-auto mr-2"> <i data-lucide="printer" class="w-4 h-4 mr-2"></i> Print </button>
+                            <button id="tbSemen-print" class="btn btn-danger w-1/2 sm:w-auto mr-2"> <i data-lucide="printer" class="w-4 h-4 mr-2"></i> Print </button>
                             <div class="dropdown w-1/2 sm:w-auto">
                                 <button id="tbSemen-export-xlsx" class="btn btn-primary w-full sm:w-auto"> <i data-lucide="file-text" class="w-4 h-4 mr-2"></i> Export as xlsx </button>
                             </div>

@@ -256,6 +256,34 @@ class Patient extends Model
             ]
         );
     }   
+    public function getPatientByPatientId($patientId,$hospitalId,$branchId)
+    {
+        $user = new User;
+        $decrypt_hospitalId=$user->getDecryptedId($hospitalId);
+        $decrypt_branchId=$user->getDecryptedId($branchId);
+        $decrypt_branchId=$decrypt_branchId==0?NULL:$decrypt_branchId;
+
+        $decrypt_patientId=$user->getDecryptedId($patientId);
+
+        $where_sts="patients.is_active=1 and patients.id=".$decrypt_patientId.($decrypt_hospitalId==0|| $decrypt_hospitalId==null?"":" and patients.hospitalId=".$decrypt_hospitalId).($decrypt_branchId==0|| $decrypt_branchId==null?"":" and patients.branchId=".$decrypt_branchId);
+        if($decrypt_hospitalId==0 || $decrypt_hospitalId==null){
+            $where_sts="patients.is_active=1 and patients.id=".$decrypt_patientId;
+        }
+
+        $patientDetails=DB::table('patients')->selectRaw("COALESCE(patients.age,'Not Provided') as age,COALESCE(patients.bloodGroup,'Not Provided') as bloodGroup,COALESCE(patients.dob,'Not Provided') as dob,COALESCE(patients.gender,'Not Provided') as gender,COALESCE(patients.martialStatus,'Not Provided') as martialStatus,COALESCE(patients.patientWeight,'Not Provided') as weight,COALESCE(patients.patientHeight,'Not Provided') as height,COALESCE(patients.address,'Not Provided') as address,COALESCE(patients.city,'Not Provided') as city,COALESCE(patients.state,'Not Provided') as state,COALESCE(patients.pincode,'Not Provided') as pincode,COALESCE(patients.spouseName,'Not Provided') as spouseName,COALESCE(patients.spousePhnNo,'Not Provided') as spousePhnNo,COALESCE(patients.refferedBy,'Not Provided') as refferedBy,COALESCE(patients.refDoctorName,'Not Provided') as refDoctorName,COALESCE(patients.refDrHospitalName,'Not Provided') as refDrHospitalName,COALESCE(patients.reason,'Not Provided') as reason,COALESCE(patients.is_active,'Not Provided') as status,patients.name,patients.hcNo,patients.phoneNo,patients.email,HEX(AES_ENCRYPT(patients.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,COALESCE(hospitalbranch.branchName,hospitalsettings.hospitalName) as hospitalName,hospitalsettings.address as hospitalAddress,patients.profileImage,COALESCE(patients.aadharCardNo,'') as aadharCardNo,attendingDoc.name as attendingDoctor,counsellor.name as counsellor,witnessHosp.name as witnessHospital,witnessBank.name as witnessBank,donorbanks.name as donorBankName,donorbanks.address as donorBankAddress,COALESCE(witnessHosp.address,'') as witnessHospAddress,COALESCE(witnessBank.address,'') as witnessBankAddress,COALESCE(counsellor.address,'') as counsellorAddress,COALESCE(attendingDoc.address,'') as attendingDoctorAddress")
+                                    ->join('hospitalsettings','hospitalsettings.id','=','patients.hospitalId')
+                                    ->leftJoin('hospitalbranch','hospitalbranch.id','=','patients.branchId')
+                                    ->leftJoin('assign_doctors','assign_doctors.patientId','=','patients.id')
+                                    ->leftJoin('doctors as attendingDoc','attendingDoc.id','=','assign_doctors.doctorId')
+                                    ->leftJoin('doctors as counsellor','counsellor.id','=','patients.refferedByDoctorId')
+                                    ->leftJoin('doctors as witnessHosp','witnessHosp.id','=','patients.witnessHospitalId')
+                                    ->leftJoin('bank_witnesses as witnessBank','witnessBank.id','=','patients.witnessBankId')
+                                    ->leftJoin('donorbanks','donorbanks.id','=','patients.donorBankId')
+                                    ->whereRaw($where_sts)
+                                   ->first();
+
+        return $patientDetails;
+    }
     public function getPatientByHcNo($hcNo,$hospitalId,$branchId)
     {
         $user = new User;
@@ -275,7 +303,7 @@ class Patient extends Model
                                     ->leftJoin('doctors as attendingDoc','attendingDoc.id','=','assign_doctors.doctorId')
                                     ->leftJoin('doctors as counsellor','counsellor.id','=','patients.refferedByDoctorId')
                                     ->leftJoin('doctors as witnessHosp','witnessHosp.id','=','patients.witnessHospitalId')
-                                    ->leftJoin('doctors as witnessBank','witnessBank.id','=','patients.witnessBankId')
+                                    ->leftJoin('bank_witnesses as witnessBank','witnessBank.id','=','patients.witnessBankId')
                                     ->leftJoin('donorbanks','donorbanks.id','=','patients.donorBankId')
                                     ->whereRaw($where_sts)
                                    ->first();

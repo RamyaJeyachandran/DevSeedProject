@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HospitalSettings;
 use URL;
 use App\Models\User;
 use config\constants;
@@ -15,11 +16,18 @@ use Illuminate\Support\Facades\Validator;
 
 class HospitalBranchController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('pages.addBranch');
+        if($request->session()->get('isSetDefault')==1){
+            return view('pages.addBranch');
+        }
+        else{
+            return redirect()->action(
+                [DashboardController::class, 'getDefaultSetting'], ['id' =>  $request->session()->get('userId')]
+            );
+        }
     }
-    public function searchIndex()
+    public function searchIndex(Request $request)
     {
         return View("pages.searchBranch");
     }
@@ -44,6 +52,29 @@ class HospitalBranchController extends Controller
                 $result['Message'] = "Validation failed. Please fill the required field marked as *";
                 return response()->json($result, 200);
             }
+            /* Hospital Branch Limit */
+            $hospital_obj=new  HospitalSettings;
+            $user_obj=new User;
+            $hospitalId=$user_obj->getDecryptedId($request->hospitalId);
+            $hospital_details=$hospital_obj->getHospitalSettingsById($hospitalId);
+            if($hospital_details->branchLimit==0)
+            {
+                $request->session()->put('branchLimit', '2');
+                $result['ShowModal'] = 1;
+                $result['Success'] = 'Failure';
+                $result['Message'] = "This account doesn't have a permission for branch creation. For futher details contact administrator";
+                return response()->json($result, 200);
+            }
+            $branch_limit=$hospital_obj->getBranchCountByHospitalId($hospitalId);
+            $branch_limit=$branch_limit+1;
+            if($branch_limit>$hospital_details->branchLimit)
+            {
+                $request->session()->put('branchLimit', '0');
+                $result['ShowModal'] = 1;
+                $result['Success'] = 'Failure';
+                $result['Message'] = "You can't create branch more than ".$hospital_details->branchLimit.". For futher details contact administrator";
+                return response()->json($result, 200);
+            }
             //----------------Store Image ---Begin 
             $url = request()->getSchemeAndHttpHost();//URL::to("/");
             $logo =$url ."/".config('constant.hospital_default_logo');
@@ -53,7 +84,7 @@ class HospitalBranchController extends Controller
                 $request->logo->move(public_path($img_location), $img_name);
 
                 $logo =$img_location.$img_name;
-                $logo=$url ."/seed/public/". $logo;
+                $logo=$url .config('constant.imageStoreLocation'). $logo;
             }
             
             //-------------------Store Image ---End
@@ -199,7 +230,7 @@ class HospitalBranchController extends Controller
                     $request->logo->move(public_path($img_location), $img_name);
     
                     $logo =$img_location.$img_name;
-                    $logo=$url ."/seed/public/". $logo;
+                    $logo=$url .config('constant.imageStoreLocation'). $logo;
                 }
             }
              //-------------------Store Image ---End
@@ -257,13 +288,42 @@ class HospitalBranchController extends Controller
     public function deleteBranch(Request $request,$id,$userId){
         try{
             $branch_obj = new HospitalBranch;
-            $branchDetails=$branch_obj->deleteHospitalBranchById($id,$userId);
             $user_obj = new User;
-            $user_login=$user_obj->deleteLogin($id,config("constant.branch_user_type_id"),$userId);
 
+            $branchId=$user_obj->getDecryptedId($id);
+            $hospital_details=$branch_obj->getHospitalBranchById($branchId);
+
+            $branchDetails=$branch_obj->deleteHospitalBranchById($id,$userId);
+            $user_login=$user_obj->deleteLogin($id,config("constant.branch_user_type_id"),$userId);
+/*Branch Limit check BEGIN */
+            $isReload=0;
+            if($hospital_details->branchLimit==0)
+            {
+                $request->session()->put('branchLimit', '2');
+                $result['ShowModal'] = 1;
+                $result['Success'] = 'Failure';
+                $result['Message'] = "This account doesn't have a permission for branch creation. For futher details contact administrator";
+                return response()->json($result, 200);
+            }
+            $hospital_obj=new HospitalSettings;
+            $hospitalId=$user_obj->getDecryptedId($hospital_details->hospitalId);
+            $branch_limit=$hospital_obj->getBranchCountByHospitalId($hospitalId);
+            if($branch_limit>$hospital_details->branchLimit)
+            {
+                $request->session()->put('branchLimit', '0');
+                $result['ShowModal'] = 1;
+                $result['Success'] = 'Failure';
+                $result['Message'] = "You can't create branch more than ".$hospital_details->branchLimit.". For futher details contact administrator";
+                return response()->json($result, 200);
+            }
+            else{
+                $request->session()->put('branchLimit', '1');
+                $isReload=1;
+            }
+/*Branch Limit check END */
             $result['Success']='Success';
             $result['ShowModal']= 1;
-            $result['hospitalDetails']=$branchDetails;
+            $result['isReload']=$isReload;
             return response()->json($result,200);
         }catch(\Throwable $th){
             $result['Success']='failure';

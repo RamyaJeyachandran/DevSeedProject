@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\HospitalSettings;
-use App\Models\pageSettings;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+use URL;
 use App\Models\User;
 use config\constants;
-use URL;
+use App\Models\pageSettings;
+use Illuminate\Http\Request;
+use App\Models\HospitalSettings;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 
 class HospitalSettingsController extends Controller
@@ -53,7 +54,7 @@ class HospitalSettingsController extends Controller
                 $request->logo->move(public_path($img_location), $img_name);
 
                 $logo = $img_location . $img_name;
-                $logo = $url . "/" . $logo; //$url . "/seed/public/" . $logo;
+                $logo = $url . config('constant.imageStoreLocation'). $logo; //$url . "/seed/public/" . $logo;
             }
 
             //-------------------Store Image ---End
@@ -196,7 +197,7 @@ class HospitalSettingsController extends Controller
                     $request->logo->move(public_path($img_location), $img_name);
 
                     $logo = $img_location . $img_name;
-                    $logo = $url . "/" . $logo;
+                    $logo = $url . config('constant.imageStoreLocation') . $logo;
                 }
             }
             //-------------------Store Image ---End

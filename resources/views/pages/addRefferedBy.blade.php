@@ -44,9 +44,9 @@
                                 <label for="ddlWitnessBank" class="form-label">Witness from Bank</label>
                                 <select id="ddlWitnessBank" name="witnessBankId" class="form-select">
                                     <option value='0'>Select Witness</option>
-                                    @foreach ($patientDetails->refferedByList as $witnessBank)
+                                    @foreach ($patientDetails->bankWitnessList as $witnessBank)
                                     <option value="{{ $witnessBank->id }}" {{ ( $witnessBank->id == $patientDetails->witnessBankId) ? 'selected' : '' }}> 
-                                        {{ $witnessBank->name }} 
+                                        {{ $witnessBank->name.'- '.$witnessBank->hospitalName}} 
                                     </option>
                                     @endforeach
                                 </select>

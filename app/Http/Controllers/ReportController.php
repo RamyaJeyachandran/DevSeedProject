@@ -8,13 +8,27 @@ use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return View("pages.patientCycleReport");
+        if($request->session()->get('isSetDefault')==1){
+            return View("pages.patientCycleReport");
+        }
+        else{
+            return redirect()->action(
+                [DashboardController::class, 'getDefaultSetting'], ['id' =>  $request->session()->get('userId')]
+            );
+        }
     }
-    public function patientIndex()
+    public function patientIndex(Request $request)
     {
-        return View("pages.PatientDetailledReport");
+        if($request->session()->get('isSetDefault')==1){
+            return View("pages.PatientDetailledReport");
+        }
+        else{
+            return redirect()->action(
+                [DashboardController::class, 'getDefaultSetting'], ['id' =>  $request->session()->get('userId')]
+            );
+        }
     }
     public function getReportPatientWise(Request $request)
     {

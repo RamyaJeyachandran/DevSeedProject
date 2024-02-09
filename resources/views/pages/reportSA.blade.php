@@ -14,7 +14,7 @@
                         <button id="btnPrintSemenAnalysis" type="button" class="btn btn-danger shadow-md mr-2"><i data-lucide="printer" class="w-4 h-4 mr-2"></i> Print</button>
                         <div class="dropdown ml-auto sm:ml-0">
                         <button onclick="window.location='{{ url("SemenAnalysis") }}'" class="btn btn-primary shadow-md mr-2">
-                            Add Semen Analysis
+                        <i data-lucide="plus-circle" class="w-4 h-4 mr-2"></i> Add Semen Analysis
                         </button>
                         <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
                         </div>
@@ -24,11 +24,8 @@
     <div  class="intro-y box mt-5">
                        
     <div class="intro-y box overflow-hidden mt-5">
+        <!-- <center><p class="p-5 text-lg font-bold">SEMEN ANALYSIS REPORT</p> </center> -->
     <div id="divPrintSemenAnalysis" class="px-5 sm:px-16 py-10 sm:py-20">
-    <center><p class="p-5 text-lg font-bold">SEMEN ANALYSIS REPORT</p> </center>
-
-    <!-- <div class="text-base mt-1 p-5">DATE : {{$analysisDetails->created_date}}</div> -->
-
             <div class="overflow-x-auto">
             <table  class="table table-bordered">
                 <tbody> <tr> <td valign="top" width="60">
@@ -84,12 +81,12 @@
                     <tr>
                         <td valign="top" width="200">
                             <p>LIQUEFACTION</p>
-                            <p>&nbsp;</p>
                         </td>
                         <td valign="top" width="150">
                             <p>{{$analysisDetails->liquefaction}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->liquefaction}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -100,6 +97,7 @@
                             <p>{{$analysisDetails->appearance}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->apperance}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -110,7 +108,7 @@
                         <p>{{$analysisDetails->ph}}</p>
                         </td>
                         <td valign="top" width="150">
-                            <p>Normal Value: 7.2-7.8</p>
+                        <p>{{$analysisDetails->normalValues->ph}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -121,7 +119,7 @@
                         <p>{{$analysisDetails->volume}}</p>
                         </td>
                         <td valign="top" width="150">
-                            <p>more than 1.5 ml</p>
+                        <p>{{$analysisDetails->normalValues->volume}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -132,6 +130,7 @@
                         <p>{{$analysisDetails->viscosity}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->viscosity}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -142,6 +141,7 @@
                         <p>{{$analysisDetails->abstinence}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->abstinence}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -152,6 +152,7 @@
                         <p>{{$analysisDetails->medication}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->medication}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -167,7 +168,7 @@
                         <p>{{$analysisDetails->spermconcentration}}</p>
                         </td>
                         <td valign="top" width="150">
-                            <p>more than 15.0 mil/ml</p>
+                        <p>{{$analysisDetails->normalValues->spermConcentration}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -178,6 +179,7 @@
                         <p>{{$analysisDetails->agglutination}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->agglutination}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -188,17 +190,18 @@
                         <p>{{$analysisDetails->clumping}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->clumping}}</p>
                         </td>
                     </tr>
                     <tr>
                         <td valign="top" width="200">
                             <p>GRANULAR DEBRIS</p>
-                            <p>&nbsp;</p>
                         </td>
                         <td valign="top" width="150">
                         <p>{{$analysisDetails->granulardebris}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->granularDebris}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -209,14 +212,12 @@
                     <tr>
                         <td valign="top" width="200">
                             <p>TOTAL MOTILITY</p>
-                            <p>&nbsp;</p>
                         </td>
                         <td valign="top" width="150">
                         <p>{{$analysisDetails->totalmotility}}</p>
                         </td>
                         <td valign="top" width="150">
-                            <p>38.0 - 42.0 %</p>
-                            <p>Normal Value: 40% RP+SP+NP </p>
+                        <p>{{$analysisDetails->normalValues->totalMotility}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -227,8 +228,7 @@
                         <p>{{$analysisDetails->rapidprogressivemovement}}</p>
                         </td>
                         <td valign="top" width="150">
-                            <p>31.0 - 34.0 %</p>
-                            <p>Normal Value: 32 %ALONE</p>
+                        <p>{{$analysisDetails->normalValues->rapidProgressiveMovement}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -239,7 +239,7 @@
                         <p>{{$analysisDetails->sluggishprogressivemovement}}</p>
                         </td>
                         <td valign="top" width="150">
-                            <p>8%</p>
+                        <p>{{$analysisDetails->normalValues->sluggishProgressiveMovement}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -250,6 +250,7 @@
                         <p>{{$analysisDetails->nonprogressive}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->nonProgressive}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -260,6 +261,7 @@
                         <p>{{$analysisDetails->nonmotile}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->nonMotile}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -275,7 +277,7 @@
                         <p>{{$analysisDetails->normalsperms}}</p>
                         </td>
                         <td valign="top" width="150">
-                            <p>4%</p>
+                        <p>{{$analysisDetails->normalValues->normalSperms}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -286,6 +288,7 @@
                         <p>{{$analysisDetails->headdefects}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->headDefects}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -296,6 +299,7 @@
                         <p>{{$analysisDetails->neckandmidpiecedefects}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->neckMidPieceDefects}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -306,6 +310,7 @@
                         <p>{{$analysisDetails->taildefects}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->tailDeffects}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -316,6 +321,7 @@
                         <p>{{$analysisDetails->cytoplasmicdroplets}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->cytoplasmicDroplets}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -331,6 +337,7 @@
                         <p>{{$analysisDetails->epithelialcells}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->epithelialCells}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -341,6 +348,7 @@
                         <p>{{$analysisDetails->puscells}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->pusCells}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -351,6 +359,7 @@
                         <p>{{$analysisDetails->rbc}}</p>
                         </td>
                         <td valign="top" width="150">
+                        <p>{{$analysisDetails->normalValues->RBC}}</p>
                         </td>
                     </tr>
                     <tr>
@@ -370,21 +379,21 @@
                         </td>
                     </tr>
                     <tr>
-                        <td valign="top" width="200" Height="150">
+                        <td valign="top" width="50" Height="50">
                             <p class="uppercase font-bold">Scientist</p>
                             @if($analysisDetails->leftSignature != '')
                             <img class="rounded-full image-fit" src="{{$analysisDetails->leftSignature}}">
                             <p>{{$analysisDetails->leftDoctor}}</p>
                             @endif
                         </td>
-                        <td valign="top" width="150" Height="150">
+                        <td valign="top" width="50" Height="50">
                             <p class="uppercase font-bold">Scientist</p>
                             @if($analysisDetails->centerSignature != '')
                             <img class="rounded-full image-fit" src="{{$analysisDetails->centerSignature}}">
                             <p>{{$analysisDetails->centerDoctor}}</p>
                             @endif
                         </td>
-                        <td valign="top" width="150" Height="150">
+                        <td valign="top" width="50" Height="50">
                             <p class="uppercase font-bold">Medical Director</p>
                             @if($analysisDetails->rightSignature != '')
                             <img class="rounded-full image-fit" src="{{$analysisDetails->rightSignature}}">

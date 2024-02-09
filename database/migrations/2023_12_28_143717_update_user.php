@@ -13,6 +13,12 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('colorId')->nullable();
+            $table->bigInteger('defaultHospitalId')->unsigned()->nullable();
+            $table->bigInteger('defaultBranchId')->unsigned()->nullable();
+            $table->timestamp('lastActivityDateTime')->nullable();
+
+            $table->foreign('defaultHospitalId')->references('id')->on('hospitalsettings');
+            $table->foreign('defaultBranchId')->references('id')->on('hospitalBranch');
          });
     }
 
@@ -23,6 +29,8 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('colorId');
+            $table->dropColumn('defaultHospitalId');
+            $table->dropColumn('defaultBranchId');
          });
     }
 };

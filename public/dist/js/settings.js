@@ -75186,17 +75186,29 @@ __webpack_require__.r(__webpack_exports__);
     document.body.scrollTop = 0; // For Safari
     document.documentElement.scrollTop = 0;
   });
+  function logoutSession(msg) {
+    var base_url = localStorage.getItem("base_url");
+    document.body.scrollTop = 0; // For Safari
+    document.documentElement.scrollTop = 0;
+    window.location.href = base_url + "/login/" + msg;
+  }
   window.addEventListener("load", function (e) {
     e.preventDefault();
     var pathname = window.location.pathname;
-    // var base_url = window.location.origin+'/seed/public';
+    //Local Path
+    // var base_url = window.location.origin;
     // localStorage.setItem("base_url", base_url);
-    // var serverPath='/seed/public/index.php';
-    // var serverPath2='/seed/public';
-    var base_url = window.location.origin;
+    // var serverPath='';
+    // var serverPath2='';
+
+    //server Path
+    var base_url = window.location.origin + '/seed/public';
     localStorage.setItem("base_url", base_url);
-    var serverPath = '';
-    var serverPath2 = '';
+    var serverPath = '/seed/public/index.php';
+    var serverPath2 = '/seed/public';
+    if (document.getElementById("divYear") != null) {
+      document.getElementById("divYear").innerHTML = '@' + new Date().getFullYear() + ' Agnai Solutions';
+    }
     switch (pathname) {
       case serverPath + '/PrintSettings':
       case serverPath2 + '/PrintSettings':
@@ -75211,12 +75223,18 @@ __webpack_require__.r(__webpack_exports__);
         loadDepartment(base_url);
         listReportSignature();
         break;
-      // case serverPath+'/addLabStaff':
-      // case serverPath2+'/addLabStaff':
-      //     setMenu();
-      //     break;
+      case serverPath + '/ImageCaptureSettings':
+      case serverPath2 + '/ImageCaptureSettings':
+        setMenu("[id*=lnkPrintSettings]", "[id*=ulPrintSettings]");
+        setMobileMenu("[id*=lnkMobilePrint]", "[id*=ulMobilePrint]", "[id*=aMobilePrint]");
+        break;
+      case serverPath + '/BankWitness':
+      case serverPath2 + '/BankWitness':
+        setMenu("[id*=lnkDonor]", "[id*=ulDonor]");
+        setMobileMenu("[id*=lnkMobileDonor]", "[id*=ulMobileDonor]", "[id*=aMobileDonor]");
+        setWitness();
+        break;
     }
-
     return;
   });
   function setMenu($lnkControl, $ulControl) {
@@ -75238,6 +75256,7 @@ __webpack_require__.r(__webpack_exports__);
     document.getElementById('txtMarginLeft').disabled = false;
     document.getElementById('txtMarginBottom').disabled = false;
     document.getElementById('txtMarginTop').disabled = false;
+    document.getElementById('chkHeader').disabled = false;
   });
   $("#btnCancelPrintSetting").on("click", function () {
     cancelPrintSettings();
@@ -75250,6 +75269,7 @@ __webpack_require__.r(__webpack_exports__);
     document.getElementById('txtMarginLeft').disabled = true;
     document.getElementById('txtMarginBottom').disabled = true;
     document.getElementById('txtMarginTop').disabled = true;
+    document.getElementById('chkHeader').disabled = true;
   }
   var printSettingForm = document.getElementById('frmPrintSettings');
   if (printSettingForm != null) {
@@ -75283,6 +75303,8 @@ __webpack_require__.r(__webpack_exports__);
           $('#divErrorMsg span').text(data.Message);
           if (data.ShowModal == 1) {
             errorModal.show();
+          } else if (data.ShowModal == 2) {
+            logoutSession(data.Message);
           }
         }
       })["catch"](function (error) {
@@ -75338,6 +75360,8 @@ __webpack_require__.r(__webpack_exports__);
           $('#divErrorMsg span').text(data.Message);
           if (data.ShowModal == 1) {
             errorModal.show();
+          } else if (data.ShowModal == 2) {
+            logoutSession(data.Message);
           }
         }
       })["catch"](function (error) {
@@ -75370,24 +75394,26 @@ __webpack_require__.r(__webpack_exports__);
     fetch(url, options).then(function (response) {
       return response.json();
     }).then(function (result) {
-      var listDepartment = result.departmentList;
-      listDepartment.forEach(function (value, key) {
-        $("#ddlDepartmentLeft").append($("<option></option>").val(value.id).html(value.name));
-        $("#ddlDepartmentRight").append($("<option></option>").val(value.id).html(value.name));
-        $("#ddlDepartmentcenter").append($("<option></option>").val(value.id).html(value.name));
-      });
-      var deptId = $("#ddlDepartmentLeft").val();
-      var doctorUrl = base_url + '/api/doctorByDepartment/' + hospitalId + '/' + branchId + '/' + deptId;
-      fetch(doctorUrl, options).then(function (response) {
-        return response.json();
-      }).then(function (result) {
-        var listDoctor = result.doctorList;
-        listDoctor.forEach(function (value, key) {
-          $("#ddlDoctorLeft").append($("<option></option>").val(value.id).html(value.name));
-          $("#ddlDoctorRight").append($("<option></option>").val(value.id).html(value.name));
-          $("#ddlDoctorcenter").append($("<option></option>").val(value.id).html(value.name));
+      if (result.Success == 'Success') {
+        var listDepartment = result.departmentList;
+        listDepartment.forEach(function (value, key) {
+          $("#ddlDepartmentLeft").append($("<option></option>").val(value.id).html(value.name));
+          $("#ddlDepartmentRight").append($("<option></option>").val(value.id).html(value.name));
+          $("#ddlDepartmentcenter").append($("<option></option>").val(value.id).html(value.name));
         });
-      });
+        var deptId = $("#ddlDepartmentLeft").val();
+        var doctorUrl = base_url + '/api/doctorByDepartment/' + hospitalId + '/' + branchId + '/' + deptId;
+        fetch(doctorUrl, options).then(function (response) {
+          return response.json();
+        }).then(function (result) {
+          var listDoctor = result.doctorList;
+          listDoctor.forEach(function (value, key) {
+            $("#ddlDoctorLeft").append($("<option></option>").val(value.id).html(value.name));
+            $("#ddlDoctorRight").append($("<option></option>").val(value.id).html(value.name));
+            $("#ddlDoctorcenter").append($("<option></option>").val(value.id).html(value.name));
+          });
+        });
+      }
     });
   }
   $("#ddlDepartmentLeft").on('change', function () {
@@ -75416,12 +75442,14 @@ __webpack_require__.r(__webpack_exports__);
     fetch(doctorUrl, options).then(function (response) {
       return response.json();
     }).then(function (result) {
-      $(doctorCtrlId + " option").remove();
-      $(doctorCtrlId).append($("<option></option>").val(0).html("Select Doctor"));
-      var listDoctor = result.doctorList;
-      listDoctor.forEach(function (value, key) {
-        $(doctorCtrlId).append($("<option></option>").val(value.id).html(value.name));
-      });
+      if (result.Success == 'Success') {
+        $(doctorCtrlId + " option").remove();
+        $(doctorCtrlId).append($("<option></option>").val(0).html("Select Doctor"));
+        var listDoctor = result.doctorList;
+        listDoctor.forEach(function (value, key) {
+          $(doctorCtrlId).append($("<option></option>").val(value.id).html(value.name));
+        });
+      }
     });
     document.getElementById(divSignCtrl).innerHTML = "";
   }
@@ -75636,6 +75664,8 @@ __webpack_require__.r(__webpack_exports__);
           $('#divErrorMsg span').text(data.Message);
           if (data.ShowModal == 1) {
             errorModal.show();
+          } else if (data.ShowModal == 2) {
+            logoutSession(data.Message);
           }
         }
       })["catch"](function (error) {
@@ -75678,6 +75708,8 @@ __webpack_require__.r(__webpack_exports__);
         $('#divErrorMsg span').text(data.Message);
         if (data.ShowModal == 1) {
           errorModal.show();
+        } else if (data.ShowModal == 2) {
+          logoutSession(data.Message);
         }
       }
     })["catch"](function (error) {
@@ -75687,6 +75719,390 @@ __webpack_require__.r(__webpack_exports__);
     });
   }
   /*------------------------------REPORT SIGNATURE --------END ------------------------- */
+  $("#ddlHospital").on('change', function () {
+    var token = $('#txtToken').val();
+    var hospitalId = $("#ddlHospital").val();
+    var options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token
+      }
+    };
+    var base_url = localStorage.getItem("base_url");
+    var url = base_url + '/api/loadBranch/' + hospitalId;
+    var errorModal = tailwind.Modal.getInstance(document.querySelector("#divDefaultErrorModal"));
+    fetch(url, options).then(function (response) {
+      return response.json();
+    }).then(function (result) {
+      if (result.Success == 'Success') {
+        $("#ddlBranch option").remove();
+        $("#ddlBranch").append($("<option></option>").val(0).html("Select Branch"));
+        //Load Branch
+        var listBranch = result.branchList;
+        if (listBranch.length != 0) {
+          listBranch.forEach(function (value, key) {
+            $("#ddlBranch").append($("<option></option>").val(value.id).html(value.branchName));
+          });
+        }
+      }
+    })["catch"](function (error) {
+      $('#divErrorHead span').text('Error');
+      $('#divErrorMsg span').text(error);
+      errorModal.show();
+    });
+  });
+  /* Save Default hospital and branch */
+  var setDefaultform = document.getElementById('frmSetDefaultHospital');
+  if (setDefaultform != null) {
+    setDefaultform.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var donorBankdata = new FormData(setDefaultform);
+      var token = $('#txtToken').val();
+      var options = {
+        method: "POST",
+        body: donorBankdata,
+        headers: {
+          Accept: 'application/json',
+          Authorization: 'Bearer ' + token
+        }
+      };
+      var base_url = localStorage.getItem("base_url");
+      var url = base_url + '/api/setDefaultHospital';
+      var errorModal = tailwind.Modal.getInstance(document.querySelector("#divDefaultErrorModal"));
+      fetch(url, options).then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        if (data.Success == 'Success') {
+          $('#divMsg span').text(data.Message);
+          if (data.ShowModal == 1) {
+            var successModal = tailwind.Modal.getInstance(document.querySelector("#divDefaultSuccessModal"));
+            successModal.show();
+          }
+        } else {
+          $('#divErrorHead span').text(data.Success);
+          $('#divErrorMsg span').text(data.Message);
+          if (data.ShowModal == 1) {
+            errorModal.show();
+          } else if (data.ShowModal == 2) {
+            logoutSession(data.Message);
+          }
+        }
+      })["catch"](function (error) {
+        $('#divErrorHead span').text('Error');
+        $('#divErrorMsg span').text(error);
+        errorModal.show();
+      });
+    });
+  }
+  $("#chkImageCapture").on('change', function () {
+    var isSet = $('#chkImageCapture').val();
+    setImageCaptureSettings(isSet);
+  });
+  $("#chkImageCapture1").on('change', function () {
+    var isSet = $('#chkImageCapture1').val();
+    setImageCaptureSettings(isSet);
+  });
+  function setImageCaptureSettings(isSet) {
+    var token = $('#txtToken').val();
+    var userId = $('#txtUser').val();
+    var options = {
+      method: "GET",
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token
+      }
+    };
+    var base_url = localStorage.getItem("base_url");
+    var url = base_url + '/api/setImageCapture/' + userId + '/' + isSet;
+    var errorModal = tailwind.Modal.getInstance(document.querySelector("#divImageSetErrorModal"));
+    fetch(url, options).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      if (data.Success == 'Success') {
+        $('#divMsg span').text(data.Message);
+        if (data.ShowModal == 1) {
+          var successModal = tailwind.Modal.getInstance(document.querySelector("#divImageSetSuccessModal"));
+          successModal.show();
+        }
+      } else {
+        $('#divErrorHead span').text(data.Success);
+        $('#divErrorMsg span').text(data.Message);
+        if (data.ShowModal == 1) {
+          errorModal.show();
+        } else if (data.ShowModal == 2) {
+          logoutSession(data.Message);
+        }
+      }
+    })["catch"](function (error) {
+      $('#divErrorHead span').text('Error');
+      $('#divErrorMsg span').text(error);
+      errorModal.show();
+    });
+  }
+  /*------------------------------------ Search Bank Witness Begin ----------------------------*/
+  function setWitness() {
+    // Tabulator
+    if ($("#tbWitness").length) {
+      var hospitalId = $('#txtHospital').val();
+      var branchId = $('#txtBranch').val();
+      // Setup Tabulator
+      var token = $('#txtToken').val();
+      var table = new tabulator_tables__WEBPACK_IMPORTED_MODULE_1__["default"]("#tbWitness", {
+        ajaxURL: localStorage.getItem("base_url") + "/api/bankWitnessList",
+        ajaxParams: {
+          "hospitalId": hospitalId,
+          "branchId": branchId
+        },
+        ajaxConfig: {
+          method: "GET",
+          //set request type to Position
+          headers: {
+            "Content-type": 'application/json; charset=utf-8',
+            //set specific content type
+            "Accept": 'application/json',
+            "Authorization": 'Bearer ' + token
+          }
+        },
+        ajaxFiltering: false,
+        ajaxSorting: true,
+        printAsHtml: true,
+        printStyled: true,
+        pagination: "remote",
+        paginationSize: 10,
+        paginationSizeSelector: [10, 20, 30, 40],
+        layout: "fitColumns",
+        responsiveLayout: "collapse",
+        placeholder: "No matching records found",
+        columns: [{
+          formatter: "responsiveCollapse",
+          width: 40,
+          minWidth: 30,
+          hozAlign: "center",
+          resizable: false,
+          headerSort: false
+        },
+        // For HTML table
+        {
+          title: "NAME",
+          minWidth: 100,
+          field: "name",
+          hozAlign: "center",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          responsive: 2
+        }, {
+          title: "HOSPITAL NAME",
+          minWidth: 100,
+          field: "hospitalName",
+          hozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false
+        }, {
+          title: "PHONE NO",
+          minWidth: 100,
+          field: "phoneNo",
+          hozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false
+        }, {
+          title: "EMAIL",
+          minWidth: 100,
+          field: "email",
+          hozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false
+        }, {
+          title: "ADDRESS",
+          minWidth: 100,
+          field: "address",
+          hozAlign: "left",
+          vertAlign: "middle",
+          print: false,
+          download: false
+        }, {
+          title: "ACTIONS",
+          minWidth: 200,
+          field: "actions",
+          responsive: 1,
+          hozAlign: "center",
+          vertAlign: "middle",
+          print: false,
+          download: false,
+          formatter: function formatter(cell, formatterParams) {
+            var a = $("<div class=\"flex lg:justify-center items-center text-info\">\n                        <a class=\"edit flex items-center mr-3 text-primary tooltip\" title=\"Edit Details\" href=\"javascript:;\">\n                            <i data-lucide=\"check-square\" class=\"w-5 h-5 mr-1\"></i> \n                        </a>\n                        <a class=\"delete flex items-center text-danger tooltip\" title=\"Delete Details\" href=\"javascript:;\">\n                            <i data-lucide=\"trash-2\" class=\"w-5 h-5 mr-1\"></i> \n                        </a>\n                    </div>");
+            $(a).find(".edit").on("click", function () {
+              $('#txtName').val(cell.getData().name);
+              $('#txtHospitalName').val(cell.getData().hospitalName);
+              $('#txtPhoneNo').val(cell.getData().phoneNo);
+              $('#txtEmail').val(cell.getData().email);
+              $('#txtAddress').val(cell.getData().address);
+              $('#txtMode').val(2);
+              $('#txtWitnessId').val(cell.getData().id);
+              window.scrollTo(0, 0);
+            });
+            $(a).find(".delete").on("click", function () {
+              var deleteModal = tailwind.Modal.getInstance(document.querySelector("#divDeleteWitness"));
+              deleteModal.show();
+              $('#divWitness span').text(cell.getData().name);
+              $("#btnDelWitness").on("click", function () {
+                var userId = $('#txtUser').val();
+                deleteWitness(cell.getData().id, userId);
+              });
+            });
+            return a[0];
+          }
+        },
+        // For print format
+        {
+          title: "NAME",
+          field: "name",
+          visible: false,
+          print: true,
+          download: true
+        }, {
+          title: "HOSPITAL NAME",
+          field: "hospitalName",
+          visible: false,
+          print: true,
+          download: true
+        }, {
+          title: "PHONE NO",
+          field: "phoneNo",
+          visible: false,
+          print: true,
+          download: true
+        }, {
+          title: "EMAIL",
+          field: "email",
+          visible: false,
+          print: true,
+          download: true
+        }, {
+          title: "ADDRESS",
+          field: "address",
+          visible: false,
+          print: true,
+          download: true
+        }],
+        renderComplete: function renderComplete() {
+          (0,lucide__WEBPACK_IMPORTED_MODULE_2__.createIcons)({
+            icons: lucide__WEBPACK_IMPORTED_MODULE_3__,
+            "stroke-width": 1.5,
+            nameAttr: "data-lucide"
+          });
+        }
+      });
+
+      // Redraw table onresize
+      window.addEventListener("resize", function () {
+        table.redraw();
+        (0,lucide__WEBPACK_IMPORTED_MODULE_2__.createIcons)({
+          icons: lucide__WEBPACK_IMPORTED_MODULE_3__,
+          "stroke-width": 1.5,
+          nameAttr: "data-lucide"
+        });
+      });
+    }
+  }
+  /*------------------------------------------------------- Bank Witness END ---------------------------*/
+  /*----------------------------------- Delete Donor Bank By ID bEGINS -------------------------*/
+  function deleteWitness(witnessId, userId) {
+    var errorModal = tailwind.Modal.getInstance(document.querySelector("#divErrorWitness"));
+    var base_url = localStorage.getItem("base_url");
+    var url = base_url + '/api/deleteBankWitness/' + witnessId + '/' + userId;
+    var token = $('#txtToken').val();
+    var options = {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        Authorization: 'Bearer ' + token
+      }
+    };
+    fetch(url, options).then(function (response) {
+      return response.json();
+    }).then(function (data) {
+      if (data.Success == 'Success') {
+        if (data.ShowModal == 1) {
+          var el = document.querySelector("#divDeleteWitness");
+          var modal = tailwind.Modal.getOrCreateInstance(el);
+          modal.hide();
+          setWitness();
+        }
+      } else {
+        $('#divErrorHead span').text(data.Success);
+        $('#divErrorMsg span').text(data.Message);
+        if (data.ShowModal == 1) {
+          errorModal.show();
+        } else if (data.ShowModal == 2) {
+          logoutSession(data.Message);
+        }
+      }
+    })["catch"](function (error) {
+      $('#divErrorHead span').text('Error');
+      $('#divErrorMsg span').text(error);
+      errorModal.show();
+    });
+  }
+
+  /*----------------------------------- Delete Donor Bank By ID END -------------------------*/
+  $("#btnWitnessCancel").on("click", function () {
+    $('#txtMode').val(1);
+  });
+  /* --------------- Bank Witness Add form submit Begins ------------------------*/
+
+  var witnessform = document.getElementById('frmWitness');
+  if (witnessform != null) {
+    //witnessform registeration
+    witnessform.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var witnessdata = new FormData(witnessform);
+      var token = $('#txtToken').val();
+      var options = {
+        method: "POST",
+        body: witnessdata,
+        headers: {
+          Accept: 'application/json',
+          Authorization: 'Bearer ' + token
+        }
+      };
+      var base_url = localStorage.getItem("base_url");
+      var url = base_url + '/api/addBankWitness';
+      var errorModal = tailwind.Modal.getInstance(document.querySelector("#divErrorWitness"));
+      fetch(url, options).then(function (response) {
+        return response.json();
+      }).then(function (data) {
+        if (data.Success == 'Success') {
+          $('#divMsg span').text(data.Message);
+          if (data.ShowModal == 1) {
+            var successModal = tailwind.Modal.getInstance(document.querySelector("#divSuccessWitness"));
+            successModal.show();
+            witnessform.reset();
+            $('#txtMode').val(1);
+            setWitness();
+          }
+        } else {
+          $('#divErrorHead span').text(data.Success);
+          $('#divErrorMsg span').text(data.Message);
+          if (data.ShowModal == 1) {
+            errorModal.show();
+          } else if (data.ShowModal == 2) {
+            logoutSession(data.Message);
+          }
+        }
+      })["catch"](function (error) {
+        $('#divErrorHead span').text('Error');
+        $('#divErrorMsg span').text(error);
+        errorModal.show();
+      });
+      window.scrollTo(0, 0);
+    });
+  }
+  /* --------------- Bank Witness Add form submit End ------------------------*/
 })();
 })();
 

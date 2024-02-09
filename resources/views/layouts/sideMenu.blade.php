@@ -1,8 +1,8 @@
 <!-- BEGIN: Side Menu -->
-<nav class="side-nav">
-<a href="" class="intro-x flex items-center pl-5 pt-4">
-    <img alt="Agnai SEED" class="w-10 rounded-full" src="{{ session('logo') }}">
-    <span class="hidden xl:block text-white text-lg ml-3">@can('isAdmin') SEED @endcan @can('isNotAdmin') {{session('userName')}} @endcan</span>
+<nav id="navSideMenu" class="side-nav">
+<a id="aSideMenu" href="" class="intro-x flex items-center pl-5 pt-4">
+    <img id="imgSideMenu" alt="Agnai SEED" class="w-10 rounded-full" src="{{ session('logo') }}">
+    <span class="hidden xl:block text-white text-lg ml-3">{{session('userName')}}</span>
 </a>
 <div class="side-nav__devider my-6"></div>
 <ul>
@@ -38,6 +38,7 @@
 </li>
 @endcan
 @can('isAdminHospital')
+@if(session('branchLimit') < 2)
 <li>
 <a id="lnkBranch" href="javascript:;.html" class="side-menu">
     <div class="side-menu__icon"> <i data-lucide="layers"></i> </div>
@@ -47,12 +48,14 @@
     </div>
 </a>
 <ul id="ulBranch" class="">
+@if(session('branchLimit') !=0)
 <li>
 <a href="{{ url('Branch') }}" class="side-menu">
     <div class="side-menu__icon"> <i data-lucide="plus-circle"></i> </div>
     <div class="side-menu__title"> Add Branch </div>
 </a>
 </li>
+@endif
 <li>
 <a href="{{ url('SearchBranch') }}" class="side-menu">
     <div class="side-menu__icon"> <i data-lucide="search"></i> </div>
@@ -61,6 +64,7 @@
 </li>
 </ul>
 </li>
+@endif
 @endcan
 @can('isAdminHospitalBranch')
 <li>
@@ -152,7 +156,6 @@
     </ul>
 </li>
 <li>
-@can('isNotAdmin')
 <li>
     <a id="lnkSemen" href="javascript:;" class="side-menu">
         <div class="side-menu__icon"> <i data-lucide="link-2"></i> </div>
@@ -165,13 +168,25 @@
         <li>
             <a  href="{{url('SemenAnalysis')}}" class="side-menu">
                 <div class="side-menu__icon"> <i data-lucide="plus-circle"></i> </div>
-                <div class="side-menu__title">Add Semen Analysis </div>
+                <div class="side-menu__title">Add Analysis </div>
             </a>
         </li>
         <li>
             <a  href="{{url('SearchSemenAnalysis')}}" class="side-menu">
                 <div class="side-menu__icon"> <i data-lucide="search"></i> </div>
-                <div class="side-menu__title"> Search Semen Analysis  </div>
+                <div class="side-menu__title"> Search Analysis  </div>
+            </a>
+        </li>
+        <li>
+            <a  href="{{url('PrePostAnalysis')}}" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="plus-circle"></i> </div>
+                <div class="side-menu__title">Add Pre & Post Analysis </div>
+            </a>
+        </li>
+        <li>
+            <a  href="{{url('SearchPrePostAnalysis')}}" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="search"></i> </div>
+                <div class="side-menu__title"> Search Pre & Post Analysis  </div>
             </a>
         </li>
         <li>
@@ -183,31 +198,7 @@
     </ul>
 
 </li>
-@endcan
-<li>
-    <a id="lnkReport" href="javascript:;" class="side-menu">
-        <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
-        <div class="side-menu__title">
-            Report 
-            <div class="side-menu__sub-icon "> <i data-lucide="chevron-down"></i> </div>
-        </div>
-    </a>
-    <ul id="ulReport" class="">
-                        <li>
-                        <a id="lnkPatientReport" href="{{url('PatientReport')}}" class="side-menu">
-                            <div class="side-menu__icon"> <i data-lucide="user"></i> </div>
-                            <div class="side-menu__title"> Patient / Doctor Report </div>
-                        </a>
-                        </li>
-                        <li>
-                        <a id="lnkPatientDetails" href="{{url('PatientDetails')}}" class="side-menu">
-                            <div class="side-menu__icon"> <i data-lucide="user-check"></i> </div>
-                            <div class="side-menu__title"> Patient Detail Report </div>
-                        </a>
-                        </li>
-                        </ul>
 
-</li>
 <li>
     <a id="lnkConsentForm" href="javascript:;" class="side-menu">
         <div class="side-menu__icon"> <i data-lucide="book"></i> </div>
@@ -238,10 +229,27 @@
     </ul>
 </li>
 <li>
-    <a id="lnkDonor" href="{{url('DonorBank')}}" class="side-menu">
+<a id="lnkDonor" href="javascript:;" class="side-menu">
         <div class="side-menu__icon"> <i data-lucide="droplet"></i> </div>
-        <div class="side-menu__title"> Donor Bank </div>
+        <div class="side-menu__title">
+        Donor Bank
+            <div class="side-menu__sub-icon "> <i data-lucide="chevron-down"></i> </div>
+        </div>
     </a>
+    <ul id="ulDonor" class="">
+        <li>
+            <a href="{{ url('DonorBank') }}" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="archive"></i> </div>
+                <div class="side-menu__title"> Bank Details</div>
+            </a>
+        </li>
+        <li>
+            <a href="{{url('BankWitness')}}" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="external-link"></i> </div>
+                <div class="side-menu__title"> Bank Witness </div>
+            </a>
+        </li>
+    </ul>
 </li>
 <!-- @can('isAdminHospitalBranch') -->
 <!-- <li>
@@ -251,7 +259,30 @@
     </a>
 </li> -->
 <!-- @endcan -->
-@can('isNotAdmin')
+<li>
+    <a id="lnkReport" href="javascript:;" class="side-menu">
+        <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
+        <div class="side-menu__title">
+            Report 
+            <div class="side-menu__sub-icon "> <i data-lucide="chevron-down"></i> </div>
+        </div>
+    </a>
+    <ul id="ulReport" class="">
+                        <li>
+                        <a id="lnkPatientReport" href="{{url('PatientReport')}}" class="side-menu">
+                            <div class="side-menu__icon"> <i data-lucide="user"></i> </div>
+                            <div class="side-menu__title"> Patient / Doctor Report </div>
+                        </a>
+                        </li>
+                        <li>
+                        <a id="lnkPatientDetails" href="{{url('PatientDetails')}}" class="side-menu">
+                            <div class="side-menu__icon"> <i data-lucide="user-check"></i> </div>
+                            <div class="side-menu__title"> Patient Detail Report </div>
+                        </a>
+                        </li>
+                        </ul>
+
+</li>
 <li>
     <a id="lnkPrintSettings" href="javascript:;" class="side-menu">
         <div class="side-menu__icon"> <i data-lucide="settings"></i> </div>
@@ -260,17 +291,37 @@
             <div class="side-menu__sub-icon "> <i data-lucide="chevron-down"></i> </div>
         </div>
     </a>
-   
-    <ul id="ulPrintSettings" class="">
+    <ul id="ulPrintSettings" class="">   
+@can('isNotAdmin')
         <li>
             <a href="{{ url('PrintSettings') }}" class="side-menu">
                 <div class="side-menu__icon"> <i data-lucide="printer"></i> </div>
                 <div class="side-menu__title"> Print Settings</div>
             </a>
-        </li>      
+        </li>    
+@endcan
+        <li>
+            <a href="{{ url('ImageCaptureSettings') }}" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="image"></i> </div>
+                <div class="side-menu__title"> Image Capture Settings</div>
+            </a>
+        </li>  
+        <li>
+            <a href="{{ url('SetNormalValues') }}" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="align-center"></i> </div>
+                <div class="side-menu__title">Set Normal Values</div>
+            </a>
+        </li>  
+        <!-- @can('isAdminHospitalBranch')
+        <li>
+            <a href="{{ url('Department') }}" class="side-menu">
+                <div class="side-menu__icon"> <i data-lucide="layers"></i> </div>
+                <div class="side-menu__title">Department</div>
+            </a>
+        </li>   
+        @endcan  -->
     </ul>
 </li>
-@endcan
 
 </ul>
 </nav>

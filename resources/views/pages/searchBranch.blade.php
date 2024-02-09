@@ -12,10 +12,12 @@
                 <div class="content">
                     @include('layouts.topBar')
                     <div class="intro-y flex flex-col sm:flex-row items-center mt-8">
+                    @if(session('branchLimit') !=0)
                     <div class="w-full sm:w-auto flex mt-4 sm:mt-0">
                         <button onclick="window.location='{{ url("Branch") }}'" class="btn btn-primary shadow-md mr-2">Add Branch</button>
-                        <input id="txtHospital" name="hospitalId" value="{{ session('hospitalId') }}" type="hidden" class="form-control">
                     </div>
+                    @endif
+                    <input id="txtHospital" name="hospitalId" value="{{ session('hospitalId') }}" type="hidden" class="form-control">
                 </div>
                 <!-- BEGIN: HTML Table Data -->
                 <div class="intro-y box p-5 mt-5">

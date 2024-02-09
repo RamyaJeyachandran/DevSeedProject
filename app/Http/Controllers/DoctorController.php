@@ -23,9 +23,16 @@ class DoctorController extends Controller
      * Display a add doctor screen
      */
     
-    public function index()
+    public function index(Request $request)
     {
-        return View("pages.addDoctor");
+        if($request->session()->get('isSetDefault')==1){
+            return View("pages.addDoctor");
+        }
+        else{
+            return redirect()->action(
+                [DashboardController::class, 'getDefaultSetting'], ['id' =>  $request->session()->get('userId')]
+            );
+        }
     }
     public function searchIndex()
     {
@@ -102,15 +109,15 @@ class DoctorController extends Controller
 
             //----------------Store Image ---Begin 
             $url = request()->getSchemeAndHttpHost();//URL::to("/");
-            $profileImage =$url .config('constant.doctor_default_profileImage');
+            $profileImage =$url ."/" .config('constant.doctor_default_profileImage');
             if($request->hasfile('profileImage')){
                 $hospital_id_store=($hospitalId==NULL?0:$decrpt_hospitalId);
-                $img_location="images/doctors/";
+                $img_location=config('constant.doctorImageLocation');
                 $img_name =config('constant.prefix_doctor_profile_image').$hospital_id_store.'_'.time().'.'.$request->profileImage->getClientOriginalExtension();
                 $request->profileImage->move(public_path($img_location), $img_name);
 
                 $profileImage =$img_location.$img_name;
-                $profileImage=$url ."/". $profileImage;
+                $profileImage=$url .config('constant.imageStoreLocation'). $profileImage;
             }
             //-------------------Store Image ---End
                       
@@ -136,18 +143,18 @@ class DoctorController extends Controller
                 $decrpt_userId=$user_obj->getDecryptedId($request->userId);
                  //----------------Store signature ---Begin 
                     $url = request()->getSchemeAndHttpHost();//URL::to("/");
-                    $signature =$url .config('constant.doctor_default_profileImage');
+                    $signature =$url."/" .config('constant.doctor_default_profileImage');
                     $files = $request->file('signature');
 
                     if($request->hasFile('signature'))
                     {
                         foreach ($files as $file) {
                             $hospital_id_store=($hospitalId==NULL?0:$decrpt_hospitalId);
-                            $img_location="images/doctors/";
+                            $img_location=config('constant.doctorImageLocation');
                             $img_name =config('constant.prefix_doctor_signature').$hospital_id_store.'_'.time().'.'.$file->getClientOriginalExtension();
                             $file->move(public_path($img_location), $img_name);
                             $signature =$img_location.$img_name;
-                            $signature =$url ."/". $signature;
+                            $signature =$url .config('constant.imageStoreLocation'). $signature;
                              //-------------------Store signature ---End
 
                             $doctorSignature =  $doctorsign_obj->addDoctorSignature($decrpt_hospitalId,$decrpt_branchId,$doctorId,$signature,$decrpt_userId); 
@@ -237,15 +244,15 @@ class DoctorController extends Controller
             if($request->isImageChanged==1)
             {
                 $url = request()->getSchemeAndHttpHost();//URL::to("/");
-                $profileImage =$url .config('constant.doctor_default_profileImage');
+                $profileImage =$url."/" .config('constant.doctor_default_profileImage');
                 if($request->hasfile('profileImage')){
                     $hospital_id_store=($hospitalId==NULL?0:$decrpt_hospitalId);
-                    $img_location="images/doctors/";
+                    $img_location=config('constant.doctorImageLocation');
                     $img_name =config('constant.prefix_doctor_profile_image').$hospital_id_store.'_'.time().'.'.$request->profileImage->getClientOriginalExtension();
                     $request->profileImage->move(public_path($img_location), $img_name);
 
                     $profileImage =$img_location.$img_name;
-                    $profileImage=$url ."/". $profileImage;
+                    $profileImage=$url .config('constant.imageStoreLocation'). $profileImage;
                 }
             }
             
@@ -283,18 +290,18 @@ class DoctorController extends Controller
 
              //----------------Store signature ---Begin 
                  $url = request()->getSchemeAndHttpHost();//URL::to("/");
-                 $signature =$url .config('constant.doctor_default_profileImage');
+                 $signature =$url."/" .config('constant.doctor_default_profileImage');
                  $files = $request->file('signature');
 
                  if($request->hasFile('signature'))
                  {
                      foreach ($files as $file) {
                          $hospital_id_store=($hospitalId==NULL?0:$decrpt_hospitalId);
-                         $img_location="images/doctors/";
+                         $img_location=config('constant.doctorImageLocation');
                          $img_name =config('constant.prefix_doctor_signature').$hospital_id_store.'_'.time().'.'.$file->getClientOriginalExtension();
                          $file->move(public_path($img_location), $img_name);
                          $signature =$img_location.$img_name;
-                         $signature =$url ."/". $signature;
+                         $signature =$url .config('constant.imageStoreLocation'). $signature;
                           //-------------------Store signature ---End
 
                          $doctorSignature =  $doctorsign_obj->addDoctorSignature($decrpt_hospitalId,$decrpt_branchId,$decrpt_doctorId,$signature,$decrpt_userId); 

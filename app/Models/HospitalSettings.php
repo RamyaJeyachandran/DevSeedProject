@@ -25,6 +25,7 @@ class HospitalSettings extends Model
         'email',
         'inChargePerson',
         'inChargePhoneNo',
+        'branchLimit',
         'is_subscribed',
         'is_active',
         'created_by',
@@ -44,6 +45,7 @@ class HospitalSettings extends Model
                 'email' => $request->email,
                 'inChargePerson' => $request->inChargePerson,
                 'inChargePhoneNo' => $request->inChargePhoneNo,
+                'branchLimit'=>$request->branchLimit,
                 'created_by' => $userId,
                 'logo'=>$logo
             ]
@@ -64,6 +66,7 @@ class HospitalSettings extends Model
                     'email' => $request->email,
                     'inChargePerson' => $request->inChargePerson,
                     'inChargePhoneNo' => $request->inChargePhoneNo,
+                    'branchLimit'=>$request->branchLimit,
                     'updated_by' => $userId,
                 ]
             );
@@ -76,6 +79,7 @@ class HospitalSettings extends Model
                     'email' => $request->email,
                     'inChargePerson' => $request->inChargePerson,
                     'inChargePhoneNo' => $request->inChargePhoneNo,
+                    'branchLimit'=>$request->branchLimit,
                     'updated_by' => $userId,
                     'logo'=>$logo
                 ]
@@ -87,7 +91,7 @@ class HospitalSettings extends Model
         $skip=$pagination['page'] ==1 ?0:(($pagination['page'] * $pagination['size'])-$pagination['size']);
         $where_sts="is_active=1  ".(($pagination['filters_field'] =="" || $pagination['filters_value']=="")?"":" and ".$pagination['filters_field']." ".$pagination['filters_type']." '".$pagination['filters_value']."%'");
        
-        $hospitalSettingsList['hospitalSettingsList'] = DB::table('hospitalsettings')->selectRaw("logo,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,hospitalName,address,phoneNo,email,inChargePerson,inChargePhoneNo,IF(is_subscribed=0,'No','Yes') as is_subscribed,IF(is_active=0,'In Active','Active') as status")
+        $hospitalSettingsList['hospitalSettingsList'] = DB::table('hospitalsettings')->selectRaw("logo,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,hospitalName,address,phoneNo,email,inChargePerson,inChargePhoneNo,IF(is_subscribed=0,'No','Yes') as is_subscribed,IF(is_active=0,'In Active','Active') as status,branchLimit")
                                                             ->whereRaw($where_sts)
                                                             ->skip($skip)->take($pagination['size']) //pagination
                                                             ->orderBy($pagination['sorters_field'],$pagination['sorters_dir']) 
@@ -98,8 +102,8 @@ class HospitalSettings extends Model
     }
     public function getHospitalSettingsById($id)
     {
-        $where_sts = "id=" . $id;
-        $hospitalDetails = DB::table('hospitalsettings')->selectRaw("logo,hospitalName,address,phoneNo,email,inChargePerson,inChargePhoneNo,IF(is_subscribed=0,'No','Yes') as is_subscribed,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId")
+        $where_sts="id=".$id;
+        $hospitalDetails = DB::table('hospitalsettings')->selectRaw("branchLimit,logo,hospitalName,address,phoneNo,email,inChargePerson,inChargePhoneNo,IF(is_subscribed=0,'No','Yes') as is_subscribed,HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId")
             ->whereRaw($where_sts)
             ->first();
         return $hospitalDetails;
@@ -327,5 +331,9 @@ class HospitalSettings extends Model
                         'updated_by' => $userId,
                     ]
                 );
+    }
+    public static function getBranchCountByHospitalId($hospitalId)
+    {
+        return DB::table('hospitalbranch')->select("id")->where([['is_active','=',1],['hospitalId','=',$hospitalId]])->count();
     }
 }

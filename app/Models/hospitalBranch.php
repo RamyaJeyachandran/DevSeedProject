@@ -103,7 +103,7 @@ class HospitalBranch extends Model
     {
         $where_sts = "hospitalbranch.id=" . $id;
         $branchDetails = DB::table('hospitalbranch')->selectRaw("
-        hospitalbranch.logo,hospitalsettings.hospitalName,hospitalbranch.branchName,hospitalbranch.address,hospitalbranch.phoneNo,hospitalbranch.email,hospitalbranch.contactPerson,hospitalbranch.contactPersonPhNo,HEX(AES_ENCRYPT(hospitalbranch.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(hospitalbranch.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as branchId")
+        hospitalsettings.branchLimit,hospitalbranch.logo,hospitalsettings.hospitalName,hospitalbranch.branchName,hospitalbranch.address,hospitalbranch.phoneNo,hospitalbranch.email,hospitalbranch.contactPerson,hospitalbranch.contactPersonPhNo,HEX(AES_ENCRYPT(hospitalbranch.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(hospitalbranch.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as branchId")
         ->join('hospitalsettings', 'hospitalsettings.id', '=', 'hospitalbranch.hospitalId')
             ->whereRaw($where_sts)
             ->first();

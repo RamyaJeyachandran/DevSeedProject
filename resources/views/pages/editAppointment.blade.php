@@ -10,6 +10,64 @@
 <!-- BEGIN: Content -->
 <div class="content"> @include('layouts.topBar')
     <form id="frmEditAppointment" method="POST">
+    <!-- <div class="intro-y box p-5"> -->
+            <!-- ---------------------------------------Patient Information Begin---------------------------------------------------------- -->
+            <div id="divPatientInfo" class="intro-y box px-5">
+            <nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item active font-medium text-base  mr-auto" aria-current="page">Patient Information</li>
+                        </ol>
+                    </nav>
+                <div class="flex flex-col lg:flex-row border-b border-slate-200/60 dark:border-darkmode-400 pb-5 -mx-5">
+                    <div class="flex flex-1 px-5 items-center justify-center lg:justify-start">
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 flex-none lg:w-32 lg:h-32 image-fit relative">
+                            <img id="imgProfileImage" alt="Profile Picture" class="rounded-full"
+                                src="{{ $appointmentDetails->profileImage}}">
+                        </div>
+                        <div class="ml-5">
+                            <div id="lblName" class="w-24 sm:w-40 truncate sm:whitespace-normal font-medium text-lg">
+                                <span>{{ $appointmentDetails->patientName}}</span>
+                            </div>
+                            <div id="lblHcNo" class="text-info">Code No : <span>{{ $appointmentDetails->hcNo}}</span>
+                            </div>
+                            <div id="lblPhoneNo" class="truncate sm:whitespace-normal flex items-center"><i
+                                    data-lucide="phone" class="w-4 h-4 mr-2"></i><span>{{
+                                    $appointmentDetails->phoneNo}}</span> </div>
+                            <div id=lblEmail class="truncate sm:whitespace-normal flex items-center"><i
+                                    data-lucide="mail" class="w-4 h-4 mr-2"></i><span>{{
+                                    $appointmentDetails->email}}</span></div>
+                            <div id=lblAddress class="truncate sm:whitespace-normal flex items-center"><i
+                                    data-lucide="home" class="w-4 h-4 mr-2"></i><span>{{
+                                    $appointmentDetails->address}}</span></div>
+                        </div>
+                    </div>
+                    <div
+                        class="mt-6 lg:mt-0 flex-1 px-5 border-l border-r border-slate-200/60 dark:border-darkmode-400 border-t lg:border-t-0 pt-5 lg:pt-0">
+                        <div class="flex flex-col justify-center items-center lg:items-start mt-4">
+                            <div id="lblGender" class="truncate sm:whitespace-normal flex items-center mt-3">
+                                <b>Gender : </b><span>{{ $appointmentDetails->gender}}</span>
+                            </div>
+                            <div id="lblBloodGrp" class="truncate sm:whitespace-normal flex items-center mt-3">
+                                <b>Blood Group : </b><span>{{ $appointmentDetails->bloodGroup}}</span>
+                            </div>
+                            <div id="lblMartialStatus" class="truncate sm:whitespace-normal flex items-center mt-3">
+                                <b>Martial
+                                    Status
+                                    :</b><span>{{ $appointmentDetails->martialStatus}}</span> </div>
+                            <div id="lblSpouseName" class="truncate sm:whitespace-normal flex items-center mt-3">
+                                <b>Spouse Name : </b><span>{{ $appointmentDetails->spouseName}}</span>
+                            </div>
+                            <div id="lblSpousePhNo" class="truncate sm:whitespace-normal flex items-center mt-3">
+                                <b>Spouse Phone No : </b><span>{{ $appointmentDetails->spousePhnNo}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <!-- </div> -->
+        <!-- -------------------------------------------------------Patient Information End ---------------------------------------------------- -->
+
+
         <input id="txtHospital" name="hospitalId" value="{{ session('hospitalId') }}" type="hidden"
             class="form-control">
         <input id="txtBranch" name="branchId" value="{{ session('branchId') }}" type="hidden" class="form-control">
@@ -86,59 +144,7 @@
             </div>
         </div>
 
-        <div class="intro-y box p-5">
-            <!-- ---------------------------------------Patient Information Begin---------------------------------------------------------- -->
-            <div id="divPatientInfo" class="intro-y box px-5">
-                <div class="flex flex-col lg:flex-row border-b border-slate-200/60 dark:border-darkmode-400 pb-5 -mx-5">
-                    <div class="flex flex-1 px-5 items-center justify-center lg:justify-start">
-                        <div class="w-20 h-20 sm:w-24 sm:h-24 flex-none lg:w-32 lg:h-32 image-fit relative">
-                            <img id="imgProfileImage" alt="Profile Picture" class="rounded-full"
-                                src="{{ $appointmentDetails->profileImage}}">
-                        </div>
-                        <div class="ml-5">
-                            <div id="lblName" class="w-24 sm:w-40 truncate sm:whitespace-normal font-medium text-lg">
-                                <span>{{ $appointmentDetails->patientName}}</span>
-                            </div>
-                            <div id="lblHcNo" class="text-info">Code No : <span>{{ $appointmentDetails->hcNo}}</span>
-                            </div>
-                            <div id="lblPhoneNo" class="truncate sm:whitespace-normal flex items-center"><i
-                                    data-lucide="phone" class="w-4 h-4 mr-2"></i><span>{{
-                                    $appointmentDetails->phoneNo}}</span> </div>
-                            <div id=lblEmail class="truncate sm:whitespace-normal flex items-center"><i
-                                    data-lucide="mail" class="w-4 h-4 mr-2"></i><span>{{
-                                    $appointmentDetails->email}}</span></div>
-                            <div id=lblAddress class="truncate sm:whitespace-normal flex items-center"><i
-                                    data-lucide="home" class="w-4 h-4 mr-2"></i><span>{{
-                                    $appointmentDetails->address}}</span></div>
-                        </div>
-                    </div>
-                    <div
-                        class="mt-6 lg:mt-0 flex-1 px-5 border-l border-r border-slate-200/60 dark:border-darkmode-400 border-t lg:border-t-0 pt-5 lg:pt-0">
-                        <div class="flex flex-col justify-center items-center lg:items-start mt-4">
-                            <div id="lblGender" class="truncate sm:whitespace-normal flex items-center mt-3">
-                                <b>Gender : </b><span>{{ $appointmentDetails->gender}}</span>
-                            </div>
-                            <div id="lblBloodGrp" class="truncate sm:whitespace-normal flex items-center mt-3">
-                                <b>Blood Group : </b><span>{{ $appointmentDetails->bloodGroup}}</span>
-                            </div>
-                            <div id="lblMartialStatus" class="truncate sm:whitespace-normal flex items-center mt-3">
-                                <b>Martial
-                                    Status
-                                    :</b><span>{{ $appointmentDetails->martialStatus}}</span> </div>
-                            <div id="lblSpouseName" class="truncate sm:whitespace-normal flex items-center mt-3">
-                                <b>Spouse Name : </b><span>{{ $appointmentDetails->spouseName}}</span>
-                            </div>
-                            <div id="lblSpousePhNo" class="truncate sm:whitespace-normal flex items-center mt-3">
-                                <b>Spouse Phone No : </b><span>{{ $appointmentDetails->spousePhnNo}}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- -------------------------------------------------------Patient Information End ---------------------------------------------------- -->
-
-</div>
+       </div>
 
 </div>
 </form>
@@ -167,8 +173,8 @@
         <div class="modal-content">
             <div class="modal-body p-0">
                 <div class="p-5 text-center"> <i data-lucide="x-circle" class="w-16 h-16 text-warning mx-auto mt-3"></i>
-                    <div id="divAppErrorHead" class="text-3xl mt-5"><span></span></div>
-                    <div id="divAppErrorMsg" class="text-slate-500 mt-2"><span></span></div>
+                    <div id="divErrorHead" class="text-3xl mt-5"><span></span></div>
+                    <div id="divErrorMsg" class="text-slate-500 mt-2"><span></span></div>
                 </div>
                 <div class="px-5 pb-8 text-center">
                     <button type="button" data-tw-dismiss="modal" class="btn w-24 btn-primary">Ok</button>

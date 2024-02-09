@@ -3,6 +3,7 @@ import { createIcons, icons } from "lucide";
 import Tabulator from "tabulator-tables";
 import colors from "./colors";
 import Chart from "chart.js/auto";
+import TomSelect from "tom-select";
 // import { forEach } from "lodash";
 
 (function () {
@@ -14,18 +15,32 @@ import Chart from "chart.js/auto";
         document.body.scrollTop = 0; // For Safari
         document.documentElement.scrollTop = 0;
     });  
-   
+    function logoutSession(msg)
+    {
+        var base_url = localStorage.getItem("base_url");
+        document.body.scrollTop = 0; // For Safari
+        document.documentElement.scrollTop = 0;
+        window.location.href = base_url+ "/login/"+msg;
+    }
 window.addEventListener("load", (e) => {
     e.preventDefault();
     var pathname = window.location.pathname;
-    // var base_url = window.location.origin+'/seed/public';
-    // localStorage.setItem("base_url", base_url);
-    // var serverPath='/seed/public/index.php';
-    // var serverPath2='/seed/public';
+     //Local Path
     var base_url = window.location.origin;
     localStorage.setItem("base_url", base_url);
     var serverPath='';
     var serverPath2='';
+    
+    //server Path
+    // var base_url = window.location.origin+'/seed/public';
+    // localStorage.setItem("base_url", base_url);
+    // var serverPath='/seed/public/index.php';
+    // var serverPath2='/seed/public';
+   
+    if(document.getElementById("divYear")!=null)
+    {
+        document.getElementById("divYear").innerHTML = '@'+new Date().getFullYear() + ' Agnai Solutions';
+    }
         
     function setMenu($lnkControl,$ulControl){
         $($lnkControl).addClass("side-menu--active");
@@ -149,6 +164,15 @@ window.addEventListener("load", (e) => {
     setMenu("[id*=lnkConsentForm]","[id*=ulConsentForm]");
     setMobileMenu("[id*=lnkMobileConsent]","[id*=ulMobileConsent]","[id*=aMobileConsent]","[id*=aMobilePatientConsent]",1);
     consentFormOnLoad();
+    /*set tom-select for dropdown */
+      let options = {
+        plugins: {
+            dropdown_input: {},
+        },
+    };
+            // clear_button :{},
+    new TomSelect('#ddlPatientList', options);
+    
 }
  if(pathname==serverPath+"/SearchConsent" || pathname==serverPath2+"/SearchConsent")
 {
@@ -171,8 +195,8 @@ window.addEventListener("load", (e) => {
 }
  if(pathname==serverPath+"/DonorBank" || pathname==serverPath2+"/DonorBank")
 {
-    $("[id*=lnkDonor]").addClass("side-menu--active");
-    $("[id*=lnkMobileDonor]").addClass("menu--active");
+    setMenu("[id*=lnkDonor]","[id*=ulDonor]");
+    setMobileMenu("[id*=lnkMobileDonor]","[id*=ulMobileDonor]","[id*=aMobileDonor]","[id*=aMobileWitness]",1);
     setDonor();
 }
  if(pathname==serverPath+'/PatientAppointment' || pathname==serverPath2+'/PatientAppointment')
@@ -239,14 +263,16 @@ window.addEventListener("load", (e) => {
     setMenu("[id*=lnkPatientReport]","[id*=ulReport]");
     setMobileMenu("[id*=lnkMobileReport]","[id*=ulMobilePatientReport]","[id*=aMobilePatientReport]","[id*=aMobileSemenAnalysis]",0); 
     loadYear();
-    loadHospital(base_url);
+    // loadHospital(base_url);
+    getPatientDoctor();
     hideReportOption();
 }
  if(pathname==serverPath+'/AssignDoctor' || pathname==serverPath2+'/AssignDoctor')
 {
     setMenu("[id*=lnkDoctor]","[id*=ulDoctor]");
     setMobileMenu("[id*=lnkMobileReport]","[id*=ulMobilePatientReport]","[id*=aMobilePatientReport]","[id*=aMobileSemenAnalysis]",0); 
-    loadHospitalForAssign(base_url);
+    // loadHospitalForAssign(base_url);
+    getAssignPatientDoctor();
 }
  if(pathname==serverPath+'/ListAssignedDoctor' || pathname==serverPath2+'/ListAssignedDoctor')
 {
@@ -312,6 +338,9 @@ window.addEventListener("load", (e) => {
         fetch(url,options)
                 .then(response => response.json())
                 .then(function (result) {
+                    const errorModal = tailwind.Modal.getInstance(document.querySelector("#divPatientErrorModal"));
+                    if(result.Success=='Success')
+                    {
                     var listCity=result.cities;
                     listCity.forEach(function(value, key) {
                         $("#ddlState").append($("<option></option>").val(value.city_state).html(value.city_state)); 
@@ -336,7 +365,22 @@ window.addEventListener("load", (e) => {
                      listBloodGrp.forEach(function(value, key) {
                         $("#ddlBloodGrp").append($("<option></option>").val(value.name).html(value.name)); 
                     });
-                });   
+                }else{
+                    $('#divErrorHead span').text(data.Success);
+                    $('#divErrorMsg span').text(data.Message);
+                    if (data.ShowModal==1) {
+                        errorModal.show();
+                    }
+                    else if(data.ShowModal==2)
+                    {
+                       logoutSession(data.Message);
+                    }
+                }
+                }) .catch(function(error){
+                    $('#divDrErrorHead span').text('Error');
+                    $('#divDrErrorMsg span').text(error);
+                    errorModal.show();
+                }); 
         /* ---------------WebCam Photo capture -BEGIN ---------------*/
                 Webcam.set({
                     width: 250,
@@ -393,6 +437,9 @@ patientEditform.addEventListener("submit", (epf) => {
                  $('#divErrorMsg span').text(data.Message);
                  if (data.ShowModal==1) {
                      errorModal.show();
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
              }
          })
@@ -711,6 +758,9 @@ function viewPatient($patientId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -792,6 +842,9 @@ patientform.addEventListener("submit", (e) => {
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
             }
         })
@@ -845,6 +898,9 @@ function deletePatient(patientId,userId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -873,13 +929,15 @@ function loadHospital(base_url){
     fetch(url,options)
             .then(response => response.json())
             .then(function (result) {
+                if(result.Success=='Success'){
                 // Load Hospital
-                var listHospital=result.hospitalList;
-                if(listHospital!=null)
-                {
-                    listHospital.forEach(function(value, key) {
-                        $("#ddlHospital").append($("<option></option>").val(value.id).html(value.hospitalName)); 
-                    });
+                    var listHospital=result.hospitalList;
+                    if(listHospital!=null)
+                    {
+                        listHospital.forEach(function(value, key) {
+                            $("#ddlHospital").append($("<option></option>").val(value.id).html(value.hospitalName)); 
+                        });
+                    }
                 }
             }); 
            
@@ -890,20 +948,22 @@ function loadHospital(base_url){
                     fetch(ddlUrl,options)
                     .then(response => response.json())
                     .then(function (result) {
+                        if(result.Success=='Success'){
                         // Load Branch
-                        var listBranch=result.branchList;
-                        $("#ddlBranch option").remove();
-                        $("#ddlBranch").append($("<option></option>").val(0).html("Select Branch"));
-                        if(listBranch.length!=0)
-                        {
-                            listBranch.forEach(function(value, key) {
-                                $("#ddlBranch").append($("<option></option>").val(value.id).html(value.branchName)); 
-                            });
-                            $("#divBranchddl").removeClass("hidden").removeAttr("style");
-                        }else{
-                            $("#divBranchddl").addClass('hidden');
-                            if(ddlPatient !== null){
-                                getPatientDoctor();
+                            var listBranch=result.branchList;
+                            $("#ddlBranch option").remove();
+                            $("#ddlBranch").append($("<option></option>").val(0).html("Select Branch"));
+                            if(listBranch.length!=0)
+                            {
+                                listBranch.forEach(function(value, key) {
+                                    $("#ddlBranch").append($("<option></option>").val(value.id).html(value.branchName)); 
+                                });
+                                $("#divBranchddl").removeClass("hidden").removeAttr("style");
+                            }else{
+                                $("#divBranchddl").addClass('hidden');
+                                if(ddlPatient !== null){
+                                    getPatientDoctor();
+                                }
                             }
                         }
                     }); 
@@ -943,18 +1003,20 @@ $("#ddlHospital").on('change',function() {
                     $("#ddlBranch option").remove();
                     $("#ddlBranch").append($("<option></option>").val(0).html("Select Branch"));
                     //Load Branch
-                    var listBranch=result.branchList;
-                    if(listBranch.length!=0)
-                    {
-                        listBranch.forEach(function(value, key) {
-                            $("#ddlBranch").append($("<option></option>").val(value.id).html(value.branchName)); 
-                        });
-                        $("#divBranchddl").removeClass("hidden").removeAttr("style");
-                        $("#divBranchddl1").removeClass("hidden").removeAttr("style");
-                    }else{
-                        $("#divBranchddl").addClass('hidden');
-                        $("#divBranchddl1").addClass('hidden');
-                        $("#divBranchddl2").addClass('hidden');
+                    if(result.Success=='Success'){
+                        var listBranch=result.branchList;
+                        if(listBranch.length!=0)
+                        {
+                            listBranch.forEach(function(value, key) {
+                                $("#ddlBranch").append($("<option></option>").val(value.id).html(value.branchName)); 
+                            });
+                            $("#divBranchddl").removeClass("hidden").removeAttr("style");
+                            $("#divBranchddl1").removeClass("hidden").removeAttr("style");
+                        }else{
+                            $("#divBranchddl").addClass('hidden');
+                            $("#divBranchddl1").addClass('hidden');
+                            $("#divBranchddl2").addClass('hidden');
+                        }
                     }
                 });  
         }
@@ -974,21 +1036,23 @@ function addDoctorLoadEvent(base_url){
     fetch(url,options)
             .then(response => response.json())
             .then(function (result) {
-                // Load GENDER
-                var listGender=result.gender;
-                listGender.forEach(function(value, key) {
-                    $("#ddlGender").append($("<option></option>").val(value.name).html(value.name)); 
-                });
-                //LOAD BLOOD GROUP
-                var listBloodGrp=result.bloodGrp;
-                 listBloodGrp.forEach(function(value, key) {
-                    $("#ddlBloodGrp").append($("<option></option>").val(value.name).html(value.name)); 
-                });
-                //LOAD DEPARTMENT
-                var listDepartment=result.department;
-                listDepartment.forEach(function(value, key) {
-                    $("#ddlDepartment").append($("<option></option>").val(value.id).html(value.name)); 
-                });
+                if(result.Success=='Success'){
+                    // Load GENDER
+                    var listGender=result.gender;
+                    listGender.forEach(function(value, key) {
+                        $("#ddlGender").append($("<option></option>").val(value.name).html(value.name)); 
+                    });
+                    //LOAD BLOOD GROUP
+                    var listBloodGrp=result.bloodGrp;
+                    listBloodGrp.forEach(function(value, key) {
+                        $("#ddlBloodGrp").append($("<option></option>").val(value.name).html(value.name)); 
+                    });
+                    //LOAD DEPARTMENT
+                    var listDepartment=result.department;
+                    listDepartment.forEach(function(value, key) {
+                        $("#ddlDepartment").append($("<option></option>").val(value.id).html(value.name)); 
+                    });
+                }
             });         
    
 }
@@ -1038,6 +1102,9 @@ doctorFrom.addEventListener("submit", (e) => {
                 $('#divDrErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     drerrorModal.show();
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
             }
         })
@@ -1387,6 +1454,9 @@ function deleteDoctor(doctorId,userId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -1429,6 +1499,7 @@ function viewDoctor($doctorId){
                 $('#divDesignation span').text((data.doctorDetails.designation==""?"Not Provided" :data.doctorDetails.designation));
                 $('#divDepartment span').text((data.doctorDetails.department==""?"Not Provided" :data.doctorDetails.department));
                 $('#divExperience span').text((data.doctorDetails.experience==""?"Not Provided" :data.doctorDetails.experience));
+                // $('#divAppointmentInterval span').text((data.doctorDetails.appointmentInterval==""?"Not Provided" :data.doctorDetails.appointmentInterval));
                 $('#divAddress span').text((data.doctorDetails.address==""?"Not Provided" : data.doctorDetails.address));
                 const viewModal = tailwind.Modal.getInstance(document.querySelector("#divViewDoctor"));
                 viewModal.show();
@@ -1440,6 +1511,9 @@ function viewDoctor($doctorId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -1482,6 +1556,9 @@ function viewSignature($doctorId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -1533,16 +1610,20 @@ if(doctorEditform!=null){
                      successEditModal.show();    
                  }                   
              }else{
-                 $('#divErrorHead span').text(data.Success);
-                 $('#divErrorMsg span').text(data.Message);
+                 $('#divDrErrorHead span').text(data.Success);
+                 $('#divDrErrorMsg span').text(data.Message);
                  if (data.ShowModal==1) {
                     errorDrModal.show();
+                 }
+                 else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
              }
          })
          .catch(function(error){
-             $('#divErrorHead span').text('Error');
-             $('#divErrorMsg span').text(error);
+             $('#divDrErrorHead span').text('Error');
+             $('#divDrErrorMsg span').text(error);
              errorDrModal.show();
          });       
  });      
@@ -1599,6 +1680,9 @@ hospitalFrom.addEventListener("submit", (e) => {
                 $('#divDrErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     drerrorModal.show();
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
             }
         })
@@ -1702,9 +1786,9 @@ function setHospitalTabulator(){
                     download: false,
                 },
                 {
-                    title: "SUBSCRIBED",
+                    title: "BRANCH LIMIT",
                     minWidth: 50,
-                    field: "is_subscribed",
+                    field: "branchLimit",
                     hozAlign: "center",
                     vertAlign: "middle",
                     print: false,
@@ -1910,6 +1994,9 @@ function viewHospital($hospitalId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -1943,6 +2030,10 @@ function deleteHospital(hospitalId,userId){
                   const el = document.querySelector("#divDeleteHospital"); 
                   const modal = tailwind.Modal.getOrCreateInstance(el); 
                   modal.hide();
+                  if(data.isReload==1)
+                  {
+                    window.location.reload();
+                  }
                   setHospitalTabulator();
                 }                   
             }else{
@@ -1950,6 +2041,9 @@ function deleteHospital(hospitalId,userId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -1999,6 +2093,9 @@ if(hospitalEditform!=null){
                  $('#divErrorMsg span').text(data.Message);
                  if (data.ShowModal==1) {
                     errorDrModal.show();
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
              }
          })
@@ -2025,13 +2122,16 @@ $( "#btnHsRedirect" ).on( "click", function() {
               },
         }
         var url=base_url+'/api/listAllHospital';
+        console.log(token);
         fetch(url,options)
                 .then(response => response.json())
                 .then(function (result) {
-                    var hospitalList=result.hospitalList;
-                    hospitalList.forEach(function(value, key) {
-                        $("#ddlHospital").append($("<option></option>").val(value.id).html(value.hospitalName)); 
-                    });
+                    if(result.Success=='Success'){
+                        var hospitalList=result.hospitalList;
+                        hospitalList.forEach(function(value, key) {
+                            $("#ddlHospital").append($("<option></option>").val(value.id).html(value.hospitalName)); 
+                        });
+                    }
                 });        
                 $("#ddlHospital").val($('#txtHospital').val());
 }
@@ -2079,6 +2179,9 @@ branchFrom.addEventListener("submit", (e) => {
                 $('#divBrErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     brerrorModal.show();
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
             }
         })
@@ -2399,6 +2502,9 @@ function viewBranch($branchId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -2439,6 +2545,9 @@ function deleteBranch(branchId,userId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -2488,6 +2597,9 @@ if(branchEditform!=null){
                  $('#divErrorMsg span').text(data.Message);
                  if (data.ShowModal==1) {
                     errorDrModal.show();
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
              }
          })
@@ -2504,25 +2616,26 @@ $( "#btnbrRedirect" ).on( "click", function() {
     window.location.href = localStorage.getItem("base_url")+ "/SearchBranch";
 });
 /*-------------------------------------- Consent Form --------------------------------------*/
+$( "#ddlPatientList" ).on( "change", function() {
+    $("#txtPatient").val($("#ddlPatientList").val());
+});
 function consentFormOnLoad(){
     $("#divNewPanel").addClass('hidden');
-    var hcNo=$("#txtRegNo").val();
-    if(hcNo>0){
+    var patientId=$("#txtPatient").val();
+    if(patientId!=0){
         clearConsentForm();
         getPatientFormInfo();
         $("#divRegPanel").addClass('hidden');
         $("#divNewPanel").removeClass("hidden").removeAttr("style");
         document.getElementById('btnPrintConsent').disabled = false;
         // document.getElementById('btnPrintAllConsent').disabled = false; 
-    }else{
-        $("#txtRegNo").val('');
     }
-    $("#btnRegNoClear").on("click", function () {
-        $("#txtRegNo").val("");
-        clearConsentForm();
-    });
+    // $("#btnRegNoClear").on("click", function () {
+    //     // $("#txtRegNo").val("");
+    //     clearConsentForm();
+    // });
     $("#btnNewConsent").on("click", function () {
-        $("#txtRegNo").val("");
+        // $("#txtRegNo").val("");
         clearConsentForm();
         $("#divNewPanel").addClass('hidden');
         $("#divRegPanel").removeClass("hidden").removeAttr("style");
@@ -2530,7 +2643,7 @@ function consentFormOnLoad(){
     $("#btnGo").on("click", function () {
         clearConsentForm();
         getPatientFormInfo();  
-        $("#txtRegNo").val("");      
+        // $("#txtRegNo").val("");      
     });
     $( "#btnPrintConsent" ).on( "click", function() {
         var userId=$("#txtUser").val();
@@ -2550,23 +2663,53 @@ function consentFormOnLoad(){
             })
             .then(function(data){ 
                 if(data.Success=='Success'){
-                    var printMarign=[];
-                    var ml=data.pageSettingsDetails.marginLeft-1;
-                    var mr=data.pageSettingsDetails.marginRight-1;
-                    var mb=data.pageSettingsDetails.marginBottom-1;
-                    var mt=data.pageSettingsDetails.marginTop-1;
-                    printMarign["marginRight"]=mr+'cm';
-                    printMarign["marginLeft"]=ml+'cm';
-                    printMarign["marginBottom"]=mb+'cm';
-                    printMarign["marginTop"]=mt+'cm';
-                   
-                    var divToPrint=document.getElementById('divConsentContent');
-                    var newWin=window.open('','Print-Window');
-                    var content='<html ><body topmargin="'+printMarign["marginTop"]+'" bottommargin="'+printMarign["marginBottom"]+'" rightmargin="'+printMarign["marginRight"]+'" leftmargin="'+printMarign["marginLeft"]+'" onload="window.print()">'+divToPrint.innerHTML+'</body></html>';
-                    newWin.document.open();
-                    newWin.document.write(content);
-                    newWin.document.close();
-                    setTimeout(function(){newWin.close();},10);  
+                    let pixelsmt = (96 * data.pageSettingsDetails.marginTop) / 2.54;
+                    let pixelsmr = (96 * data.pageSettingsDetails.marginRight) / 2.54;
+                    let pixelsmb = (96 * data.pageSettingsDetails.marginBottom) / 2.54;
+                    let pixelsml = (96 * data.pageSettingsDetails.marginLeft) / 2.54;
+
+                    let isHeaderDisplay=data.pageSettingsDetails.isHeaderDisplay;
+                   var title='';
+                   if(isHeaderDisplay==1)
+                   {
+                        var isHospital=data.pageSettingsDetails.isHospital;
+                        var hospitalDetails=isHospital==1?data.pageSettingsDetails.hospitalAddress:data.pageSettingsDetails.branchAddress;
+                        if(isHospital==1)
+                        {
+                            title='<center>'+hospitalDetails.hospitalName+'<br>'+hospitalDetails.address+'<br>'+hospitalDetails.email+', '+hospitalDetails.phoneNo+'</center><br>';
+                        }else{
+                            title='<center>'+hospitalDetails.branchName+'<br>'+hospitalDetails.address+'<br>'+hospitalDetails.email+', '+hospitalDetails.phoneNo+'</center><br>';
+                        }
+                   }
+                    
+                    var contents = $("#divConsentContent").html();
+                    var frame1 = $('<iframe />');
+                    var style='<head><style>@media print {@page {size: auto; } body{margin: '+pixelsmt+'px '+pixelsmr+'px '+pixelsmb+'px '+pixelsml+'px ;}}</style></head>';
+                    frame1[0].name = "frame1";//margin: 0mm;
+                    frame1.css({ "position": "absolute", "top": "-1000000px" });
+                    $("body").append(frame1);
+                    var frameDoc = frame1[0].contentWindow ? frame1[0].contentWindow : frame1[0].contentDocument.document ? frame1[0].contentDocument.document : frame1[0].contentDocument;
+                    frameDoc.document.open();
+                    //Create a new HTML document.
+                    frameDoc.document.write('<html>'+style);
+                    frameDoc.document.write('<body>');
+                    //Append the DIV contents.
+                    frameDoc.document.write(title);
+                    frameDoc.document.write(contents);
+                    frameDoc.document.write('</body></html>');
+                    frameDoc.document.close();
+                    setTimeout(function () {
+                        window.frames["frame1"].focus();
+                        window.frames["frame1"].print();
+                        frame1.remove();
+                    }, 500);
+                }else{
+                    if (typeof data.ShowModal !== 'undefined') {
+                        if(data.ShowModal==2)
+                        {
+                            logoutSession(data.Message);
+                        }
+                    }
                 }
             })
             .catch(function(error){
@@ -2587,7 +2730,7 @@ function consentFormOnLoad(){
         $('#divConsentHeader span').text("");
         $("#divProfile").addClass('hidden');
         $("#divFormList").addClass('hidden');
-        $("#divFormContent").addClass('hidden');
+        $("#divFormContent").addClass('hidden');       
     }
     
     /*----------------------------------------------- Display Patient Info and Consent Form BEGIN -------------------------------------*/
@@ -2598,15 +2741,15 @@ function consentFormOnLoad(){
     const errorDrModal = tailwind.Modal.getInstance(document.querySelector("#divConsentErrorModal"));
     var hospitalId=$("#txtHospital").val();
     var branchId=$("#txtBranch").val()==""?0:$("#txtBranch").val();
-    var hcNo=$("#txtRegNo").val();
-    if(hcNo==""||hcNo==0||hcNo==null){
+    var patientId=$("#txtPatient").val();
+    if(patientId==""||patientId==0||patientId==null){
         $('#divErrorHead span').text('Error');
-        $('#divErrorMsg span').text("Please enter Patient Registered Number");
+        $('#divErrorMsg span').text("Please select the Patient");
         errorDrModal.show();
     }else{
         
         var token=$('#txtToken').val();
-            var url=base_url+'/api/consentFormList/'+hospitalId+'/'+branchId+'/'+hcNo;
+            var url=base_url+'/api/consentFormList/'+hospitalId+'/'+branchId+'/'+patientId;
             let options = {
                 method: 'GET',
                 headers: {
@@ -2614,7 +2757,6 @@ function consentFormOnLoad(){
                     Authorization: 'Bearer '+token,
                   },
             }
-            displayLoading();
             fetch(url, options)
                 .then(function(response){ 
                     return response.json(); 
@@ -2626,7 +2768,7 @@ function consentFormOnLoad(){
                         var formList=data.consentList;
                         var i=1;
                         formList.forEach(function(value, key) {
-                            html = '<div id=div'+i+' class="intro-x bg-blue-800 text-white cursor-pointer box relative flex items-center p-5 '+(i>1?'mt-5':'')+'"><div class="ml-2 overflow-hidden"><div class="form-check mt-2"> <input id="chk'+value.id+'" class="form-check-input" type="checkbox"><label class="form-check-label" for="chk'+value.id+'"> <div class="flex items-center"><a href="javascript:;" class="font-medium">'+value.formName+'</a> </div></label></div></div></div> '; 
+                            html = '<div id=div'+i+' class="intro-x bg-primary text-white cursor-pointer box relative flex items-center p-5 '+(i>1?'mt-5':'')+' "><div class="form-check mt-2"> <input id="chk'+value.id+'" class="form-check-input" type="checkbox"><label class="form-check-label" for="chk'+value.id+'"> <div class="flex items-center"><a href="javascript:;" class="font-medium">'+value.formName+'</a> </div></label></div><span class="tooltiptext">'+value.formTitle+'</span></div>'; 
                             $('#divFormNameList').append(html);
                                     // Consent for display -- BEGIN
                                     $("#div"+i).on("click",function(){
@@ -2735,9 +2877,11 @@ function consentFormOnLoad(){
                         $('#divErrorMsg span').text(data.Message);
                         if (data.ShowModal==1) {
                         errorDrModal.show();
+                        }else if(data.ShowModal==2)
+                        {
+                           logoutSession(data.Message);
                         }
                     }
-                    hideLoading();
                 })
                 .catch(function(error){
                     $('#divErrorHead span').text('Error');
@@ -2787,13 +2931,15 @@ consentForm.addEventListener("submit", (e) => {
                    successModal.show(); 
                    document.getElementById('btnPrintConsent').disabled = false;
                    // document.getElementById('btnPrintAllConsent').disabled = false;   
-                   $('#txtRegNo').val('');
                 }                   
             }else{
                 $('#divErrorHead span').text(data.Success);
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                    errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -2847,44 +2993,38 @@ function setConsentTabulator(){
 
                 // For HTML table
                 {
-                    title: "REGISTERED NO",
-                    minWidth: 50,
+                    title: "PATIENT INFORMATION",
+                    minWidth: 250,
                     field: "hcNo",
                     hozAlign: "center",
                     vertAlign: "middle",
                     print: false,
                     download: false,
-                },
-                {
-                    title: "PATIENT NAME",
-                    minWidth: 50,
-                    field: "patientName",
-                    hozAlign: "center",
-                    vertAlign: "middle",
-                    print: false,
-                    download: false,
-                },
-                {
-                    title: "PHONE NO",
-                    minWidth: 100,
-                    field: "phoneNo",
-                    hozAlign: "center",
-                    vertAlign: "middle",
-                    print: false,
-                    download: false,
-                },
-                {
-                    title: "Email",
-                    minWidth: 100,
-                    field: "email",
-                    hozAlign: "left",
-                    vertAlign: "middle",
-                    print: false,
-                    download: false,
+                    formatter(cell, formatterParams) {
+                        return `<div class="flex lg:justify-center">
+                            <div class="intro-x w-12 h-12 image-fit">
+                                <img class="rounded-full" src="${cell.getData().profileImage}">
+                            </div>
+                        </div>
+                        <div>
+                        <div class="font-medium whitespace-nowrap">${
+                            cell.getData().patientName
+                        }</div>
+                        <div class="text-slate-800 text-xs whitespace-nowrap">${
+                            cell.getData().hcNo
+                        }</div>
+                        <div class="text-slate-800 text-xs whitespace-nowrap">${
+                            cell.getData().phoneNo
+                        }</div>
+                        <div class="text-slate-800 text-xs whitespace-nowrap">${
+                            cell.getData().email
+                        }</div>
+                        </div>`;
+                    },
                 },
                 {
                     title: "CONSENT FORM",
-                    minWidth: 150,
+                    minWidth: 300,
                     field: "consentForms",
                     hozAlign: "center",
                     vertAlign: "middle",
@@ -2893,7 +3033,7 @@ function setConsentTabulator(){
                 },
                 {
                     title: "CREATED DATE",
-                    minWidth: 150,
+                    minWidth: 120,
                     field: "created_date",
                     hozAlign: "center",
                     vertAlign: "middle",
@@ -2902,7 +3042,7 @@ function setConsentTabulator(){
                 },
                 {
                     title: "UPDATED DATE",
-                    minWidth: 150,
+                    minWidth: 120,
                     field: "updated_at",
                     hozAlign: "center",
                     vertAlign: "middle",
@@ -2911,7 +3051,7 @@ function setConsentTabulator(){
                 },
                 {
                     title: "ACTIONS",
-                    minWidth: 200,
+                    minWidth: 100,
                     field: "actions",
                     responsive: 1,
                     hozAlign: "center",
@@ -2928,7 +3068,7 @@ function setConsentTabulator(){
                         $(a)
                             .find(".edit")
                             .on("click", function () {
-                                window.location.href= localStorage.getItem("base_url")+"/ConsentForm/"+cell.getData().hcNo;
+                                window.location.href= localStorage.getItem("base_url")+"/ConsentForm/"+cell.getData().patientId;
                             });
                         return a[0];
                     },
@@ -3064,7 +3204,6 @@ function loadViewConsentForm(){
                     Authorization: 'Bearer '+token,
                   },
             }
-            displayLoading();
      fetch(url, options)
                 .then(function(response){ 
                     return response.json(); 
@@ -3076,7 +3215,7 @@ function loadViewConsentForm(){
                         var formList=data.consentList;
                         var i=1;
                         formList.forEach(function(value, key) {
-                            html = '<div id=div'+i+' class="intro-x bg-blue-800 text-white cursor-pointer box relative flex items-center p-5 '+(i>1?'mt-5':'')+'"><div class="ml-2 overflow-hidden"><div class="form-check mt-2"> <input id="chk'+value.id+'" class="form-check-input" type="checkbox"><label class="form-check-label" for="chk'+value.id+'"> <div class="flex items-center"><a href="javascript:;" class="font-medium">'+value.formName+'</a> </div></label></div></div></div> '; 
+                            html = '<div id=div'+i+' class="intro-x bg-primary text-white cursor-pointer box relative flex items-center p-5 '+(i>1?'mt-5':'')+'"><div class="flex items-center"><a href="javascript:;" class="font-medium">'+value.formName+'</a> </div><span class="tooltiptext">'+value.formTitle+'</span></div> '; 
                             $('#divFormNameList').append(html);
                                     // Consent for display -- BEGIN
                                     $("#div"+i).on("click",function(){
@@ -3097,8 +3236,14 @@ function loadViewConsentForm(){
                             });
                             i=i+1;
                         });
+                    }else{
+                        if (typeof data.ShowModal !== 'undefined') {
+                            if(data.ShowModal==2)
+                            {
+                             logoutSession(data.Message);
+                            }
+                        }
                     }
-                    hideLoading();
                 });
 }
 function take_snapshot() {
@@ -3150,15 +3295,17 @@ function addAppointmentLoadEvent(base_url){
     fetch(url,options)
             .then(response => response.json())
             .then(function (result) {
-                var listGender=result.gender;
-                listGender.forEach(function(value, key) {
-                    $("#ddlGender").append($("<option></option>").val(value.name).html(value.name)); 
-                });
+                if(result.Success=='Success'){
+                    var listGender=result.gender;
+                    listGender.forEach(function(value, key) {
+                        $("#ddlGender").append($("<option></option>").val(value.name).html(value.name)); 
+                    });
 
-                var listDepartment=result.department;
-                listDepartment.forEach(function(value, key) {
-                    $("#ddlDepartment").append($("<option></option>").val(value.id).html(value.name)); 
-                });
+                    var listDepartment=result.department;
+                    listDepartment.forEach(function(value, key) {
+                        $("#ddlDepartment").append($("<option></option>").val(value.id).html(value.name)); 
+                    });
+                }
             });  
     
             //Doctor details   
@@ -3166,10 +3313,12 @@ function addAppointmentLoadEvent(base_url){
     fetch(doctorUrl,options)
             .then(response => response.json())
             .then(function (result) {
-                var listDoctor=result.doctorList;
-                listDoctor.forEach(function(value, key) {
-                    $("#ddlDoctor").append($("<option></option>").val(value.id).html(value.name)); 
-                });
+                if(result.Success=='Success'){
+                    var listDoctor=result.doctorList;
+                    listDoctor.forEach(function(value, key) {
+                        $("#ddlDoctor").append($("<option></option>").val(value.id).html(value.name)); 
+                    });
+                }
             });    
     
             //Department change load doctor
@@ -3179,18 +3328,21 @@ function addAppointmentLoadEvent(base_url){
         fetch(doctorUrl,options)
                 .then(response => response.json())
                 .then(function (result) {
-                    $("#ddlDoctor option").remove();
-                    $("#ddlDoctor").append($("<option></option>").val(0).html("Select Doctor"));
-                    var listDoctor=result.doctorList;
-                    listDoctor.forEach(function(value, key) {
-                        $("#ddlDoctor").append($("<option></option>").val(value.id).html(value.name)); 
-                    });
+                    if(result.Success=='Success'){
+                        $("#ddlDoctor option").remove();
+                        $("#ddlDoctor").append($("<option></option>").val(0).html("Select Doctor"));
+                        var listDoctor=result.doctorList;
+                        listDoctor.forEach(function(value, key) {
+                            $("#ddlDoctor").append($("<option></option>").val(value.id).html(value.name)); 
+                        });
+                    }
                 });  
      });      
     
      //Display Patient Information
      $('#txtHcNo').on("keypress", function(e) {
         if (e.key == "Enter") {
+            e.preventDefault();
             var hcNo=$("#txtHcNo").val();
             const errorModal = tailwind.Modal.getInstance(document.querySelector("#divErrorAppointment"));
             if(hcNo==null || hcNo==0)
@@ -3245,6 +3397,9 @@ function addAppointmentLoadEvent(base_url){
                 if (data.ShowModal==1) {
                     $("#divPatientInfo").addClass('hidden');
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -3259,6 +3414,9 @@ function addAppointmentLoadEvent(base_url){
         }
 });      
 }
+$("#ddlDoctor").on('change',function() {
+    
+});
  /* --------------- Patient Add form submit Begins ------------------------*/
 
  const appointmentForm = document.getElementById('frmAppointment');
@@ -3304,6 +3462,9 @@ function addAppointmentLoadEvent(base_url){
                  $('#divAppErrorMsg span').text(data.Message);
                  if (data.ShowModal==1) {
                      errorModal.show();
+                  }else if(data.ShowModal==2)
+                  {
+                     logoutSession(data.Message);
                   }
              }
          })
@@ -3697,6 +3858,9 @@ function viewPatientAppointment(appointmentId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -3741,6 +3905,9 @@ function deleteAppointment(appointmentId,userId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -3788,6 +3955,9 @@ if(appointmentEditform!=null){
                  $('#divErrorMsg span').text(data.Message);
                  if (data.ShowModal==1) {
                      errorModal.show();
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
              }
          })
@@ -4183,6 +4353,9 @@ if(resetPwdForm!=null){
                  $('#divErrorMsg span').text(data.Message);
                  if (data.ShowModal==1) {
                     errorModal.show();  
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
              }
          })
@@ -4235,6 +4408,9 @@ if ($("#pie-chart-appointmentStatus").length) {
             $('#divErrorMsg span').text(data.Message);
             if (data.ShowModal==1) {
                errorModal.show();  
+            }else if(data.ShowModal==2)
+            {
+               logoutSession(data.Message);
             }
         }
     })
@@ -4282,214 +4458,6 @@ if(chart_labels!=""){
     }
 }
 /*---------------------------------------------- Doctor Dashboard Appointment status CHART END ----------------------------*/
-/* ------------------------------------------ Add Semen Analysis Begin -----------------------*/
-function semenAnalysisFormOnLoad(base_url) {
-    var token=$('#txtToken').val();
-    let options = {
-        method: "GET",
-        headers: {
-           Accept: 'application/json',
-           Authorization: 'Bearer '+token,
-         },
-    };
-    var url = base_url + '/api/getSemenAnalysisCommonData';
-    fetch(url, options)
-        .then(response => response.json())
-        .then(function (result) {
-            //liquefaction
-            var listliquefaction = result.liquefaction;
-            listliquefaction.forEach(function (value, key) {
-                $("#ddlliquefaction").append($("<option></option>").val(value.name).html(value.name));
-            });
-            //apperance
-            var listappearance = result.appearance;
-            listappearance.forEach(function (value, key) {
-                $("#ddlappearance").append($("<option></option>").val(value.name).html(value.name));
-            });
-
-            //ph
-            var listph = result.ph;
-            listph.forEach(function (value, key) {
-                $("#ddlph").append($("<option></option>").val(value.name).html(value.name));
-            });
-            //viscosity
-
-            var listviscosity = result.viscosity;
-            listviscosity.forEach(function (value, key) {
-                $("#ddlviscosity").append($("<option></option>").val(value.name).html(value.name));
-            });
-            //abstinence         
-            var listabstinence = result.abstinence;
-            listabstinence.forEach(function (value, key) {
-                $("#ddlabstinence").append($("<option></option>").val(value.name).html(value.name));
-            });
-            //agglutination & granulardebris
-            var listagglutination = result.agglutination;
-            listagglutination.forEach(function (value, key) {
-                $("#ddlagglutination").append($("<option></option>").val(value.name).html(value.name));
-                $("#ddlgranulardebris").append($("<option></option>").val(value.name).html(value.name));
-
-            });
-            //clumping & epithelialcells
-            var listclumping = result.clumping;
-            listclumping.forEach(function (value, key) {
-                $("#ddlclumping").append($("<option></option>").val(value.name).html(value.name));
-                $("#ddlepithelialcells").append($("<option></option>").val(value.name).html(value.name));
-
-            });
-            //pusCells
-            var listpusCells = result.pusCells;
-            listpusCells.forEach(function (value, key) {
-                $("#ddlpuscells").append($("<option></option>").val(value.name).html(value.name))
-            });
-
-        });
-// Patient change Event
-        $("#ddlPatient").on('change',function() {
-            var base_url = localStorage.getItem("base_url");
-            var patientId=$("#ddlPatient").val();
-            var url = base_url + '/api/patientInfo/'+patientId;
-        
-            fetch(url,options)
-            .then(response => response.json())
-            .then(function (result) {
-                var patientList=result.patientDetails;
-                $('#txtSpouseName').val(patientList.spouseName);
-            });
-        });
-
-}
-/* ------------------------------------------ Add semenanalysis END -----------------------*/
-/* --------------- Semen Analysis Add form submit Begins ------------------------*/
-
-const semenanalysisform = document.getElementById('frmSemenAnalysis');
-if (semenanalysisform != null) {
-    //Semen analysiscentry
-    semenanalysisform.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const semenanalysisdata = new FormData(semenanalysisform);
-        const params = new URLSearchParams(semenanalysisdata);
-        var token=$('#txtToken').val();
-        let options = {
-            method: "POST",
-            body: params,
-            headers: {
-                Accept: 'application/json',
-                Authorization: 'Bearer '+token,
-              },
-        };
-        var base_url = localStorage.getItem("base_url");
-        var url = base_url + '/api/addSemenAnalysis';
-        const errorModal = tailwind.Modal.getInstance(document.querySelector("#warning-modal-preview"));
-        fetch(url, options)
-            .then(function (response) {
-                return response.json();
-            })
-            .then(function (data) {
-                if (data.Success == 'Success') {
-                    $('#divMsg span').text(data.Message);
-
-                    if (data.ShowModal == 1) {
-                        const successModal = tailwind.Modal.getInstance(document.querySelector("#success-modal-preview"));
-                        document.getElementById("frmSemenAnalysis").reset();
-                        let ddlBranch = document.getElementById('ddlBranch');
-                        let ddlHospital = document.getElementById('ddlHospital');
-                        if (ddlBranch !== null || ddlHospital!== null) {
-                            $("#ddlBranch option").remove();
-                            $("#ddlBranch").append($("<option></option>").val(0).html("Select Branch"));
-                            $("#divBranchddl").addClass('hidden');
-                            $("#ddlPatient option").remove();
-                            $("#ddlPatient").append($("<option></option>").val(0).html("Select Patient"));
-                            $("#ddlDoctor option").remove();
-                            $("#ddlDoctor").append($("<option></option>").val(0).html("Select Doctor"));
-                        }                       
-                        document.getElementById('divLeftSignature').innerHTML="";
-                        document.getElementById('divCenterSignature').innerHTML="";
-                        document.getElementById('divRightSignature').innerHTML="";
-                        $('#txtId').val(data.semenId);
-                        successModal.show($('#txtId').val());
-                    }
-                } else {
-                    $('#divErrorHead span').text(data.Success);
-                    $('#divErrorMsg span').text(data.Message);
-                    if (data.ShowModal == 1) {
-                        errorModal.show();
-                    }
-                }
-            })
-            .catch(function (error) {
-                $('#divErrorHead span').text('Error');
-                $('#divErrorMsg span').text(error);
-                errorModal.show();
-            });
-        window.scrollTo(0, 0);
-    });
-
-}
-/* --------------- Semen Analysis Add form submit End ------------------------*/
-$( "#btnSemenSuccessPrint" ).on( "click", function() {
-    window.scrollTo(0, 0);
-    var id=$('#txtId').val();
-    var base_url = localStorage.getItem("base_url");
-    window.location.href = base_url+ "/PrintSemenAnalysis/"+id;
-});
-/*---------------------- PRINT SEMEN ANALYSIS -------------------*/
-$( "#btnPrintSemenAnalysis" ).on( "click", function() {
-     var contents = $("#divPrintSemenAnalysis").html();
-     var userId=$("#txtUser").val();
-        var base_url = localStorage.getItem("base_url");
-        var url=base_url+'/api/getPrintMargin/'+userId;
-        var token=$('#txtToken').val();
-        let options = {
-            method: 'GET',
-            headers: {
-                Accept: 'application/json',
-                Authorization: 'Bearer '+token,
-              },
-        }
-        fetch(url, options)
-            .then(function(response){ 
-                return response.json(); 
-            })
-            .then(function(data){ 
-                if(data.Success=='Success'){
-                    var printMarign=[];
-                    var ml=data.pageSettingsDetails.marginLeft-1;
-                    var mr=data.pageSettingsDetails.marginRight-1;
-                    var mb=data.pageSettingsDetails.marginBottom-1;
-                    var mt=data.pageSettingsDetails.marginTop-1;
-
-                    var frame1 = $('<iframe />');
-                    var style='<head><style>table { width: 100%; font-size:12px } table, th, td { border: 1px solid black;border-collapse: collapse;}</style></head>';
-                    frame1[0].name = "frame1";
-                    frame1.css({ "position": "absolute", "top": "-1000000px" });
-                    $("body").append(frame1);
-                    var frameDoc = frame1[0].contentWindow ? frame1[0].contentWindow : frame1[0].contentDocument.document ? frame1[0].contentDocument.document : frame1[0].contentDocument;
-                    frameDoc.document.open();
-                    //Create a new HTML document.
-                    frameDoc.document.write('<html>'+style);//<head><title>DIV Contents</title></head>
-                    frameDoc.document.write('<body topmargin="'+mt+'" bottommargin="'+mb+'" rightmargin="'+mr+'" leftmargin="'+ml+'">');
-                    //Append the external CSS file.
-                    // var styleLocation=localStorage.getItem("base_url")+"/dist/css/app.css";
-                    // frameDoc.document.write("<link rel='stylesheet' href='"+styleLocation+"' />");
-                    //Append the DIV contents.
-                    frameDoc.document.write(contents);
-                    frameDoc.document.write('</body></html>');
-                    frameDoc.document.close();
-                    setTimeout(function () {
-                        window.frames["frame1"].focus();
-                        window.frames["frame1"].print();
-                        frame1.remove();
-                    }, 500);
-                }
-            })
-            .catch(function(error){
-                const errorDrModal = tailwind.Modal.getInstance(document.querySelector("#divPrintSAErrorModal"));
-                $('#divErrorHead span').text('Error');
-                $('#divErrorMsg span').text(error);
-                errorDrModal.show();
-            });        
-});
 /* Get Patient and Doctor for Semen Analysis -- BEGIN */
 function getPatientDoctor(){
     let ddlPatient = document.getElementById('ddlPatient');
@@ -4512,37 +4480,24 @@ function getPatientDoctor(){
     fetch(url,options)
     .then(response => response.json())
     .then(function (result) {
-        var patientList=result.patientList;
-        if(patientList!=null)
+        if(result.Success=='Success'){
+            var patientList=result.patientList;
+            if(patientList!=null)
+                    {
+                        patientList.forEach(function(value, key) {
+                            $("#ddlPatient").append($("<option></option>").val(value.id).html(value.name)); 
+                        });
+                    }
+            var doctorList=result.doctorList;
+            if(doctorList!=null)
                 {
-                    patientList.forEach(function(value, key) {
-                        $("#ddlPatient").append($("<option></option>").val(value.id).html(value.name)); 
-                    });
+                    var ddlDoctor=document.getElementById("ddlDoctor");
+                    if(ddlDoctor!== null)
+                    {
+                        loadDoctorddl('ddlDoctor',doctorList);
+                    }
                 }
-        var doctorList=result.doctorList;
-        if(doctorList!=null)
-            {
-                var ddlDoctor=document.getElementById("ddlDoctor");
-                if(ddlDoctor!== null)
-                {
-                    loadDoctorddl('ddlDoctor',doctorList);
-                }
-                var ddlScientist1=document.getElementById("ddlScientist1");
-                if(ddlScientist1!== null)
-                {
-                    loadDoctorddl('ddlScientist1',doctorList);
-                }
-                var ddlScientist2=document.getElementById("ddlScientist2");
-                if(ddlScientist2!== null)
-                {
-                    loadDoctorddl('ddlScientist2',doctorList);
-                }
-                var ddlMedicalDirector=document.getElementById("ddlMedicalDirector");
-                if(ddlMedicalDirector!== null)
-                {
-                    loadDoctorddl('ddlMedicalDirector',doctorList);
-                }
-            }
+        }
     });
 }
 }
@@ -4911,6 +4866,9 @@ function deleteSemenAnalysis(semenId,userId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -5287,6 +5245,8 @@ $('#ddlReport').on('change',function(){
                 $("#divReportNoRecord").addClass('hidden');
                 $("#divReportPatient").addClass('hidden');
                 $("#tbDoctorHeader").addClass('hidden');
+                $("#tbDoctorHeader").css('display', 'none');
+                // $("#divReportNoRecord").css('visibility', 'none');
                 $("#tbReport").removeClass("hidden").removeAttr("style");
                 break;
             case 7:
@@ -5309,28 +5269,55 @@ $('#ddlReport').on('change',function(){
     /*---------------------------- PRINT REPORT --------------------------*/    
     function printData(printContent,title){
         var contents = $(printContent).html();
-        var frame1 = $('<iframe />');
-        frame1[0].name = "frame1";
-        frame1.css({ "position": "absolute", "top": "-1000000px" });
-        $("body").append(frame1);
-        var frameDoc = frame1[0].contentWindow ? frame1[0].contentWindow : frame1[0].contentDocument.document ? frame1[0].contentDocument.document : frame1[0].contentDocument;
-        frameDoc.document.open();
-        //Create a new HTML document.
-        frameDoc.document.write('<html><head><title>'+title+'</title>');
-        // frameDoc.document.write('<style> @media print { @page {margin: 0;}}</style>');
-        frameDoc.document.write('</head><body leftmargin="20px" rightmargin="20px" bottommargin="20px" topmargin="20px">');
-        //Append the external CSS file.
-        var styleLocation=localStorage.getItem("base_url")+"/dist/css/app.css";
-        frameDoc.document.write("<link rel='stylesheet' href='"+styleLocation+"' />");
-        //Append the DIV contents.
-        frameDoc.document.write(contents);
-        frameDoc.document.write('</body></html>');
-        frameDoc.document.close();
-        setTimeout(function () {
-            window.frames["frame1"].focus();
-            window.frames["frame1"].print();
-            frame1.remove();
-        }, 500);
+        var userId=$("#txtUser").val();
+       var base_url = localStorage.getItem("base_url");
+       var url=base_url+'/api/getPrintMargin/'+userId;
+       var token=$('#txtToken').val();
+       let options = {
+           method: 'GET',
+           headers: {
+               Accept: 'application/json',
+               Authorization: 'Bearer '+token,
+             },
+       }
+        fetch(url, options)
+        .then(function(response){ 
+            return response.json(); 
+        })
+        .then(function(data){ 
+            if(data.Success=='Success'){
+                let pixelsmt = (96 * data.pageSettingsDetails.marginTop) / 2.54;
+                let pixelsmr = (96 * data.pageSettingsDetails.marginRight) / 2.54;
+                let pixelsmb = (96 * data.pageSettingsDetails.marginBottom) / 2.54;
+                let pixelsml = (96 * data.pageSettingsDetails.marginLeft) / 2.54;
+
+                var frame1 = $('<iframe />');
+                frame1[0].name = "frame1";
+                frame1.css({ "position": "absolute", "top": "-1000000px" });
+                $("body").append(frame1);
+                var frameDoc = frame1[0].contentWindow ? frame1[0].contentWindow : frame1[0].contentDocument.document ? frame1[0].contentDocument.document : frame1[0].contentDocument;
+                frameDoc.document.open();
+                //Create a new HTML document.
+                frameDoc.document.write('<html><head><style>@media print {@page {size: auto; margin: 0mm;} body{margin: '+pixelsmt+'px '+pixelsmr+'px '+pixelsmb+'px '+pixelsml+'px ;} .hidden{display: none;}} table {width: 100%; font-size:12px } table, th, td { border: 1px solid black;border-collapse: collapse;} div,span {text-align: center; font-weight: 500; font-size:14px; }</style>');
+                frameDoc.document.write('</head><body>');
+                //Append the DIV contents.
+                frameDoc.document.write(contents);
+                frameDoc.document.write('</body></html>');
+                frameDoc.document.close();
+                setTimeout(function () {
+                    window.frames["frame1"].focus();
+                    window.frames["frame1"].print();
+                    frame1.remove();
+                }, 500);
+              
+            }
+        })
+        .catch(function(error){
+            const errorDrModal = tailwind.Modal.getInstance(document.querySelector("#divPrintSAErrorModal"));
+            $('#divErrorHead span').text('Error');
+            $('#divErrorMsg span').text(error);
+            errorDrModal.show();
+        });        
     }
     /*---------------------------- PRINT REPORT --------------------------*/    
     $( "#btnPrintReport" ).on( "click", function() {
@@ -5446,12 +5433,14 @@ $('#ddlReport').on('change',function(){
             .then(response => response.json())
             .then(function (result) {
                 // Load Hospital
-                var listHospital=result.hospitalList;
-                if(listHospital!=null)
-                {
-                    listHospital.forEach(function(value, key) {
-                        $("#ddlAssignHospital").append($("<option></option>").val(value.id).html(value.hospitalName)); 
-                    });
+                if(result.Success=='Success'){
+                    var listHospital=result.hospitalList;
+                    if(listHospital!=null)
+                    {
+                        listHospital.forEach(function(value, key) {
+                            $("#ddlAssignHospital").append($("<option></option>").val(value.id).html(value.hospitalName)); 
+                        });
+                    }
                 }
             }); 
             let ddlAssignBranch = document.getElementById('ddlAssignBranch');
@@ -5635,13 +5624,16 @@ $('#ddlReport').on('change',function(){
                             const successModal = tailwind.Modal.getInstance(document.querySelector("#divAssignSuccessModal"));
                             successModal.show();    
                             document.getElementById("frmAssignDoctor").reset();
-                            ClearAssignDdl();
+                            // ClearAssignDdl();
                         } 
                     }else{
                         $('#divErrorHead span').text(data.Success);
                         $('#divErrorMsg span').text(data.Message);
                         if (data.ShowModal==1) {
                             errorModal.show();
+                        }else if(data.ShowModal==2)
+                        {
+                           logoutSession(data.Message);
                         }
                     }
                 })
@@ -6059,6 +6051,9 @@ function deleteAssignDoctor(assignId,userId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -6117,6 +6112,9 @@ if(assignEditform!=null){
                  $('#divErrorMsg span').text(data.Message);
                  if (data.ShowModal==1) {
                     errorDrModal.show();
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
              }
          })
@@ -6371,6 +6369,9 @@ if(refferedByform!=null){
                  $('#divErrorMsg span').text(data.Message);
                  if (data.ShowModal==1) {
                      errorModal.show();
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
              }
          })
@@ -6560,6 +6561,9 @@ donorBankform.addEventListener("submit", (e) => {
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                 }else if(data.ShowModal==2)
+                 {
+                    logoutSession(data.Message);
                  }
             }
         })
@@ -6575,6 +6579,7 @@ donorBankform.addEventListener("submit", (e) => {
 /* --------------- Donor Bank Add form submit End ------------------------*/
 /*----------------------------------- Delete Donor Bank By ID bEGINS -------------------------*/
 function deleteDonorBank(patientId,userId){
+    const errorModal = tailwind.Modal.getInstance(document.querySelector("#divDonorErrorModal"));
     var base_url = localStorage.getItem("base_url");
     var url=base_url+'/api/deleteDonorBank/'+patientId+'/'+userId;
     var token=$('#txtToken').val();
@@ -6602,6 +6607,9 @@ function deleteDonorBank(patientId,userId){
                 $('#divErrorMsg span').text(data.Message);
                 if (data.ShowModal==1) {
                     errorModal.show();
+                }else if(data.ShowModal==2)
+                {
+                   logoutSession(data.Message);
                 }
             }
         })
@@ -6616,16 +6624,8 @@ function deleteDonorBank(patientId,userId){
 $( "#btnCancelDonor" ).on( "click", function() {
     $('#txtMode').val(1);
 });
-/*-------------Loading------- Begin */
-const loader=document.querySelector("#loading");
-function displayLoading(){
-    loader.classList.add("display");
-    setTimeout(() => {
-        loader.classList.remove("display");
-    }, 5000);
-}
-function hideLoading(){
-    loader.classList.remove("display");
-}
-/* ------------Loading ------ END-----*/
+
+$( "#btnShowAppointmentSlot" ).on( "click", function() {
+   alert( $('#txtAppointmentTime').val());
+});
 })();

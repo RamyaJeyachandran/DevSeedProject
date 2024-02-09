@@ -135,7 +135,6 @@
                             </li>
                         </ul>
                     </li>
-                    @can('isNotAdmin')
                     <li>
                         <a  id="lnkMobileSemenAnalysis" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="link-2"></i> </div>
@@ -145,13 +144,25 @@
                         <li>
                         <a  id="aMobileSemenAnalysis" href="{{url('SemenAnalysis')}}" class="menu">
                             <div class="menu__icon"> <i data-lucide="plus-circle"></i> </div>
-                            <div class="menu__title"> Semen Analysis  </div>
+                            <div class="menu__title"> Add Analysis  </div>
                         </a>
                         </li>
                         <li>
                                 <a id="aMobileSemenAnalysisSearch" href="{{url('SearchSemenAnalysis')}}" class="menu">
                                     <div class="menu__icon"> <i data-lucide="search"></i> </div>
-                                    <div class="menu__title"> Search Semen Analysis </div>
+                                    <div class="menu__title"> Search Analysis </div>
+                                </a>
+                            </li>
+                            <li>
+                        <a  id="aMobilePrePostAnalysis" href="{{url('PrePostAnalysis')}}" class="menu">
+                            <div class="menu__icon"> <i data-lucide="plus-circle"></i> </div>
+                            <div class="menu__title"> Add Pre & Post Analysis  </div>
+                        </a>
+                        </li>
+                        <li>
+                                <a id="aMobilePrePostAnalysisSearch" href="{{url('SearchPrePostAnalysis')}}" class="menu">
+                                    <div class="menu__icon"> <i data-lucide="search"></i> </div>
+                                    <div class="menu__title"> Search Pre & Post Analysis </div>
                                 </a>
                             </li>
                             <li>
@@ -162,27 +173,7 @@
                             </li>
                      </ul>
                     </li>
-                    @endcan
-                    <li>
-                        <a  id="lnkMobileReport" href="javascript:;" class="menu">
-                            <div class="menu__icon"> <i data-lucide="settings"></i> </div>
-                            <div class="menu__title">  Report <i data-lucide="chevron-down" class="menu__sub-icon "></i></div>
-                        </a>
-                        <ul  id="ulMobilePatientReport" class="">
-                        <li>
-                        <a  id="aMobilePatientReport" href="{{url('PatientReport')}}" class="menu">
-                            <div class="menu__icon"> <i data-lucide="user"></i> </div>
-                            <div class="menu__title"> Patient / Doctor Report  </div>
-                        </a>
-                        </li>
-                        <li>
-                        <a  id="aMobilePatientDetails" href="{{url('PatientDetails')}}" class="menu">
-                            <div class="menu__icon"> <i data-lucide="user-check"></i> </div>
-                            <div class="menu__title"> Patient Detail Report  </div>
-                        </a>
-                        </li>
-                     </ul>
-                    </li>
+                   
                     <li>
                         <a  id="lnkMobileConsent" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="book"></i> </div>
@@ -210,10 +201,24 @@
                         </ul>
                     </li>
                     <li>
-                        <a  id="lnkMobileDonor" href="{{url('DonorBank')}}" class="menu">
+                        <a  id="lnkMobileDonor" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="droplet"></i> </div>
-                            <div class="menu__title">  Donor Bank </div>
+                            <div class="menu__title"> Donor Bank  <i data-lucide="chevron-down" class="menu__sub-icon "></i> </div>
                         </a>
+                        <ul  id="ulMobileDonor" class="">
+                            <li>
+                                <a  id="aMobileDonor" href="{{ url('DonorBank') }}" class="menu">
+                                    <div class="menu__icon"> <i data-lucide="archive"></i> </div>
+                                    <div class="menu__title"> Bank Details</div>
+                                </a>
+                            </li>
+                            <li>
+                                <a id="aMobileWitness" href="{{url('BankWitness')}}" class="menu">
+                                    <div class="menu__icon"> <i data-lucide="external-link"></i> </div>
+                                    <div class="menu__title"> Bank Witness </div>
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     <!-- <li>
                         <a  id="lnkMobileSubscribe" href="{{url('subscribe')}}" class="menu">
@@ -221,23 +226,62 @@
                             <div class="menu__title"> Subscribe </div>
                         </a>
                     </li> -->
-                    @can('isNotAdmin')
+                    <li>
+                        <a  id="lnkMobileReport" href="javascript:;" class="menu">
+                            <div class="menu__icon"> <i data-lucide="settings"></i> </div>
+                            <div class="menu__title">  Report <i data-lucide="chevron-down" class="menu__sub-icon "></i></div>
+                        </a>
+                        <ul  id="ulMobilePatientReport" class="">
+                        <li>
+                        <a  id="aMobilePatientReport" href="{{url('PatientReport')}}" class="menu">
+                            <div class="menu__icon"> <i data-lucide="user"></i> </div>
+                            <div class="menu__title"> Patient / Doctor Report  </div>
+                        </a>
+                        </li>
+                        <li>
+                        <a  id="aMobilePatientDetails" href="{{url('PatientDetails')}}" class="menu">
+                            <div class="menu__icon"> <i data-lucide="user-check"></i> </div>
+                            <div class="menu__title"> Patient Detail Report  </div>
+                        </a>
+                        </li>
+                     </ul>
+                    </li>
                     <li>
                         <a  id="lnkMobilePrint" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="settings"></i> </div>
                             <div class="menu__title">  Settings  <i data-lucide="chevron-down" class="menu__sub-icon "></i> </div>
                         </a>
                         <ul  id="ulMobilePrint" class="">
+                    @can('isNotAdmin')
                             <li>
                                 <a  id="aMobilePrint" href="{{ url('PrintSettings') }}" class="menu">
                                     <div class="menu__icon"> <i data-lucide="printer"></i> </div>
                                     <div class="menu__title"> Print Settings</div>
                                 </a>
                             </li>
-                            
+                    @endcan
+                    <li>
+                                <a  id="aMobileImageCapSettings" href="{{ url('ImageCaptureSettings') }}" class="menu">
+                                    <div class="menu__icon"> <i data-lucide="image"></i> </div>
+                                    <div class="menu__title"> Image Capture Settings</div>
+                                </a>
+                            </li>
+                            <li>
+                                <a  id="aMobileNormalValue" href="{{ url('SetNormalValues') }}" class="menu">
+                                    <div class="menu__icon"> <i data-lucide="align-center"></i> </div>
+                                    <div class="menu__title"> Set Normal Values</div>
+                                </a>
+                            </li>
+                            <!-- @can('isAdminHospitalBranch')
+                            <li>
+                                <a  id="aMobileDepartment" href="{{ url('Department') }}" class="menu">
+                                    <div class="menu__icon"> <i data-lucide="layers"></i> </div>
+                                    <div class="menu__title"> Department</div>
+                                </a>
+                            </li>
+                            @endcan -->
                         </ul>
                     </li>
-                    @endcan
                 </ul>
             </div>
         </div>

@@ -4,7 +4,6 @@
     <head>
         <meta charset="utf-8">
         <link href="{{ asset('dist/images/logo.svg') }}" rel="shortcut icon">
-        <meta name="author" content="LEFT4CODE">
         <title>@yield('title')</title>
         <!-- BEGIN: CSS Assets-->
         @yield('style')
@@ -20,5 +19,6 @@
         @yield('content')
         @include('layouts.footer')
         @stack('js')        
+        <!-- <script  type="module" src="{{ asset('dist/js/chatgptui.js')}}"></script> -->
     </body>
 </html>

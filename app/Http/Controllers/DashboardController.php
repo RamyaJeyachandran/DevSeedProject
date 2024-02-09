@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\loginLog;
 use Illuminate\Http\Request;
+use App\Models\HospitalBranch;
 use App\Models\HospitalSettings;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Validator;
@@ -15,6 +18,10 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         try{
+            $companyId=$request->session()->get('companyId')==null ? 1 : $request->session()->get('companyId');
+        $log_obj=new loginLog;
+        $log_obj->setDatabaseByCompanyId($companyId);
+        
             $userId = $request->session()->get('userId');
             $user_obj=new User;
             $userDetails=$user_obj->userInformation( $userId );
@@ -134,6 +141,7 @@ class DashboardController extends Controller
             'newPassword'=>'required',
             'confirmPassword'=>'required',
             'emailId'=>'required',
+            'companyId'=>'required'
         ]);
         if($validateUser->fails()){
             $result['ShowModal']=1;
@@ -147,7 +155,20 @@ class DashboardController extends Controller
             $result['Message']="New password and Confirm password doesn't match.";
             return response()->json($result,200);
         }
-        $user_obj=new User;
+        if($request->companyId==1)
+        {
+            $request->session()->put('dbName',config('constant.seed_db_name'));
+            DB::disconnect();
+            Config::set('database.default','mysql');
+            DB::reconnect();
+        }else if($request->companyId==2)
+        {
+            $request->session()->put('dbName',config('constant.stech_db_name'));
+            DB::disconnect();
+            Config::set('database.default','mysql_stech');
+            DB::reconnect();
+        }
+        
          $user_obj=new User;
         $chkEmail=$user_obj->checkEmailId($request->emailId);
         if(count($chkEmail)>0){
@@ -218,5 +239,52 @@ class DashboardController extends Controller
             $result['Message']=$th->getMessage();
             return response()->json($result,200);
         }
-    }   
+    } 
+    public function getDefaultSetting(Request $request,$userId)
+    {   
+        try{
+            $user_obj=new User;
+            $userDetails=$user_obj->getUserInfo( $userId );
+            $hospitalId=$userDetails->user_type_id==1?($userDetails->defaultHospitalId==null?0:$userDetails->defaultHospitalId):$userDetails->user_id;
+            $branch_obj = new HospitalBranch;
+            $userDetails->hospitalList = $branch_obj->getHospitalList();
+            $userDetails->branchList = $branch_obj->getBranchListByHospitalId($hospitalId);
+            return view('pages.setDefaultHospital')->with('details',$userDetails);
+        }catch(\Throwable $th){
+            // return Redirect::back()->withErrors($th->getMessage());
+            $result['ShowModal']=$hospitalId;
+            $result['Success']='failure';
+            $result['Message']=$th->getMessage();
+            return response()->json($result,200);
+        }
+    }
+    public function setDefaultHospital(Request $request)
+    { try{
+        $result=array();
+        $validateUser=Validator::make($request->all(), [
+            'userId'=>'required',
+        ]);
+        if($validateUser->fails()){
+            $result['ShowModal']=1;
+            $result['Success']='Failure';
+            $result['Message']="Validation failed. Please fill the required fields";
+            return response()->json($result,200);
+        }
+        $user_obj=new User;
+        $userDetails=$user_obj->updateDefaultHospital($request);
+        $branchId= ($request->branchId==0|| $request->branchId==null) ?$user_obj->getEncryptedId(0): $request->branchId;
+        $request->session()->put('hospitalId', $request->hospitalId);
+        $request->session()->put('branchId', $branchId);
+             
+            $result['ShowModal']=1;
+            $result['Success']='Success';
+            $result['Message']="Default Hospital/Branch changed successfully.";
+            return response()->json($result,200);
+        }catch(\Throwable $th){
+            $result['ShowModal']=1;
+            $result['Success']='failure';
+            $result['Message']=$th->getMessage();
+            return response()->json($result,200);
+        }
+    }  
 }

@@ -20,22 +20,7 @@
         
                     <input id="txtHospital" name="hospitalId" value="{{ session('hospitalId') }}" type="hidden" class="form-control">
                     <input id="txtBranch" name="branchId" value="{{ session('branchId') }}" type="hidden" class="form-control">
-                    @can('isAdmin')
-                    <div class="intro-y col-span-12 sm:col-span-6 form-control">
-                                <label for="ddlHospital" class="form-label">Hospital </label>
-                                <select id="ddlHospital" name="hospitalId" class="form-select">
-                                    <option value='0'>Select Hospital</option>
-                                </select>
-                            </div>
-                    @endcan
-                    @can('isAdminHospital')
-                            <div id="divBranchddl" class="intro-y col-span-12 sm:col-span-6 form-control">
-                                <label for="ddlBranch" class="form-label">Branch </label>
-                                <select id="ddlBranch" name="branchId" class="form-select">
-                                    <option value='0'>Select Branch</option>
-                                </select>
-                            </div>
-                        @endcan
+                    <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
         <div class="intro-y col-span-12 sm:col-span-6 form-control">
         <label class="w-12 flex-none xl:w-auto xl:flex-initial mr-2">Patient</label>
                                 <select id="ddlPatient" name="patientId"  class="form-select">

@@ -21,6 +21,8 @@ mix.js("public/src/js/app.js", "public/dist/js/")
     .js('public/src/js/patient.js', 'public/dist/js/patient.js')
     .js('public/src/js/settings.js', 'public/dist/js/settings.js')
     .js('public/src/js/semenAnalysis.js', 'public/dist/js/semenAnalysis.js')    
+    .js('public/src/js/prePost.js', 'public/dist/js/prePost.js')    
+    // .js('public/src/js/chatgptui.js', 'public/dist/js/chatgptui.js')    
     .css("public/dist/css/_app.css", "public/dist/css/app.css")
     .css("public/src/css/loading.css", "public/dist/css/loading.css")
     .options({

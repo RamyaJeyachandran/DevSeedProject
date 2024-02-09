@@ -19,6 +19,7 @@ class pageSettings extends Model
         'marginLeft',
         'marginBottom',
         'marginTop',
+        'isHeaderDisplay',
         'is_active',
         'created_by',
         'updated_by'
@@ -44,6 +45,7 @@ class pageSettings extends Model
         $user_obj = new User;
         $userId = $user_obj->getDecryptedId($request->userId);
         $pageSettingId= $user_obj->getDecryptedId($request->pageSettingId);
+        $isHeaderDisplay=(isset($request->isHeaderDisplay) && !empty($request->isHeaderDisplay)) ?$request->isHeaderDisplay : 0;
 
         return static::where('id',$pageSettingId)->update(
             [
@@ -51,18 +53,19 @@ class pageSettings extends Model
                 'marginLeft'=>$request->marginLeft,
                 'marginBottom'=>$request->marginBottom,
                 'marginTop'=>$request->marginTop,
+                'isHeaderDisplay'=>$isHeaderDisplay,
                 'updated_by'=>$userId
             ]
         );
     }
     public function getPageSettingsByUserId($userId)
     {
-        $page_settings=DB::table('page_settings')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,marginRight,marginLeft,marginBottom,marginTop")
+        $page_settings=DB::table('page_settings')->selectRaw("HEX(AES_ENCRYPT(id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,marginRight,marginLeft,marginBottom,marginTop,isHeaderDisplay")
                                     ->where([['userId','=',$userId],['is_active','=',1]])
                                    ->first();
         if($page_settings==null)
         {
-            $query_sts = "SELECT HEX(AES_ENCRYPT(0,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,".config('constant.pageSetting.marginRight')." as marginRight,".config('constant.pageSetting.marginLeft')." as marginLeft,".config('constant.pageSetting.marginBottom')." as marginBottom,".config('constant.pageSetting.marginTop')." as marginTop";
+            $query_sts = "SELECT HEX(AES_ENCRYPT(0,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as id,".config('constant.pageSetting.marginRight')." as marginRight,".config('constant.pageSetting.marginLeft')." as marginLeft,".config('constant.pageSetting.marginBottom')." as marginBottom,".config('constant.pageSetting.marginTop')." as marginTop,0 as isHeaderDisplay";
             $result = DB::select($query_sts);
             $page_settings=$result[0];
         }

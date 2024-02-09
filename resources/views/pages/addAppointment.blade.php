@@ -16,29 +16,9 @@
                     <input id="txtBranch" name="branchId" value="{{ session('branchId') }}" type="hidden" class="form-control">
                     <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
                     <input id="txtTabNo" name="tabNo"  type="hidden" class="form-control">
-                <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
-                        <button id="btnSaveAppointment" type=submit class="btn btn-primary shadow-md mr-2"><i data-lucide="save" class="w-4 h-4 mr-2"></i>Save</button>
-                        <button id="btnCancelAppointment" type="reset" class="btn btn-dark w-24">Cancel</button>
-                    </div>
+                
                    <div class="intro-y box p-5 mt-5">
                     <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5">
-                    @can('isAdmin')
-                    <div class="intro-y col-span-12 sm:col-span-6">
-                                <label for="ddlHospital" class="form-label">Hospital </label>
-                                <select id="ddlHospital" name="hospitalId" class="form-select">
-                                    <option value='0'>Select Hospital</option>
-                                </select>
-                            </div>
-                    @endcan
-                    @can('isAdminHospital')
-                            <div id="divBranchddl" class="intro-y col-span-12 sm:col-span-6">
-                                <label for="ddlBranch" class="form-label">Branch </label>
-                                <select id="ddlBranch" name="branchId" class="form-select">
-                                    <option value='0'>Select Branch</option>
-                                </select>
-                            </div>
-                        @endcan
-
                     <div class="intro-y col-span-12 sm:col-span-6">
                                 <label for="txtAppointmentDate" class="form-label">Appointment Date <span class="text-danger mt-2"> *</span></label>
                                 <input id="txtAppointmentDate" name="appointmentDate" type="text" class="datepicker form-control " data-single-mode="true" required> 
@@ -169,9 +149,13 @@
                                 </div> 
                     </div>
                     
-                    
+                    <div class="intro-y col-span-12 flex flex-wrap sm:flex-nowrap items-center mt-2">
+                        <button id="btnSaveAppointment" type=submit class="btn btn-primary shadow-md mr-2"><i data-lucide="save" class="w-4 h-4 mr-2"></i>Save</button>
+                        <button id="btnCancelAppointment" type="reset" class="btn btn-dark w-24"><i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>Cancel</button>
+                    </div>
                    
                 </div>
+                
 </form>
                 <!-- END: Content -->
                  <!-- BEGIN: Success Modal Content --> 

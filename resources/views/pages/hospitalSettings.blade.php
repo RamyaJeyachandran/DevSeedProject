@@ -50,8 +50,9 @@
                                         <input id="txtContactPhNo" name="inChargePhoneNo"  type="text"  pattern="(0|91)?(-)?[6-9][0-9]{9}" maxlength="13" title="Phone number format 9999999999 or 91-9999999999" class="form-control" required>
                     </div>
                     <div class="intro-y col-span-12 sm:col-span-4 form-control">
+                            <label for="txtBranchLimit" class="form-label">Branch Limit <span class="text-danger mt-2"> *</span></label>
+                            <input id="txtBranchLimit" name="branchLimit"  type="number" class="form-control" required>
                     </div>
-
                     <div class="intro-y col-span-12 justify-center sm:justify-end mt-5">
                     <button id="btnSavePatient" type=submit class="btn btn-primary w-24 ml-2">Register</button>
                                         <button type=reset class="btn btn-dark w-24 ">Cancel</button> 

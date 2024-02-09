@@ -18,22 +18,6 @@
 
                     <div class="intro-y box p-5 mt-5">
                     <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5">
-                    @can('isAdmin')
-                    <div class="intro-y col-span-12 sm:col-span-4 form-control">
-                                <label for="ddlHospital" class="form-label">Hospital </label>
-                                <select id="ddlHospital" name="hospitalId" class="form-select">
-                                    <option value='0'>Select Hospital</option>
-                                </select>
-                            </div>
-                    @endcan
-                    @can('isAdminHospital')
-                            <div id="divBranchddl" class="intro-y col-span-12 sm:col-span-4 form-control">
-                                <label for="ddlBranch" class="form-label">Branch </label>
-                                <select id="ddlBranch" name="branchId" class="form-select">
-                                    <option value='0'>Select Branch</option>
-                                </select>
-                            </div>
-                    @endcan
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtProfileImage" class="form-label">Profile Image </label>
                                 <input id="txtProfileImage" name="profileImage" accept="image/*" type="file" class="form-control" >
@@ -58,6 +42,24 @@
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtPassword" class="form-label">Password</label>
                                 <input id="txtPassword" name="password" type="password" minlength="5" maxlength="10" title="Please enter minimum 5 characters" class="form-control">
+                            </div>
+                            <div class="intro-y col-span-12 sm:col-span-4">
+                                <label for="ddlAppointmentInterval" class="form-label">Appointment slot interval</label>
+                                <select id="ddlAppointmentInterval" name="appointmentInterval" class="form-select" required>
+                                    <option value='0'>Select Appointment Interval</option>
+                                    <option value='5'>5 minutes</option>
+                                    <option value='10'>10 minutes</option>
+                                    <option value='15'>15 minutes</option>
+                                    <option value='20'>20 minutes</option>
+                                    <option value='25'>25 minutes</option>
+                                    <option value='30'>30 minutes</option>
+                                    <option value='35'>35 minutes</option>
+                                    <option value='40'>40 minutes</option>
+                                    <option value='45'>45 minutes</option>
+                                    <option value='50'>50 minutes</option>
+                                    <option value='55'>55 minutes</option>
+                                    <option value='60'>60 minutes</option>
+                                </select>
                             </div>
                             <div class="intro-y col-span-12 sm:col-span-4">
                                 <label for="txtDOB" class="form-label">Date of Birth</label>

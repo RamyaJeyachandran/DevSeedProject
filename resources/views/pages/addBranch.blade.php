@@ -20,15 +20,6 @@
                         <label for="txtLogo" class="form-label">Logo</label>
                         <input id="txtLogo" name="logo" accept="image/*" type="file" class="form-control">
                         </div>
-                        @can('isAdmin')
-                            <div class="intro-y col-span-12 sm:col-span-4 form-control">
-
-                            <label for="ddlHospital" class="form-label">Hospital Name</label>
-                                            <select id="ddlHospital" name="hospitalId" class="form-select" required>
-                                                <option value='0'>Select Hospital</option>
-                                            </select>
-                            </div>
-                        @endcan
                         <div class="intro-y col-span-12 sm:col-span-4 form-control">
                         <label for="txtHospitalName" class="form-label">Branch Hospital Name <span class="text-danger mt-2"> *</span></label>
                                         <input id="txtHospitalName" type="text" name="branchName" class="form-control" required>

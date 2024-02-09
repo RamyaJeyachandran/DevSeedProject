@@ -20,7 +20,7 @@
                     <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5">
                              <input id="txtPageSettingId" name="pageSettingId" type="hidden" value="{{$printSettingDetails->id}}" class="form-control">
                             <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
-                            <input id="colorId" name="colorId" value="{{ session('colorId') }}" type="hidden" class="form-control">
+                            <!-- <input id="colorId" name="colorId" value="{{ session('colorId') }}" type="hidden" class="form-control"> -->
                             <div class="intro-y col-span-12 sm:col-span-3">
                                 <label for="txtMarginRight" class="form-label">Margin Right <span class="text-danger mt-2"> *</span></label>
                                 <div class="input-group">
@@ -49,9 +49,16 @@
                                 <div id="txttopGroup" class="input-group-text">cm</div>
                                 </div>
                             </div>
+                            <div class="intro-y col-span-12 sm:col-span-12"> 
+                                <div class="form-check mr-2">
+                                     <input id="chkHeader" class="form-check-input" name="isHeaderDisplay" type="checkbox" value="1" disabled {{$printSettingDetails->isHeaderDisplay==1?'checked':''}} > 
+                                     <label class="form-check-label" for="chkHeader">Display header on report print
+                                     </label> 
+                                </div>
+                            </div>
                             <div class="intro-y col-span-12 justify-center sm:justify-end mt-5">
-                                <button id="btnUpdPrintSetting" type=submit class="btn btn-primary w-24 ml-2">Update</button>
-                                <button id="btnCancelPrintSetting" type="reset" class="btn btn-dark w-24">Cancel</button> 
+                                <button id="btnUpdPrintSetting" type=submit class="btn btn-primary w-24 ml-2"><i data-lucide="edit" class="w-4 h-4 mr-2"></i>Update</button>
+                                <button id="btnCancelPrintSetting" type="reset" class="btn btn-dark w-24"><i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>Cancel</button> 
                             </div>
                         </div></div>
                           <!-- BEGIN: Success Modal Content --> 
@@ -89,5 +96,4 @@
 @push('js')
 <script type="module" src="{{ asset('dist/js/app.js')}}"></script>
 <script  type="module" src="{{ asset('dist/js/settings.js')}}"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js" integrity="sha512-dQIiHSl2hr3NWKKLycPndtpbh5iaHLo6MwrXm7F0FM5e+kL2U16oE9uIwPHUl6fQBeCthiEuV/rzP3MiAB8Vfw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 @endpush

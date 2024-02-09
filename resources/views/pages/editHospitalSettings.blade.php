@@ -44,6 +44,10 @@
                                         <input id="txtContactPhNo" name="inChargePhoneNo" value="{{$hospitalDetails->inChargePhoneNo}}" type="text" class="form-control" required>
                                     </div>
                                     <div class="mt-3">
+                                        <label for="txtBranchLimit" class="form-label">Branch Limit <span class="text-danger mt-2"> *</span></label>
+                                        <input id="txtBranchLimit" name="branchLimit" value="{{$hospitalDetails->branchLimit}}" type="number" class="form-control" required>
+                                    </div>
+                                    <div class="mt-3">
                                         <button id="btnEditHospital" type=submit class="btn btn-danger w-24 ml-2"><i data-lucide="edit" class="w-4 h-4 mr-2"></i>Update</button>
                                     </div>
                                 </div>

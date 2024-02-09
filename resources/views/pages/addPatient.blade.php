@@ -29,23 +29,6 @@
                     <div class="intro-y col-span-12 sm:col-span-4 form-control"><div id="results">
                     
                     </div></div>
-                    @can('isAdmin')
-                    <div class="intro-y col-span-12 sm:col-span-4 form-control">
-                                <label for="ddlHospital" class="form-label">Hospital </label>
-                                <select id="ddlHospital" name="hospitalId" class="form-select">
-                                    <option value='0'>Select Hospital</option>
-                                </select>
-                            </div>
-                    @endcan
-                    @can('isAdminHospital')
-                            <div id="divBranchddl" class="intro-y col-span-12 sm:col-span-4 form-control">
-                                <label for="ddlBranch" class="form-label">Branch </label>
-                                <select id="ddlBranch" name="branchId" class="form-select">
-                                    <option value='0'>Select Branch</option>
-                                </select>
-                            </div>
-                        @endcan
-
                             <div class="intro-y col-span-12 sm:col-span-4 form-control">
                                 <label for="txtName" class="form-label">Patient Name <span class="text-danger mt-2"> *</span></label>
                                 <input id="txtName" name="name" type="text" class="form-control" required>

@@ -95,7 +95,7 @@
                                                 <div class="flex">
                                                     <i data-lucide="layers" class="report-box__icon text-primary"></i> 
                                                 </div>
-                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['hospitalWiseTotal']->total_branches}}</div>
+                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['hospitalWiseTotal']==null?0:$dashboardDetails['hospitalWiseTotal']->total_branches}}</div>
                                                 <div class="text-base text-slate-500 mt-1">Total Branches</div>
                                             </div>
                                         </div>
@@ -106,7 +106,7 @@
                                                 <div class="flex">
                                                     <i data-lucide="activity" class="report-box__icon text-pending"></i> 
                                                 </div>
-                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['hospitalWiseTotal']->total_doctors}}</div>
+                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['hospitalWiseTotal']==null?0:$dashboardDetails['hospitalWiseTotal']->total_doctors}}</div>
                                                 <div class="text-base text-slate-500 mt-1">Total Doctors</div>
                                             </div>
                                         </div>
@@ -117,7 +117,7 @@
                                                 <div class="flex">
                                                     <i data-lucide="user" class="report-box__icon text-warning"></i> 
                                                 </div>
-                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['hospitalWiseTotal']->total_patients}}</div>
+                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['hospitalWiseTotal']==null?0:$dashboardDetails['hospitalWiseTotal']->total_patients}}</div>
                                                 <div class="text-base text-slate-500 mt-1">Total Patients</div>
                                             </div>
                                         </div>
@@ -164,7 +164,7 @@
                                                 <div class="flex">
                                                     <i data-lucide="activity" class="report-box__icon text-primary"></i> 
                                                 </div>
-                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['branchWiseTotal']->total_doctors}}</div>
+                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['branchWiseTotal']==null ? 0: $dashboardDetails['branchWiseTotal']->total_doctors}}</div>
                                                 <div class="text-base text-slate-500 mt-1">Total Doctors</div>
                                             </div>
                                         </div>
@@ -175,7 +175,7 @@
                                                 <div class="flex">
                                                     <i data-lucide="user" class="report-box__icon text-pending"></i> 
                                                 </div>
-                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['branchWiseTotal']->total_patients}}</div>
+                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['branchWiseTotal']==null?0:$dashboardDetails['branchWiseTotal']->total_patients}}</div>
                                                 <div class="text-base text-slate-500 mt-1">Total Patients</div>
                                             </div>
                                         </div>
@@ -186,7 +186,7 @@
                                                 <div class="flex">
                                                     <i data-lucide="calendar" class="report-box__icon text-warning"></i> 
                                                 </div>
-                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['branchWiseTotal']->total_appointments}}</div>
+                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['branchWiseTotal']==null?0:$dashboardDetails['branchWiseTotal']->total_appointments}}</div>
                                                 <div class="text-base text-slate-500 mt-1">Total Appointments</div>
                                             </div>
                                         </div>
@@ -236,7 +236,7 @@
                                                 <div class="flex">
                                                     <i data-lucide="user" class="report-box__icon text-primary"></i> 
                                                 </div>
-                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['appointmentTotal']->total_patient}}</div>
+                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['appointmentTotal']==null?0:$dashboardDetails['appointmentTotal']->total_patient}}</div>
                                                 <div class="text-base text-slate-500 mt-1">Total Patients</div>
                                             </div>
                                         </div>
@@ -247,7 +247,7 @@
                                                 <div class="flex">
                                                     <i data-lucide="calendar" class="report-box__icon text-pending"></i> 
                                                 </div>
-                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['appointmentTotal']->total_patient}}</div>
+                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['appointmentTotal']==null?0:$dashboardDetails['appointmentTotal']->total_patient}}</div>
                                                 <div class="text-base text-slate-500 mt-1">Total Appointments</div>
                                             </div>
                                         </div>
@@ -258,7 +258,7 @@
                                                 <div class="flex">
                                                     <i data-lucide="layout" class="report-box__icon text-warning"></i> 
                                                 </div>
-                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['appointmentTotal']->today_appointment}}</div>
+                                                <div class="text-3xl font-medium leading-8 mt-6">{{$dashboardDetails['appointmentTotal']==null?0:$dashboardDetails['appointmentTotal']->today_appointment}}</div>
                                                 <div class="text-base text-slate-500 mt-1">Today Total Appointments</div>
                                             </div>
                                         </div>

@@ -20,7 +20,7 @@ return new class extends Migration
 
             $table->foreign('refferedByDoctorId')->references('id')->on('doctors');
             $table->foreign('witnessHospitalId')->references('id')->on('doctors');
-            $table->foreign('witnessBankId')->references('id')->on('doctors');
+            $table->foreign('witnessBankId')->references('id')->on('bank_witnesses');
             $table->foreign('donorBankId')->references('id')->on('donorBanks');
          });
     }
