@@ -125,6 +125,9 @@ class HospitalBranchController extends Controller
                         }
                     }
                 }
+                  //Create Consent form 
+                  $userId=$user_obj->getDecryptedId($request->userId);
+                  $user_obj->addConsentForm($hospitalId,$branchId,$userId);
             }
 
             $result['ShowModal'] = 1;

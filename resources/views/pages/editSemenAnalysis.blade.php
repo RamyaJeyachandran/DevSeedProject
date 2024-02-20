@@ -357,7 +357,49 @@
         </div>
     </div>
 </div>
+<!-- Image Capture BEGIN-->
+@if($semenanalysisDetails->isSetImg==1 || $semenanalysisDetails->imgCount>0)
+<div id="divEditImageCaputre" class="intro-y box p-5 mt-5">
+<nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item active font-medium text-base  mr-auto" aria-current="page"> Capture Images  
+                <input id="btnEditOnCam" type="button" value="On Camera" class="btn btn-pending w-24  {{$semenanalysisDetails->isSetImg == 1 ?'':'hidden'}}">
 
+                            </li>
+                        </ol>
+                    </nav>
+                    <!-- BEGIN: Uplaod Images -->
+                        <div id="divEditCaptureImage" class="intro-y box p-5 {{$semenanalysisDetails->imgCount>0 ?'':'hidden'}}">
+                            <div class="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
+                                <div class="mt-5">
+                                    <div class="form-inline items-start flex-col xl:flex-row mt-10">
+                                        <div class="form-label w-full xl:w-64 xl:!mr-10">
+                                            <div class="text-left">
+                                            <!-- Image capture from camera -- Begin  -->
+                                                <div id="edit_my_camera"></div>
+                                                <br/>
+                                                <input id="btnEditCaptureImg" type=button value="Caputre Images" class="btn btn-primary shadow-md mr-2 hidden">
+                                             <!-- Image capture from camera -- END  -->
+                                            </div>
+                                        </div>
+                                        <input id="txtEditImgCount" name="imgCount" value="{{$semenanalysisDetails->imgCount}}" type="hidden" class="form-control">
+                                        <input id="txtDelAnalysisImage" name="delAnalysisImage"  type="hidden" class="form-control">
+                                        <div id="divEditImg" class="w-full mt-3 xl:mt-0 flex-1 border-2 border-dashed dark:border-darkmode-400 rounded-md pt-4">
+                                            <div id="divEditDisplayImg" class="grid grid-cols-10 gap-5 pl-4 pr-5">
+                                           
+                                            </div>
+                                            <div class="px-4 pb-4 mt-5 flex items-center justify-center cursor-pointer relative">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END: Uplaod Images -->
+                       
+</div>
+@endif
+<!-- Image Capture END -->
     </div>
 
     </form>
@@ -404,4 +446,5 @@
     @push('js')
     <script src="{{ asset('dist/js/app.js')}}"></script>
     <script  type="module" src="{{ asset('dist/js/semenAnalysis.js')}}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js" integrity="sha512-dQIiHSl2hr3NWKKLycPndtpbh5iaHLo6MwrXm7F0FM5e+kL2U16oE9uIwPHUl6fQBeCthiEuV/rzP3MiAB8Vfw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     @endpush

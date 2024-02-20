@@ -16,7 +16,7 @@
                     <div class="intro-y box p-5 mt-5">
                     <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5">
                             <input id="txtUser" name="userId" value="{{ session('userId') }}" type="hidden" class="form-control">
-                            @can('isAdmin')
+                            @if(Session::has('isAdmin') && Session::get('isAdmin'))
                             <div class="intro-y col-span-12 sm:col-span-6">
                                 <label for="ddlHospital" class="form-label">Hospital <span class="text-danger mt-2"> *</span></label>
                                 <select id="ddlHospital"  value="{{$details->defaultHospitalId}}" name="hospitalId" class="form-select" required>
@@ -28,7 +28,7 @@
                                 @endforeach    
                                 </select>
                             </div>
-                            @endcan
+                            @endif
                             <div id="divBranchddl" class="intro-y col-span-12 sm:col-span-6">
                                 <label for="ddlBranch" class="form-label">Branch</label>
                                 <select id="ddlBranch"  value="{{$details->defaultBranchId}}" name="branchId" class="form-select">

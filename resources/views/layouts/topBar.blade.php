@@ -16,33 +16,33 @@
                             <ul class="dropdown-content bg-primary text-white">
                                 <li class="p-2">
                                     <a href="javascript:;.html" class="intro-x flex items-center">
-                                        @can('isDoctor')
+                                        @if(Session::has('isDoctor') && Session::get('isDoctor'))
                                         <img class="w-10 rounded-full" src="{{ session('profileImage') }}">
-                                        @endcan
-                                        @can('isAdminHospitalBranch')
+                                        @endif
+                                        @if(Session::has('isAdminHospitalBranch') && Session::get('isAdminHospitalBranch'))
                                         <img class="w-10 rounded-full" src="{{ session('logo') }}">
-                                        @endcan
+                                        @endif
                                         <span class="hidden xl:block text-white text-lg ml-3"> {{session('userName')}} </span>
                                     </a>
                                 </li>
                                 <li>
                                     <hr class="dropdown-divider border-white/[0.08]">
                                 </li>
-                                @can('isNotAdmin')
+                                @if(Session::has('isNotAdmin') && Session::get('isNotAdmin'))
                                 <li>
                                     <a href="{{ url('Profile') }}/{{ session('userId')}}" class="dropdown-item hover:bg-white/5"> <i data-lucide="user" class="w-4 h-4 mr-2"></i> Profile </a>
                                 </li>
-                                @endcan
+                                @endif
                                 <li>
                                     <a href="{{ url('ResetPassword') }}/{{ session('userId')}}" class="dropdown-item hover:bg-white/5"> <i data-lucide="lock" class="w-4 h-4 mr-2"></i> Reset Password </a>
                                 </li>
-                                @can('isAdminHospital')
+                                @if(Session::has('isAdminHospital') && Session::get('isAdminHospital'))
                                 @if(session('branchLimit') < 2)
                                 <li>
                                     <a href="{{ url('SefDefaultHospital') }}/{{ session('userId')}}" class="dropdown-item hover:bg-white/5"> <i data-lucide="git-branch" class="w-4 h-4 mr-2"></i> Set Default Hospital </a>
                                 </li>
                                 @endif
-                                @endcan
+                                @endif
                                 <li>
                                     <a href="{{ url('ColourTheme') }}/{{ session('userId')}}" class="dropdown-item hover:bg-white/5"> <i data-lucide="zap" class="w-4 h-4 mr-2"></i>Color Theme </a>
                                 </li>

@@ -4,6 +4,8 @@ import Tabulator from "tabulator-tables";
 import colors from "./colors";
 import Chart from "chart.js/auto";
 import TomSelect from "tom-select";
+import tippy, { roundArrow } from "tippy.js";
+
 // import { forEach } from "lodash";
 
 (function () {
@@ -26,16 +28,16 @@ window.addEventListener("load", (e) => {
     e.preventDefault();
     var pathname = window.location.pathname;
      //Local Path
-    var base_url = window.location.origin;
-    localStorage.setItem("base_url", base_url);
-    var serverPath='';
-    var serverPath2='';
+    // var base_url = window.location.origin;
+    // localStorage.setItem("base_url", base_url);
+    // var serverPath='';
+    // var serverPath2='';
     
     //server Path
-    // var base_url = window.location.origin+'/seed/public';
-    // localStorage.setItem("base_url", base_url);
-    // var serverPath='/seed/public/index.php';
-    // var serverPath2='/seed/public';
+    var base_url = window.location.origin+'/seed/public';
+    localStorage.setItem("base_url", base_url);
+    var serverPath='/seed/public/index.php';
+    var serverPath2='/seed/public';
    
     if(document.getElementById("divYear")!=null)
     {
@@ -205,6 +207,24 @@ window.addEventListener("load", (e) => {
     setMobileMenu("[id*=lnkMobileAppointment]","[id*=ulMobileAppointment]","[id*=aMobileAppointment]","[id*=aMobileAppointmentSearch]",0);
     addAppointmentLoadEvent(base_url);
     loadHospital(base_url);
+      /*set tom-select for dropdown */
+      let options = {
+        plugins: {
+            dropdown_input: {},
+            clear_button :{},
+        },
+    };
+    new TomSelect('#ddlAppointmentPatient', options);
+
+    document.querySelectorAll("form").forEach((formElement) => {
+        formElement.addEventListener("reset", (event) => {
+          event.target
+            .querySelectorAll(".tomselected")
+            .forEach((tomselectedElement) => {
+              tomselectedElement.tomselect.clear();
+            });
+        });
+      });
 }
  if(pathname==serverPath+'/AllAppointments' || pathname==serverPath2+'/AllAppointments')
 {
@@ -2122,7 +2142,6 @@ $( "#btnHsRedirect" ).on( "click", function() {
               },
         }
         var url=base_url+'/api/listAllHospital';
-        console.log(token);
         fetch(url,options)
                 .then(response => response.json())
                 .then(function (result) {
@@ -2768,8 +2787,17 @@ function consentFormOnLoad(){
                         var formList=data.consentList;
                         var i=1;
                         formList.forEach(function(value, key) {
-                            html = '<div id=div'+i+' class="intro-x bg-primary text-white cursor-pointer box relative flex items-center p-5 '+(i>1?'mt-5':'')+' "><div class="form-check mt-2"> <input id="chk'+value.id+'" class="form-check-input" type="checkbox"><label class="form-check-label" for="chk'+value.id+'"> <div class="flex items-center"><a href="javascript:;" class="font-medium">'+value.formName+'</a> </div></label></div><span class="tooltiptext">'+value.formTitle+'</span></div>'; 
+                            var ctrl_name='div'+i;
+                            html = '<div id='+ctrl_name+' title="'+value.formTitle+'" class="intro-x bg-primary text-white cursor-pointer box relative flex items-center p-5 '+(i>1?'mt-5':'')+' "><div class="form-check mt-2"> <input id="chk'+value.id+'" class="form-check-input" type="checkbox"><label class="form-check-label" for="chk'+value.id+'"> <div class="flex items-center"><a href="javascript:;" class="font-medium">'+value.formName+'</a> </div></label></div></div>'; 
                             $('#divFormNameList').append(html);
+                            let options = {
+                                content: $('#'+ctrl_name).attr("title"),
+                            };
+                            tippy($('#'+ctrl_name), {
+                                arrow: roundArrow,
+                                animation: "shift-away",
+                                ...options,
+                            });
                                     // Consent for display -- BEGIN
                                     $("#div"+i).on("click",function(){
                                                 $(".chat__box")
@@ -3215,8 +3243,17 @@ function loadViewConsentForm(){
                         var formList=data.consentList;
                         var i=1;
                         formList.forEach(function(value, key) {
-                            html = '<div id=div'+i+' class="intro-x bg-primary text-white cursor-pointer box relative flex items-center p-5 '+(i>1?'mt-5':'')+'"><div class="flex items-center"><a href="javascript:;" class="font-medium">'+value.formName+'</a> </div><span class="tooltiptext">'+value.formTitle+'</span></div> '; 
+                            var ctrl_name='div'+i;
+                            html = '<div id='+ctrl_name+' title="'+value.formTitle+'" class="intro-x bg-primary text-white cursor-pointer box relative flex items-center p-5 '+(i>1?'mt-5':'')+'"><div class="flex items-center"><a href="javascript:;" class="font-medium">'+value.formName+'</a> </div></div> '; 
                             $('#divFormNameList').append(html);
+                            let options = {
+                                content: $('#'+ctrl_name).attr("title"),
+                            };
+                            tippy($('#'+ctrl_name), {
+                                arrow: roundArrow,
+                                animation: "shift-away",
+                                ...options,
+                            });
                                     // Consent for display -- BEGIN
                                     $("#div"+i).on("click",function(){
                                                 $(".chat__box")
@@ -3256,7 +3293,8 @@ function clearTabData(tabNo){
 switch(tabNo){
     case 1:
         $("#divPatientInfo").addClass('hidden');
-        $("#txtHcNo").val("");
+        $('#txtPatient').val("");
+        $('#ddlAppointmentPatient').val('0');
         break;
     case 2:
         $("#txtName").val("");
@@ -3340,83 +3378,67 @@ function addAppointmentLoadEvent(base_url){
      });      
     
      //Display Patient Information
-     $('#txtHcNo').on("keypress", function(e) {
-        if (e.key == "Enter") {
-            e.preventDefault();
-            var hcNo=$("#txtHcNo").val();
+     $( "#ddlAppointmentPatient" ).on( "change", function() {
+        var patientId=$("#ddlAppointmentPatient").val();
+        $("#txtPatient").val(patientId);
             const errorModal = tailwind.Modal.getInstance(document.querySelector("#divErrorAppointment"));
-            if(hcNo==null || hcNo==0)
-            {
-                clearTabData(1);
-                $('#divAppErrorHead span').text("Invalid Registered Number");
-                $('#divAppErrorMsg span').text("Please enter the valid registered number");
-                    errorModal.show();
-                return false;
-            }
-            var url=base_url+'/api/registeredPatientInfo/'+hcNo+'/'+hospitalId+'/'+branchId;
+            var url=base_url+'/api/registeredPatientInfo/'+patientId+'/'+hospitalId+'/'+branchId;
             fetch(url, options)
-        .then(function(response){ 
-            return response.json(); 
-        })
-        .then(function(data){ 
-            if(data.Success=='Success'){
-                if(data.patientDetails!=null){
-                    
-                    $('#txtPatientId').val(data.patientDetails.patientId);
-                        $(imgProfileImage).attr("src",data.patientDetails.profileImage);
-                        $('#lblHcNo span').text(data.patientDetails.hcNo);
-                        $('#lblName span').text(data.patientDetails.name);
-                        $('#lblPhoneNo span').text(data.patientDetails.phoneNo);
-                        $('#lblEmail span').text(data.patientDetails.email);
-                        $('#lblDob span').text(data.patientDetails.dob);
-                        $('#lblAge span').text(data.patientDetails.age);
-                        $('#lblGender span').text(data.patientDetails.gender);
-                        $('#lblBloodGrp span').text(data.patientDetails.bloodGroup);
-                        $('#lblMartialStatus span').text(data.patientDetails.martialStatus);
-                        $('#lblHeight span').text(data.patientDetails.patientHeight);
-                        $('#lblWeight span').text(data.patientDetails.patientWeight);
-                        $('#lblAddress span').text(data.patientDetails.address);
-                        $('#lblCity span').text(data.patientDetails.city);
-                        $('#lblState span').text(data.patientDetails.state);
-                        $('#lblPincode span').text(data.patientDetails.pincode);
-                        $('#lblReason span').text(data.patientDetails.reason);
-                        $('#lblSpouseName span').text(data.patientDetails.spouseName);
-                        $('#lblSpousePhNo span').text(data.patientDetails.spousePhnNo);
+            .then(function(response){ 
+                return response.json(); 
+             })
+            .then(function(data){ 
+                if(data.Success=='Success'){
+                    if(data.patientDetails!=null){
+                        $('#txtPatientId').val(data.patientDetails.patientId);
+                            $(imgProfileImage).attr("src",data.patientDetails.profileImage);
+                            $('#lblHcNo span').text(data.patientDetails.hcNo);
+                            $('#lblName span').text(data.patientDetails.name);
+                            $('#lblPhoneNo span').text(data.patientDetails.phoneNo);
+                            $('#lblEmail span').text(data.patientDetails.email);
+                            $('#lblDob span').text(data.patientDetails.dob);
+                            $('#lblAge span').text(data.patientDetails.age);
+                            $('#lblGender span').text(data.patientDetails.gender);
+                            $('#lblBloodGrp span').text(data.patientDetails.bloodGroup);
+                            $('#lblMartialStatus span').text(data.patientDetails.martialStatus);
+                            $('#lblHeight span').text(data.patientDetails.patientHeight);
+                            $('#lblWeight span').text(data.patientDetails.patientWeight);
+                            $('#lblAddress span').text(data.patientDetails.address);
+                            $('#lblCity span').text(data.patientDetails.city);
+                            $('#lblState span').text(data.patientDetails.state);
+                            $('#lblPincode span').text(data.patientDetails.pincode);
+                            $('#lblReason span').text(data.patientDetails.reason);
+                            $('#lblSpouseName span').text(data.patientDetails.spouseName);
+                            $('#lblSpousePhNo span').text(data.patientDetails.spousePhnNo);
 
-                        $("#divPatientInfo").removeClass("hidden").removeAttr("style");
+                            $("#divPatientInfo").removeClass("hidden").removeAttr("style");
+                    }else{
+                        $('#divAppErrorHead span').text("Invalid Registered Number");
+                        $('#divAppErrorMsg span').text("Please enter the valid registered number");
+                        $("#divPatientInfo").addClass('hidden');
+                        errorModal.show();
+                        return false;
+                    }
                 }else{
-                    $('#divAppErrorHead span').text("Invalid Registered Number");
-                    $('#divAppErrorMsg span').text("Please enter the valid registered number");
-                    $("#divPatientInfo").addClass('hidden');
-                    errorModal.show();
-                    return false;
+                    $('#divAppErrorHead span').text(data.Success);
+                    $('#divAppErrorMsg span').text(data.Message);
+                    if (data.ShowModal==1) {
+                        $("#divPatientInfo").addClass('hidden');
+                        errorModal.show();
+                    }else if(data.ShowModal==2)
+                    {
+                        logoutSession(data.Message);
+                    }
                 }
-            }else{
-                $('#divAppErrorHead span').text(data.Success);
-                $('#divAppErrorMsg span').text(data.Message);
-                if (data.ShowModal==1) {
-                    $("#divPatientInfo").addClass('hidden');
-                    errorModal.show();
-                }else if(data.ShowModal==2)
-                {
-                   logoutSession(data.Message);
-                }
-            }
-        })
-        .catch(function(error){
-            $('#divAppErrorHead span').text('Error');
-            $('#divAppErrorMsg span').text(error);
-            $("#divPatientInfo").addClass('hidden');
-            errorModal.show();
-        }); 
-
-            return false; 
-        }
-});      
+            })
+            .catch(function(error){
+                $('#divAppErrorHead span').text('Error');
+                $('#divAppErrorMsg span').text(error);
+                $("#divPatientInfo").addClass('hidden');
+                errorModal.show();
+            }); 
+        });
 }
-$("#ddlDoctor").on('change',function() {
-    
-});
  /* --------------- Patient Add form submit Begins ------------------------*/
 
  const appointmentForm = document.getElementById('frmAppointment');
@@ -3482,8 +3504,8 @@ $("#ddlDoctor").on('change',function() {
     clearTabData(1);
     clearTabData(2);
     $("#txtTabNo").val(1);
-    const myTab = tailwind.Tab.getInstance(document.querySelector("#divPatientTab1"));
-    myTab.show();
+    // const myTab = tailwind.Tab.getInstance(document.querySelector("#divPatientTab1"));
+    // myTab.show();
  });
 /*------------------------------------------- Appointment Search BEGIN -------------------------*/ 
 function setAppointmentTabulator(){

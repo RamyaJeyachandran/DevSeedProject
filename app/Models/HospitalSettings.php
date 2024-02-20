@@ -188,11 +188,11 @@ class HospitalSettings extends Model
                                                                     $join->on('hospitalbranch.hospitalId', '=', 'hospitalsettings.id')
                                                                     ->where('hospitalbranch.is_active','=',1);                                                   
                                                                 })
-                                                                ->joinSub($doctor_sub_table, 'doctor_sub', function (JoinClause $join)
+                                                                ->leftJoinSub($doctor_sub_table, 'doctor_sub', function (JoinClause $join)
                                                                 {
                                                                     $join->on('hospitalsettings.id', '=', 'doctor_sub.hospitalId');
                                                                 })
-                                                                ->joinSub($patient_sub_table, 'patient_sub', function (JoinClause $join)
+                                                                ->leftJoinSub($patient_sub_table, 'patient_sub', function (JoinClause $join)
                                                                 {
                                                                     $join->on('hospitalsettings.id', '=', 'patient_sub.hospitalId');
                                                                 })

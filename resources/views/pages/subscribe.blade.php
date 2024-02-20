@@ -15,22 +15,22 @@
     <div class="grid grid-cols-12 gap-4 gap-y-5 mt-5">
                     <input id="txtHospital" name="hospitalId" value="{{ session('hospitalId') }}" type="hidden" class="form-control">
                     <input id="txtBranch" name="branchId" value="{{ session('branchId') }}" type="hidden" class="form-control">
-                    @can('isAdmin')
+                    @if(Session::has('isAdmin') && Session::get('isAdmin'))
                     <div class="intro-y col-span-12 sm:col-span-6 form-control">
                                 <label for="ddlSubHospital" class="form-label">Hospital </label>
                                 <select id="ddlSubHospital" name="hospitalId" class="form-select">
                                     <option value='0'>Select Hospital</option>
                                 </select>
                             </div>
-                    @endcan
-                    @can('isAdminHospital')
+                    @endif
+                    @if(Session::has('isAdminHospital') && Session::get('isAdminHospital'))
                             <div id="divSubBranchddl" class="intro-y col-span-12 sm:col-span-6 form-control">
                                 <label for="ddlSubBranch" class="form-label">Branch </label>
                                 <select id="ddlSubBranch" name="branchId" class="form-select">
                                     <option value='0'>Select Branch</option>
                                 </select>
                             </div>
-                        @endcan
+                        @endif
     </div>
 </div>
 

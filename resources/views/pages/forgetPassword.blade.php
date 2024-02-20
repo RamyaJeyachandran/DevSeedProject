@@ -34,7 +34,7 @@
                            Forget Password
                         </h2>
                         <div class="intro-x mt-8">
-                        <input id="txtCompany" name="companyId" value="2" type="hidden" class="form-control">
+                        <input id="txtCompany" name="companyId" value="{{$companyId}}" type="hidden" class="form-control">
                             <input id="txtEmail" name="emailId" type="email" class="intro-x login__input form-control py-3 px-4 block" placeholder="example@gmail.com">
                             <input id="txtPassword" name="newPassword" type="password" class="intro-x login__input form-control py-3 px-4 block mt-4" placeholder="New Password">
                             <input id="txtConfirmPassword" name="confirmPassword" type="password" class="intro-x login__input form-control py-3 px-4 block mt-4" placeholder="Confirm Password">

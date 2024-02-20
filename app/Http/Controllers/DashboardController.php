@@ -270,10 +270,15 @@ class DashboardController extends Controller
             $result['Message']="Validation failed. Please fill the required fields";
             return response()->json($result,200);
         }
+        // $hospitalId=(isset($request->hospitalId) && !empty($request->hospitalId));
         $user_obj=new User;
         $userDetails=$user_obj->updateDefaultHospital($request);
         $branchId= ($request->branchId==0|| $request->branchId==null) ?$user_obj->getEncryptedId(0): $request->branchId;
-        $request->session()->put('hospitalId', $request->hospitalId);
+        $hosptialId= (isset($request->hosptialId) && !empty($request->hosptialId)) ? 1:0;
+        if($hosptialId>0)
+        {
+            $request->session()->put('hospitalId', $request->hospitalId);
+        }
         $request->session()->put('branchId', $branchId);
              
             $result['ShowModal']=1;

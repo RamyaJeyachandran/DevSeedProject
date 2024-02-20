@@ -267,7 +267,6 @@ class doctor extends Model
     }   
     public function getLogoByHospitalId($id){
         $user = new User;
-        // $original_id=$user->getDecryptedId($id);
        return DB::table('doctors')->selectRaw("HEX(AES_ENCRYPT(doctors.hospitalId,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as hospitalId,HEX(AES_ENCRYPT(COALESCE(doctors.branchId,0),UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as branchId,doctors.profileImage,doctors.name as doctorName,hospitalsettings.logo,COALESCE(hospitalbranch.branchName,hospitalsettings.hospitalName)  as name")
                                     ->Join('hospitalsettings', 'hospitalsettings.id', '=', 'doctors.hospitalId')
                                     ->leftJoin('hospitalbranch', function($join)

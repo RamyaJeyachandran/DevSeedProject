@@ -17,19 +17,19 @@
                 <div class="intro-y box px-5 pt-5 mt-5">
                 <div class="flex flex-col sm:flex-row items-center border-t border-slate-200/60 dark:border-darkmode-400 pt-5" >
                 <h2 class="text-3xl text-slate-600 dark:text-slate-500 font-medium leading-none mt-3">
-                 @can('isBranch') {{ $profileDetails->hospitalName }} - @endcan {{ $profileDetails->Name }}
+                 @if(Session::has('isBranch') && Session::get('isBranch')) {{ $profileDetails->hospitalName }} - @endif {{ $profileDetails->Name }}
                                     </h2>
                              
                                             <div class="flex sm:ml-auto mt-5 sm:mt-0">
-                                                @can('isHospital')
+                                            @if(Session::has('isHospital') && Session::get('isHospital'))
                                             <button onclick="window.location='{{ url("showHospital/$profileDetails->id ")}}'" href="javascript:;" class="btn btn-primary w-24"><i data-lucide="edit" class="w-4 h-4 mr-2"></i>Edit</button>
-                                            @endcan
-                                            @can('isBranch')
+                                            @endif
+                                           @if(Session::has('isBranch') && Session::get('isBranch'))
                                             <button onclick="window.location='{{ url("showBranch/$profileDetails->id ")}}'" href="javascript:;" class="btn btn-primary w-24"><i data-lucide="edit" class="w-4 h-4 mr-2"></i>Edit</button>
-                                            @endcan
-                                            @can('isDoctor')
+                                            @endif
+                                            @if(Session::has('isDoctor') && Session::get('isDoctor'))
                                             <button onclick="window.location='{{ url("showDoctor/$profileDetails->id ")}}'" href="javascript:;" class="btn btn-primary w-24"><i data-lucide="edit" class="w-4 h-4 mr-2"></i>Edit</button>
-                                            @endcan
+                                            @endif
                                             </div>
                                         </div>
                     <div class="flex flex-col lg:flex-row border-b border-slate-200/60 dark:border-darkmode-400 pb-5 -mx-5">
@@ -44,17 +44,17 @@
                                 <div class="truncate sm:whitespace-normal flex items-center tooltip" title="Phone No"> <i data-lucide="phone" class="w-4 h-4 mr-2"></i> {{ $profileDetails->phoneNo }}</div>
                                 <div class="truncate sm:whitespace-normal flex items-center mt-3 tooltip" title="Email Id"> <i data-lucide="mail" class="w-4 h-4 mr-2"></i> {{ $profileDetails->email }} </div>
                                 <div class="truncate sm:whitespace-normal flex items-center mt-3 tooltip" title="Address"> <i data-lucide="home" class="w-4 h-4 mr-2"></i> {{ $profileDetails->address }}</div>
-                                @can('isHospitalBranch')
+                                @if(Session::has('isHospitalBranch') && Session::get('isHospitalBranch'))
                                 <div class="truncate sm:whitespace-normal flex items-center mt-3 tooltip" title="Contact Person Name"> <i data-lucide="user" class="w-4 h-4 mr-2"></i> {{ $profileDetails->inChargePerson }}</div>
                                 <div class="truncate sm:whitespace-normal flex items-center mt-3 tooltip" title="Contact person phone number"> <i data-lucide="book-open" class=" w-4 h-4 mr-2"></i> {{ $profileDetails->inChargePhoneNo }}</div>
-                                @endcan
+                                @endif
                             </div>
                         </div>
                     </div>
                    
                 </div>
                 <!-- END: Profile Info -->
-                @can('isDoctor')
+                @if(Session::has('isDoctor') && Session::get('isDoctor'))
                 <div class="tab-content mt-5">
                     <div id="profile" class="tab-pane active" role="tabpanel" aria-labelledby="profile-tab">
                         <div class="grid grid-cols-12 gap-6">
@@ -166,7 +166,7 @@
                                 </div>
                             </div>
                             <!-- END: Latest Tasks -->
-                            @endcan
+                            @endif
                         </div>  
                     </div>
                 </div>    

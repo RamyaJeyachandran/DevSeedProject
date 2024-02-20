@@ -2,7 +2,7 @@
 <div class="mobile-menu md:hidden">
             <div class="mobile-menu-bar">
                 <a href="" class="flex mr-auto">
-                    <img alt="SEED" class="w-6" src="{{ asset('dist/images/logo.svg') }}">
+                <img alt="SEED" class="w-6" src="{{ session('logo') }}">
                 </a>
                 <a href="javascript:;" class="mobile-menu-toggler"> <i data-lucide="bar-chart-2" class="w-8 h-8 text-white"></i> </a>
                 <!-- transform -rotate-90 -->
@@ -17,7 +17,7 @@
                             <div class="menu__title"> Dashboard </div>
                         </a>
                     </li>
-                    @can('isAdmin')
+                    @if(Session::has('isAdmin') && Session::get('isAdmin'))
                     <li>
                         <a id="lnkMobileHospital" href="javascript:;.html" class="menu">
                             <div class="menu__icon"> <i data-lucide="folder-plus"></i> </div>
@@ -38,8 +38,8 @@
                             </li>
                         </ul>
                     </li>
-                    @endcan
-                    @can('isAdminHospital')
+                    @endif
+                    @if(Session::has('isAdminHospital') && Session::get('isAdminHospital'))
                     <li>
                         <a  id="lnkMobileBranch" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="layers"></i> </div>
@@ -60,8 +60,8 @@
                             </li>
                         </ul>
                     </li>
-                    @endcan
-                    @can('isAdminHospitalBranch')
+                    @endif
+                    @if(Session::has('isAdminHospitalBranch') && Session::get('isAdminHospitalBranch'))
                     <li>
                         <a  id="lnkMobileDoctor" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="activity"></i> </div>
@@ -82,7 +82,7 @@
                             </li>
                         </ul>
                     </li>
-                    @endcan
+                    @endif
                     <li>
                         <a  id="lnkMobilePatient" href="javascript:;" class="menu">
                             <div class="menu__icon"> <i data-lucide="users"></i> </div>
@@ -252,14 +252,14 @@
                             <div class="menu__title">  Settings  <i data-lucide="chevron-down" class="menu__sub-icon "></i> </div>
                         </a>
                         <ul  id="ulMobilePrint" class="">
-                    @can('isNotAdmin')
+                    @if(Session::has('isNotAdmin') && Session::get('isNotAdmin'))
                             <li>
                                 <a  id="aMobilePrint" href="{{ url('PrintSettings') }}" class="menu">
                                     <div class="menu__icon"> <i data-lucide="printer"></i> </div>
                                     <div class="menu__title"> Print Settings</div>
                                 </a>
                             </li>
-                    @endcan
+                    @endif
                     <li>
                                 <a  id="aMobileImageCapSettings" href="{{ url('ImageCaptureSettings') }}" class="menu">
                                     <div class="menu__icon"> <i data-lucide="image"></i> </div>
@@ -272,14 +272,14 @@
                                     <div class="menu__title"> Set Normal Values</div>
                                 </a>
                             </li>
-                            <!-- @can('isAdminHospitalBranch')
+                            <!-- @if(Session::has('isAdminHospitalBranch') && Session::get('isAdminHospitalBranch'))
                             <li>
                                 <a  id="aMobileDepartment" href="{{ url('Department') }}" class="menu">
                                     <div class="menu__icon"> <i data-lucide="layers"></i> </div>
                                     <div class="menu__title"> Department</div>
                                 </a>
                             </li>
-                            @endcan -->
+                            @endif -->
                         </ul>
                     </li>
                 </ul>

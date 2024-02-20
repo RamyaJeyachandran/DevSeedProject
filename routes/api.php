@@ -72,7 +72,7 @@ Route::group(['middleware' => ['api.customAuth']], function () {
   Route::post('savePatientConsent', [ConsentFromController::class, 'saveConsentForm']);
   Route::get('patientConsentList', [ConsentFromController::class, 'getPatientConsentDetails']);
   //Appointment
-  Route::get('registeredPatientInfo/{hcNo}/{hospitalId}/{branchId}', [AppointmentController::class, 'getPatientInfo']);
+  Route::get('registeredPatientInfo/{patientId}/{hospitalId}/{branchId}', [AppointmentController::class, 'getPatientInfo']);
   Route::post('addPatientAppointment', [AppointmentController::class, 'addAppointment']);
   Route::get('appointmentList', [AppointmentController::class, 'getAllAppointment']);
   Route::get('patientAppointmentInfo/{id}', [AppointmentController::class, 'getPatientAppointmentInfo']);
@@ -99,6 +99,7 @@ Route::group(['middleware' => ['api.customAuth']], function () {
   Route::get('SemenAnalysisList', [SemenAnalysisController::class, 'getAllSemenAnalysis']);
   Route::get('deleteSemenAnalysis/{id}/{userId}', [SemenAnalysisController::class, 'deleteSemenAnalysis']);
   Route::get('patientSemenSequenceNo/{patientId}', [SemenAnalysisController::class, 'getPatientSequenceNo']);
+  Route::get('analysisImages/{semenId}', [SemenAnalysisController::class, 'getAnalysisImages']);
   //Report
   Route::post('reportPatientWise', [ReportController::class, 'getReportPatientWise']);
   Route::post('reportPatientDetails', [ReportController::class, 'getPatientDetailReport']);

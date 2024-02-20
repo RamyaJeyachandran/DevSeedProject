@@ -12,7 +12,7 @@
     <div class="side-menu__title"> Dashboard </div>
     </a>
     </li>
-    @can('isAdmin')
+    @if(Session::has('isAdmin') && Session::get('isAdmin'))
     <li>
     <a id="lnkHospital" href="javascript:;.html" class="side-menu">
     <div class="side-menu__icon"> <i data-lucide="folder-plus"></i> </div>
@@ -36,8 +36,8 @@
 </li>
 </ul>
 </li>
-@endcan
-@can('isAdminHospital')
+@endif
+@if(Session::has('isAdminHospital') && Session::get('isAdminHospital'))
 @if(session('branchLimit') < 2)
 <li>
 <a id="lnkBranch" href="javascript:;.html" class="side-menu">
@@ -65,8 +65,8 @@
 </ul>
 </li>
 @endif
-@endcan
-@can('isAdminHospitalBranch')
+@endif
+@if(Session::has('isAdminHospitalBranch') && Session::get('isAdminHospitalBranch'))
 <li>
     <a id="lnkDoctor" href="javascript:;" class="side-menu">
     <div class="side-menu__icon"> <i data-lucide="activity"></i> </div>
@@ -96,7 +96,7 @@
         </li>        
     </ul>
 </li>
-@endcan
+@endif
 <li>
     <a id="lnkPatient" href="javascript:;.html" class="side-menu">
         <div class="side-menu__icon"> <i data-lucide="users"></i> </div>
@@ -251,14 +251,14 @@
         </li>
     </ul>
 </li>
-<!-- @can('isAdminHospitalBranch') -->
+<!-- @if(Session::has('isAdminHospitalBranch') && Session::get('isAdminHospitalBranch')) -->
 <!-- <li>
     <a id="lnkSubscribe" href="{{url('subscribe')}}" class="side-menu">
         <div class="side-menu__icon"> <i data-lucide="plus-square"></i> </div>
         <div class="side-menu__title"> Subscribe </div>
     </a>
 </li> -->
-<!-- @endcan -->
+<!-- @endif -->
 <li>
     <a id="lnkReport" href="javascript:;" class="side-menu">
         <div class="side-menu__icon"> <i data-lucide="file-text"></i> </div>
@@ -292,14 +292,14 @@
         </div>
     </a>
     <ul id="ulPrintSettings" class="">   
-@can('isNotAdmin')
+@if(Session::has('isNotAdmin') && Session::get('isNotAdmin'))
         <li>
             <a href="{{ url('PrintSettings') }}" class="side-menu">
                 <div class="side-menu__icon"> <i data-lucide="printer"></i> </div>
                 <div class="side-menu__title"> Print Settings</div>
             </a>
         </li>    
-@endcan
+@endif
         <li>
             <a href="{{ url('ImageCaptureSettings') }}" class="side-menu">
                 <div class="side-menu__icon"> <i data-lucide="image"></i> </div>
@@ -312,14 +312,14 @@
                 <div class="side-menu__title">Set Normal Values</div>
             </a>
         </li>  
-        <!-- @can('isAdminHospitalBranch')
+        <!-- @if(Session::has('isAdminHospitalBranch') && Session::get('isAdminHospitalBranch'))
         <li>
             <a href="{{ url('Department') }}" class="side-menu">
                 <div class="side-menu__icon"> <i data-lucide="layers"></i> </div>
                 <div class="side-menu__title">Department</div>
             </a>
         </li>   
-        @endcan  -->
+        @endif  -->
     </ul>
 </li>
 

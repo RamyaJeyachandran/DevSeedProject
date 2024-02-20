@@ -72,11 +72,10 @@ class HospitalSettingsController extends Controller
             $hospitalId = $hospitalSettings->id;
             //Login creation Begin
             if ($hospitalId > 0) {
-
+                $user_obj = new User;
                 $login_created = 0;
                 $password = (isset($request->password) && !empty($request->password)) ? $request->password : NULL;
                 if ($password != NULL) {
-                    $user_obj = new User;
                     $chkEmail = $user_obj->checkEmailId($request->email);
                     if (count($chkEmail) > 0) {
                         $result['ShowModal'] = 1;
@@ -94,6 +93,9 @@ class HospitalSettingsController extends Controller
                         }
                     }
                 }
+                //Create Consent form 
+                $userId=$user_obj->getDecryptedId($request->userId);
+                $user_obj->addConsentForm($hospitalId,0,$userId);
             }
             //Login creation End
 

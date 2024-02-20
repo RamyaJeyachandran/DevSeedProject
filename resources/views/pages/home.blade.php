@@ -7,7 +7,7 @@
     @include('layouts.sideMenu')
     <!-- BEGIN: Content -->
      <div class="content"> @include('layouts.topBar') 
-@can('isAdmin')
+@if(Session::has('isAdmin') && Session::get('isAdmin'))
      <div class="grid grid-cols-12 gap-6 mt-5">
                                     <div class="col-span-12 sm:col-span-6 xl:col-span-3 intro-y">
                                         <div class="report-box zoom-in">
@@ -86,8 +86,8 @@
                                     @endforeach
                                     <!-- Loop END -->
                             </div>
-                    @endcan
-                    @can('isHospital')
+                    @endif
+                    @if(Session::has('isHospital') && Session::get('isHospital'))
                     <div class="grid grid-cols-12 gap-6 mt-5">
                     <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
                                         <div class="report-box zoom-in">
@@ -155,8 +155,8 @@
                                     <!-- Loop END -->
                             </div>
                                 </div>
-                    @endcan
-                    @can('isBranch')
+                    @endif
+                    @if(Session::has('isBranch') && Session::get('isBranch'))
                     <div class="grid grid-cols-12 gap-6 mt-5">
                     <div class="col-span-12 sm:col-span-6 xl:col-span-4 intro-y">
                                         <div class="report-box zoom-in">
@@ -225,8 +225,8 @@
                                     <!-- Loop END -->
                             </div>
                                 </div>
-                    @endcan
-                    @can('isDoctor')
+                    @endif
+                    @if(Session::has('isDoctor') && Session::get('isDoctor'))
                     <input id="txtType" value="{{ $dashboardDetails['appointmentTotal']->type }}" type="hidden" class="form-control">
                     <input id="txtDoctorId" value="{{ $dashboardDetails['appointmentTotal']->doctorId }}" type="hidden" class="form-control">
                     <div class="grid grid-cols-12 gap-6 mt-5">
@@ -317,7 +317,7 @@
                             </div>
                                 <div class=" box flex h-[400px]"> <canvas id="pie-chart-appointmentStatus"></canvas> </div>
                                 </div>
-                    @endcan
+                    @endif
      
                 </div>
      <!-- END: Content --> 

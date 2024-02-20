@@ -37,6 +37,8 @@ return [
     'hospitalLogLocation'=>'images/hospitals/',
     'doctorImageLocation'=>'images/doctors/',
     'imageStoreLocation'=>'/',
+    'analysisImgLocation'=>'images/patients/analysis/',
+    'prefix_analysisImg'=>'PA_',
     'pageSetting' =>[
         'marginRight' =>'1',
         'marginLeft'=> '1',
@@ -75,7 +77,7 @@ return [
         'RBC'=>'',
     ],
     'seed_db_name'=>'newseed',
-    'stech_db_name'=>'stech',
+    'stech_db_name'=>'stechivf',
     'error_msg'=>'Technical Error. Please contact our support'
     // 'currentUrlPostfix'=>'/seed/public',
 ];

@@ -75191,17 +75191,16 @@ __webpack_require__.r(__webpack_exports__);
     var pathname = window.location.pathname;
 
     //Local Path
-    var base_url = window.location.origin;
-    localStorage.setItem("base_url", base_url);
-    var serverPath = '';
-    var serverPath2 = '';
+    // var base_url = window.location.origin;
+    // localStorage.setItem("base_url", base_url);
+    // var serverPath='';
+    // var serverPath2='';
 
     //server Path
-    //  var base_url = window.location.origin+'/seed/public';
-    // localStorage.setItem("base_url", base_url);
-    // var serverPath='/seed/public/index.php';
-    // var serverPath2='/seed/public';
-
+    var base_url = window.location.origin + '/seed/public';
+    localStorage.setItem("base_url", base_url);
+    var serverPath = '/seed/public/index.php';
+    var serverPath2 = '/seed/public';
     if (document.getElementById("divYear") != null) {
       document.getElementById("divYear").innerHTML = '@' + new Date().getFullYear() + ' Agnai Solutions';
     }
@@ -75316,13 +75315,15 @@ __webpack_require__.r(__webpack_exports__);
       return response.json();
     }).then(function (result) {
       var signatureList = result.data;
-      $('#txtReportSignId').val(signatureList.id);
-      $('#lblLeftSign').text('Left Signature: ' + signatureList.leftDoctorName);
-      $('#lblCenterSign').text('Center Signature: ' + signatureList.centerDoctorName);
-      $('#lblRightSign').text('Right Signature: ' + signatureList.rightDoctorName);
-      $(ïmgLeftSign).attr("src", signatureList.leftSign);
-      $(imgCenterSign).attr("src", signatureList.centerSign);
-      $(imgRightSign).attr("src", signatureList.rightSign);
+      if (signatureList != null) {
+        $('#txtReportSignId').val(signatureList.id);
+        $('#lblLeftSign').text('Left Signature: ' + signatureList.leftDoctorName);
+        $('#lblCenterSign').text('Center Signature: ' + signatureList.centerDoctorName);
+        $('#lblRightSign').text('Right Signature: ' + signatureList.rightDoctorName);
+        $(ïmgLeftSign).attr("src", signatureList.leftSign);
+        $(imgCenterSign).attr("src", signatureList.centerSign);
+        $(imgRightSign).attr("src", signatureList.rightSign);
+      }
     });
   }
   /* --------------- Pre/post Analysis Add form submit Begins ------------------------*/

@@ -212,16 +212,25 @@ class User extends Authenticatable
     }
     public function updateDefaultHospital($request){
         $user_id= $this->getDecryptedId($request->userId);
-        $hosptialId= $this->getDecryptedId($request->hospitalId);
+        $hosptialId= (isset($request->hosptialId) && !empty($request->hosptialId)) ? $this->getDecryptedId($request->hospitalId):0;
         $branchId= (isset($request->branchId) && !empty($request->branchId)) ?$this->getDecryptedId($request->branchId) : NULL;
-
-        return static::where('id',$user_id)->update(
-            [
-                'defaultHospitalId' => $hosptialId,
-                'defaultBranchId' => $branchId,
-                'updated_by' => $user_id
-            ]
-        );     
+        if($hosptialId>0)
+        {
+            return static::where('id',$user_id)->update(
+                [
+                    'defaultHospitalId' => $hosptialId,
+                    'defaultBranchId' => $branchId,
+                    'updated_by' => $user_id
+                ]
+            ); 
+        }else{
+            return static::where('id',$user_id)->update(
+                [
+                    'defaultBranchId' => $branchId,
+                    'updated_by' => $user_id
+                ]
+            ); 
+        }   
     }
     public function updateSessionDetails($user_id,$sessionId){
 
@@ -268,5 +277,10 @@ class User extends Authenticatable
         $request->session()->put('isHospitalBranch', $isHospitalBranch);
         $isAdminHospitalBranch=($user_type_id == 1 || $user_type_id == 2 || $user_type_id == 4);
         $request->session()->put('isAdminHospitalBranch', $isAdminHospitalBranch);
+    }
+    public function addConsentForm($hospitalId,$branchId,$createdBy)
+    {
+        $query=$branchId==0 ?"INSERT INTO consent_froms (formName,formContent,hospitalId,created_by,formTitle) SELECT name,content,".$hospitalId.",".$createdBy.",title FROM formdata" :"INSERT INTO consent_froms (formName,formContent,hospitalId,branchId,created_by,formTitle) SELECT name,content,".$hospitalId.",".$branchId.",".$createdBy.",title FROM formdata";
+        return DB::insert($query);
     }
 }

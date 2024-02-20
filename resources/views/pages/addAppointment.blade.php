@@ -69,16 +69,22 @@
                                                     <div class="font-medium">Patient Registered No <span class="text-danger mt-2"> *</span></div>
                                                 </div>
                                             </div>
-                                        <div class="px-2 py-0.5 bg-slate-200 text-slate-600 dark:bg-darkmode-300 dark:text-slate-400 text-xs rounded-md">After entered the Registered number. Please press the enter key to display patient information.</div>
                                        
                                         </div>
                                         <div class="w-full mt-3 xl:mt-0 flex-1">
-                                            <input id="txtHcNo" name="name" type="number" class="form-control">
                                             <input id="txtPatientId" name="patientId" type="hidden" class="form-control">
+                                            <select id="ddlAppointmentPatient" class="form-control" data-placeholder="Type here to search patient" required>
+                                                <option value='0'>Select Patient</option>
+                                                @foreach ($patientList as $patient)
+                                                    <option value="{{ $patient->id }}"> 
+                                                        {{ $patient->name }}
+                                                    </option>
+                                                @endforeach  
+                                            </select>
                                         </div>
                                     </div> 
                                      <!-- ---------------------------------------Patient Information Begin---------------------------------------------------------- -->
-                                     <div id="divPatientInfo" class="intro-y box px-5">
+                                     <div id="divPatientInfo" class="box px-5">
                     <div class="flex flex-col lg:flex-row border-b border-slate-200/60 dark:border-darkmode-400 pb-5 -mx-5">
                         <div class="flex flex-1 px-5 items-center justify-center lg:justify-start">
                             <div class="w-20 h-20 sm:w-24 sm:h-24 flex-none lg:w-32 lg:h-32 image-fit relative">

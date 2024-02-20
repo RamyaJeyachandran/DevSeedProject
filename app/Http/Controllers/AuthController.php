@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use URL;
 use Carbon\Carbon;
 use App\Models\User;
-use config\constants;
 use App\Models\doctor;
 use App\Models\loginLog;
 use Illuminate\Http\Request;
@@ -16,8 +14,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Facades\Redirect;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\DashboardController;
@@ -111,7 +107,6 @@ class AuthController extends Controller
 
             $loginLog = new loginLog;
             $loginLog->addLoginLog($id, 'Logged In');
-
             switch (Auth::user()->user_type_id) {
                 case 1: //Admin
                     $hospitalId = $user->getEncryptedId(Auth::user()->defaultHospitalId == null ? 0 : Auth::user()->defaultHospitalId);
@@ -126,6 +121,8 @@ class AuthController extends Controller
                     $hospital_details = $hospital_obj->getHospitalSettingsById(Auth::user()->user_id);
 
                     if ($hospital_details != null) {
+                        $request->session()->put('userName', $hospital_details->hospitalName);
+
                         $request->session()->put('logo', $hospital_details->logo);
                         //Branch details                        
                         $branch_limit = $hospital_details->branchLimit;
@@ -150,27 +147,27 @@ class AuthController extends Controller
                         $request->session()->put('hospitalId', $branch_details->hospitalId);
                         $request->session()->put('branchId', $branch_details->branchId);
                         $request->session()->put('logo', $branch_details->logo);
+                        $request->session()->put('userName', $branch_details->branchName);
                     }
                     break;
                 case 5: //Doctors
                     $doctor_obj = new doctor;
-                    $id = Auth::user()->user_id;
-                    $doctor_details = $doctor_obj->getLogoByHospitalId($id);
+                    $user_id = Auth::user()->user_id;
+                    $doctor_details = $doctor_obj->getLogoByHospitalId($user_id);
                     if ($doctor_details != NULL) {
                         $request->session()->put('hospitalId', $doctor_details->hospitalId);
                         $request->session()->put('branchId', $doctor_details->branchId);
                         $request->session()->put('profileImage', $doctor_details->profileImage);
                         $request->session()->put('logo', $doctor_details->logo);
-                        $request->session()->put('userName', $doctor_details->name);
+                        $request->session()->put('userName', $doctor_details->name.'- '. $doctor_details->doctorName);
                     }
                     break;
             }
             return redirect()->action([DashboardController::class, 'index']);
         } catch (\Throwable $th) {
             return redirect()->action(
-                //config('constant.error_msg')
                 [AuthController::class, 'login'],
-                ['errorMsg' => $th->getMessage(), 'companyId' => $companyId]
+                ['errorMsg' => config('constant.error_msg'), 'companyId' => $companyId]
             );
         }
     }

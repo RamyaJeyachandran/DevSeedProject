@@ -403,6 +403,27 @@
                     </tr>
                 </tbody>
             </table>
+            @if($analysisImg !=null && count($analysisImg)>0)
+            <div class="break-before">
+                <br>
+                <table class="table table-bordered">
+                    <tbody>
+                        @for ($i =0 ; $i < count($analysisImg); $i+=2)
+                        <tr>
+                                <td style="text-align: center; vertical-align: middle;" width="100" Height="200">
+                                    <img class="image-fit printImg" src="{{$analysisImg[$i]->imageFile}}">
+                                </td>
+                                <td style="text-align: center; vertical-align: middle;" width="100" Height="200">
+                                    @if(($i+1)< count($analysisImg))
+                                        <img class="image-fit printImg" src="{{$analysisImg[$i+1]->imageFile}}">
+                                    @endif
+                                </td>
+                        </tr>
+                        @endfor
+                    </tbody>
+                </table>
+            </div>
+         @endif
 </div>
 </div>
 </div>

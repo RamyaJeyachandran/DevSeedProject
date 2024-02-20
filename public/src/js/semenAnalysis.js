@@ -1,6 +1,7 @@
 import xlsx from "xlsx";
 import { createIcons, icons } from "lucide";
 import Tabulator from "tabulator-tables";
+import tippy, { roundArrow } from "tippy.js";
 (function () {
     "use strict";
    
@@ -15,18 +16,17 @@ import Tabulator from "tabulator-tables";
         e.preventDefault();
         var pathname = window.location.pathname;
         //Local Path
-        var base_url = window.location.origin;
-        localStorage.setItem("base_url", base_url);
-        var serverPath='';
-        var serverPath2='';
+        // var base_url = window.location.origin;
+        // localStorage.setItem("base_url", base_url);
+        // var serverPath='';
+        // var serverPath2='';
 
         //server Path
-        //  var base_url = window.location.origin+'/seed/public';
-        // localStorage.setItem("base_url", base_url);
-        // var serverPath='/seed/public/index.php';
-        // var serverPath2='/seed/public';
+         var base_url = window.location.origin+'/seed/public';
+        localStorage.setItem("base_url", base_url);
+        var serverPath='/seed/public/index.php';
+        var serverPath2='/seed/public';
        
-
         if(document.getElementById("divYear")!=null)
         {
             document.getElementById("divYear").innerHTML = '@'+new Date().getFullYear() + ' Agnai Solutions';
@@ -36,13 +36,28 @@ import Tabulator from "tabulator-tables";
         setMenu("[id*=lnkSemen]","[id*=ulSemenAnalysis]");
         setMobileMenu("[id*=lnkMobileSemenAnalysis]","[id*=ulMobileSemenAnalysis]","[id*=aMobileSemenAnalysis]");
        }
+       if(pathname.indexOf('ShowSemenAnalysis') != -1)
+       {
+        editImgAnalysis(base_url);
+       }
         switch(pathname)
         {
             case serverPath+'/SemenAnalysis':
             case serverPath2+'/SemenAnalysis':
                 semenAnalysisFormOnLoad(base_url);    
                 getPatientDoctor();
-                loadReportSign();               
+                loadReportSign();    
+                var $isSetImg=$("#txtIsSetImg").val();
+                if($isSetImg==0)
+                {
+                    $("#divImageCaputre").addClass('hidden');
+                }
+                else{
+                    $("#divImageCaputre").removeClass("hidden").removeAttr("style");
+                    $("#divCaptureImage").addClass('hidden');
+                    $("#btnCaptureImg").addClass('hidden');
+                }
+                clearLocalStorage("add_ctrl_name_list");
                 break;
             case serverPath+'/SearchSemenAnalysis':
             case serverPath2+'/SearchSemenAnalysis':
@@ -118,9 +133,18 @@ function setSemenAnalysisTabulator(){
                     download: false,                    
                 },
                 {
-                    title: "PROFILE IMAGE",
-                    minWidth: 75,
-                    field: "images",
+                    title: "PATIENT REPORT S.NO",
+                    minWidth: 100,
+                    field: "patientSeqNo",
+                    hozAlign: "center",
+                    vertAlign: "middle",
+                    print: false,
+                    download: false,
+                },
+                {
+                    title: "PATIENT INFORMATION",
+                    minWidth: 250,
+                    field: "hcNo",
                     hozAlign: "center",
                     vertAlign: "middle",
                     print: false,
@@ -130,36 +154,22 @@ function setSemenAnalysisTabulator(){
                             <div class="intro-x w-12 h-12 image-fit">
                                 <img class="rounded-full" src="${cell.getData().profileImage}">
                             </div>
+                        </div>
+                        <div>
+                        <div class="font-medium whitespace-nowrap">${
+                            cell.getData().patientName
+                        }</div>
+                        <div class="text-slate-800 text-xs whitespace-nowrap">${
+                            cell.getData().hcNo
+                        }</div>
+                        <div class="text-slate-800 text-xs whitespace-nowrap">${
+                            cell.getData().phoneNo
+                        }</div>
+                        <div class="text-slate-800 text-xs whitespace-nowrap">${
+                            cell.getData().email
+                        }</div>
                         </div>`;
                     },
-                },
-                {
-                    title: "PATIENT",
-                    minWidth: 50,
-                    field: "patientName",
-                    hozAlign: "center",
-                    vertAlign: "middle",
-                    print: false,
-                    download: false,
-                    formatter(cell, formatterParams) {
-                        return `<div>
-                            <div class="font-medium whitespace-nowrap">${
-                                cell.getData().patientName
-                            }</div>
-                            <div class="text-slate-800 text-xs whitespace-nowrap">${
-                                cell.getData().hcNo
-                            }</div>
-                        </div>`;
-                    },
-                },
-                {
-                    title: "PHONE NO",
-                    minWidth: 100,
-                    field: "phoneNo",
-                    hozAlign: "center",
-                    vertAlign: "middle",
-                    print: false,
-                    download: false,
                 },
                 {
                     title: "DOCTOR NAME",
@@ -368,7 +378,6 @@ $( "#btnPrintSemenAnalysis" ).on( "click", function() {
                    let pixelsmb = (96 * data.pageSettingsDetails.marginBottom) / 2.54;
                    let pixelsml = (96 * data.pageSettingsDetails.marginLeft) / 2.54;
                    let isHeaderDisplay=data.pageSettingsDetails.isHeaderDisplay;
-
                    var title='';
                    if(isHeaderDisplay==1)
                    {
@@ -382,7 +391,7 @@ $( "#btnPrintSemenAnalysis" ).on( "click", function() {
                         }
                    }
                    var frame1 = $('<iframe />');
-                   var style='<head><style>@media print {@page {size: auto; margin: 0mm;} body{margin: '+pixelsmt+'px '+pixelsmr+'px '+pixelsmb+'px '+pixelsml+'px ;}}table { width: 100%; font-size:12px } table, th, td { border: 1px solid black;border-collapse: collapse;} img {width: 50%;height: 30%;}</style></head>';
+                   var style='<head><style>@media print {@page {size: auto; margin: 0mm; } .break-before { page-break-before: always; margin: '+pixelsmt+'px '+pixelsmr+'px '+pixelsmb+'px '+pixelsml+'px ; }  body{margin: '+pixelsmt+'px '+pixelsmr+'px '+pixelsmb+'px '+pixelsml+'px ; }}table { width: 100%; font-size:12px } table, th, td { border: 1px solid black;border-collapse: collapse;} img {width: 50%;height: 30%;} .printImg {width: 100%;height: 100%;}</style></head>';
                    frame1[0].name = "frame1";
                    frame1.css({ "position": "absolute", "top": "-1000000px" });
                    $("body").append(frame1);
@@ -465,6 +474,26 @@ if (semenanalysiseditform != null) {
         epf.preventDefault();
         const semenanalysisdata = new FormData(semenanalysiseditform);
         const params = new URLSearchParams(semenanalysisdata);
+        /** Add capture image to form data */
+        if (localStorage.getItem("ctrl_name_list") !== null)
+        {
+            var newImg="";
+            var ctrl_name_list=localStorage.getItem("ctrl_name_list");
+            let get_ctrl_name = JSON.parse(ctrl_name_list);
+            get_ctrl_name.forEach(delCtrlName => {
+                var img_data=localStorage.getItem(delCtrlName);
+                if(newImg.length !== 0 )
+                {
+                    newImg=newImg +"@" +img_data;
+                }
+                else{
+                    newImg=img_data;
+                }
+            });
+            params.append("newAnalysisImage", newImg);
+        }
+        /** End  Add capture image to form data */
+
         var token=$('#txtToken').val();
         let options = {
             method: "POST",
@@ -489,6 +518,7 @@ if (semenanalysiseditform != null) {
                         const successEditModal = tailwind.Modal.getInstance(document.querySelector("#success-modal-preview"));
                         successEditModal.show();
                         document.getElementById("frmEditSemenAnalysis").reset();
+                        clearLocalStorage("ctrl_name_list");
                     }
                 } else {
                     $('#divErrorHead span').text(data.Success);
@@ -608,6 +638,28 @@ if (semenanalysisform != null) {
         const semenanalysisdata = new FormData(semenanalysisform);
         const params = new URLSearchParams(semenanalysisdata);
         params.append('seqNo', $('#txtSequenceNo').val());
+        /** Add capture image to form data */
+        if (localStorage.getItem("add_ctrl_name_list") !== null)
+        {
+            var newImg="";
+            var ctrl_name_list=localStorage.getItem("add_ctrl_name_list");
+            let get_ctrl_name = JSON.parse(ctrl_name_list);
+            if(get_ctrl_name !== null)
+            {
+                get_ctrl_name.forEach(delCtrlName => {
+                    var img_data=localStorage.getItem(delCtrlName);
+                    if(newImg.length !== 0 )
+                    {
+                        newImg=newImg +"@" +img_data;
+                    }
+                    else{
+                        newImg=img_data;
+                    }
+                });
+            }
+            params.append("analysisImage", newImg);
+        }
+        /** End  Add capture image to form data */
         var token=$('#txtToken').val();
         let options = {
             method: "POST",
@@ -631,6 +683,7 @@ if (semenanalysisform != null) {
                     if (data.ShowModal == 1) {
                         const successModal = tailwind.Modal.getInstance(document.querySelector("#success-modal-preview"));
                         document.getElementById("frmSemenAnalysis").reset();
+                        clearImageCapture();
                         $('#txtId').val(data.semenId);
                         successModal.show($('#txtId').val());
                     }
@@ -914,5 +967,212 @@ function deleteSemenAnalysis(semenId,userId){
 }
 
 /*----------------------------------- Delete Patient Semen Analysis By ID END -------------------------*/
+$( "#btnOnCam" ).on( "click", function() {
+    Webcam.set({
+        width: 250,
+        height: 200,
+        image_format: 'jpeg',
+        jpeg_quality: 90
+    });            
+    Webcam.attach( '#my_camera' );
+    $("#btnCaptureImg").removeClass("hidden").removeAttr("style");
+    $("#divCaptureImage").removeClass('hidden').removeAttr("style");
+    $("#btnOnCam").addClass('hidden');
+});  
+$( "#btnCaptureImg" ).on( "click", function() {
+    Webcam.snap( function(data_uri) {
+        var id=$("#txtImgCount").val();
+        var ctrl_name='divImgDel'+id;
+        var div_ctrl='divImgView'+id;
+        var divDisplayImg_data='<div id="'+div_ctrl+'" class="col-span-5 md:col-span-2 h-28 relative image-fit cursor-pointer"><img class="rounded-md" alt="SEED" src="'+data_uri+'"><div id="'+ctrl_name+'" title="Remove this image?" class="tooltip w-5 h-5 flex items-center justify-center absolute rounded-full text-white bg-danger right-0 top-0 -mr-2 -mt-2"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" icon-name="x" data-lucide="x" class="lucide lucide-x w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>  </div></div>';
+        $('#divDisplayImg').append(divDisplayImg_data);
+        /** Store data in local storage */
+        var store_data=div_ctrl+'@'+data_uri;
+        localStorage.setItem(ctrl_name, store_data);
+        if (localStorage.getItem("add_ctrl_name_list") === null) {
+            var ctrl_name_list =[ctrl_name];
+            let store_ctrl_name = JSON.stringify(ctrl_name_list);
+            localStorage.setItem("add_ctrl_name_list", store_ctrl_name);
+        }else{
+            var ctrl_name_list=localStorage.getItem("add_ctrl_name_list");
+            let get_ctrl_name = JSON.parse(ctrl_name_list);
+            get_ctrl_name.push(ctrl_name);
+            let store_ctrl_name = JSON.stringify(get_ctrl_name);
+            localStorage.setItem("add_ctrl_name_list", store_ctrl_name);
+        }
 
+        id=parseInt(id)+1;
+        $("#txtImgCount").val(id);
+        
+        /**Remove Captured images */
+        $( "#"+ctrl_name ).on( "click", function() {
+            var ctrl_data=localStorage.getItem(ctrl_name);
+            const img_array=ctrl_data.split("@");
+            if(img_array.length>0)
+            {
+                var del_div_ctrl=img_array[0];
+                $( "#"+del_div_ctrl ).remove();
+                localStorage.removeItem(ctrl_name);
+                var get_ctrl=localStorage.getItem("add_ctrl_name_list");
+                let get_ctrl_name = JSON.parse(get_ctrl)
+                var delete_ctrl_index=get_ctrl_name.findIndex((list_ctrlName) => list_ctrlName === ctrl_name); 
+                get_ctrl_name.splice(delete_ctrl_index, 1); 
+                let store_ctrl_name = JSON.stringify(get_ctrl_name);
+                localStorage.setItem("add_ctrl_name_list", store_ctrl_name);
+            }
+        });
+
+        let options = {
+            content: $('#'+ctrl_name).attr("title"),
+        };
+        tippy($('#'+ctrl_name), {
+            arrow: roundArrow,
+            animation: "shift-away",
+            ...options,
+        });
+    });
+});
+
+$( "#btnCancelanalysis" ).on( "click", function() {
+    clearImageCapture();
+});
+function clearImageCapture()
+{
+    document.getElementById('divDisplayImg').innerHTML="";
+    $("#btnOnCam").removeClass("hidden").removeAttr("style");
+    $("#btnCaptureImg").addClass('hidden');
+    $("txtImgCount").val('0');
+    $("#divCaptureImage").addClass('hidden');
+    Webcam.reset( function() {
+    });
+}
+$( "#btnEditOnCam" ).on( "click", function() {
+    Webcam.set({
+        width: 250,
+        height: 200,
+        image_format: 'jpeg',
+        jpeg_quality: 90
+    });            
+    Webcam.attach( '#edit_my_camera' );
+    $("#btnEditCaptureImg").removeClass("hidden").removeAttr("style");
+    $("#divEditCaptureImage").removeClass('hidden').removeAttr("style");
+    $("#btnEditOnCam").addClass('hidden');
+});
+$( "#btnEditCaptureImg" ).on( "click", function() {
+    Webcam.snap( function(data_uri) {
+        var id=$("#txtEditImgCount").val();
+        var ctrl_name='divEditImgDel'+id;
+        var div_ctrl='divEditImgView'+id;
+        var divDisplayImg_data='<div id="'+div_ctrl+'" class="col-span-5 md:col-span-2 h-28 relative image-fit cursor-pointer"><img class="rounded-md" alt="SEED" src="'+data_uri+'"><div id="'+ctrl_name+'" title="Remove this image?" class="tooltip w-5 h-5 flex items-center justify-center absolute rounded-full text-white bg-danger right-0 top-0 -mr-2 -mt-2"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" icon-name="x" data-lucide="x" class="lucide lucide-x w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>  </div></div>';
+        $('#divEditDisplayImg').append(divDisplayImg_data);
+        var store_data=div_ctrl+'@'+data_uri;
+        /** Store in local storage  */
+        localStorage.setItem(ctrl_name, store_data);
+        if (localStorage.getItem("ctrl_name_list") === null) {
+            var ctrl_name_list =[ctrl_name];
+            let store_ctrl_name = JSON.stringify(ctrl_name_list);
+            localStorage.setItem("ctrl_name_list", store_ctrl_name);
+        }else{
+            var ctrl_name_list=localStorage.getItem("ctrl_name_list");
+            let get_ctrl_name = JSON.parse(ctrl_name_list);
+            get_ctrl_name.push(ctrl_name);
+            let store_ctrl_name = JSON.stringify(get_ctrl_name);
+            localStorage.setItem("ctrl_name_list", store_ctrl_name);
+        }
+        $("#txtEditImgCount").val(parseInt(id)+1);
+
+        /**Remove Captured images */
+        $( "#"+ctrl_name ).on( "click", function() {
+            var ctrl_data=localStorage.getItem(ctrl_name);
+            const img_array=ctrl_data.split("@");
+            if(img_array.length>0)
+            {
+                var del_div_ctrl=img_array[0];
+                $( "#"+del_div_ctrl ).remove();
+                localStorage.removeItem(ctrl_name);
+                var get_ctrl=localStorage.getItem("ctrl_name_list");
+                let get_ctrl_name = JSON.parse(get_ctrl)
+                var delete_ctrl_index=get_ctrl_name.findIndex((list_ctrlName) => list_ctrlName === ctrl_name); 
+                get_ctrl_name.splice(delete_ctrl_index, 1); 
+                let store_ctrl_name = JSON.stringify(get_ctrl_name);
+                localStorage.setItem("ctrl_name_list", store_ctrl_name);
+            }
+        });
+
+        let options = {
+            content: $('#'+ctrl_name).attr("title"),
+        };
+        tippy($('#'+ctrl_name), {
+            arrow: roundArrow,
+            animation: "shift-away",
+            ...options,
+        });
+    });
+});
+function clearLocalStorage(storage_name)
+{
+    if (localStorage.getItem(storage_name) !== null) {
+        var ctrl_name_list=localStorage.getItem(storage_name);
+        let get_ctrl_name = JSON.parse(ctrl_name_list);
+        if(get_ctrl_name!==null)
+        {
+            get_ctrl_name.forEach(delCtrlName => {
+                localStorage.removeItem(delCtrlName);
+            });
+        }
+    }
+    localStorage.removeItem(storage_name);
+}
+function editImgAnalysis(base_url)
+{
+    clearLocalStorage("ctrl_name_list");
+    var semenId=$("#txtSemenAnalysisId").val();
+    var url = base_url + '/api/analysisImages/'+semenId;
+    var token=$('#txtToken').val();
+    //Load Dropdowns
+    let options = {
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            Authorization: 'Bearer '+token,
+          },
+    }
+    fetch(url,options)
+    .then(response => response.json())
+    .then(function (result) {
+        var imgList=result.analysisImg;
+        var img_index=0;
+        imgList.forEach(function(value, key) {
+            var ctrl_name='divEditImgDel'+img_index;
+            var div_ctrl='divEditImgView'+img_index;
+            var txt_ctrl='txtAnalysisImgId'+img_index;
+            var divDisplayImg_data='<div id="'+div_ctrl+'" class="col-span-5 md:col-span-2 h-28 relative image-fit cursor-pointer"><img class="rounded-md" alt="SEED" src="'+value.imageFile+'"><div id="'+ctrl_name+'" title="Remove this image?" class="tooltip w-5 h-5 flex items-center justify-center absolute rounded-full text-white bg-danger right-0 top-0 -mr-2 -mt-2"> <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" icon-name="x" data-lucide="x" class="lucide lucide-x w-4 h-4"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>  </div></div>';
+            var txtId='<input id="'+txt_ctrl+'" value="'+value.id+'" type="hidden" class="form-control">';
+            $('#divEditDisplayImg').append(divDisplayImg_data);
+            $('#divEditDisplayImg').append(txtId);
+            localStorage.setItem(ctrl_name, div_ctrl);
+
+            /**Remove Captured images */
+        $( "#"+ctrl_name ).on( "click", function() {
+            var div_ctrl=localStorage.getItem(ctrl_name);
+            let matches = div_ctrl.match(/(\d+)/);
+            if (matches) {
+                var deleteId=(parseInt(matches[0]));
+                let delAnalysisImg=$("#txtDelAnalysisImage").val();
+                let imgId=$("#txtAnalysisImgId"+deleteId).val();
+                if(delAnalysisImg.length !== 0 )
+                {
+                    delAnalysisImg=delAnalysisImg+","+imgId;
+                }else{
+                    delAnalysisImg=imgId;
+                }
+                $("#txtDelAnalysisImage").val(delAnalysisImg);
+            }
+            $( "#"+div_ctrl ).remove();
+            localStorage.removeItem(ctrl_name);
+        });
+            img_index++;
+        });
+    });
+}
 })();

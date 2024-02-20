@@ -284,16 +284,17 @@ class Patient extends Model
 
         return $patientDetails;
     }
-    public function getPatientByHcNo($hcNo,$hospitalId,$branchId)
+    public function getPatientByHcNo($patientId,$hospitalId,$branchId)
     {
         $user = new User;
         $decrypt_hospitalId=$user->getDecryptedId($hospitalId);
         $decrypt_branchId=$user->getDecryptedId($branchId);
+        $id=$user->getDecryptedId($patientId);
         $decrypt_branchId=$decrypt_branchId==0?NULL:$decrypt_branchId;
 
-        $where_sts="patients.is_active=1 and patients.hcNo=".$hcNo.($decrypt_hospitalId==0|| $decrypt_hospitalId==null?"":" and patients.hospitalId=".$decrypt_hospitalId).($decrypt_branchId==0|| $decrypt_branchId==null?"":" and patients.branchId=".$decrypt_branchId);
+        $where_sts="patients.is_active=1 and patients.id=".$id.($decrypt_hospitalId==0|| $decrypt_hospitalId==null?"":" and patients.hospitalId=".$decrypt_hospitalId).($decrypt_branchId==0|| $decrypt_branchId==null?"":" and patients.branchId=".$decrypt_branchId);
         if($decrypt_hospitalId==0 || $decrypt_hospitalId==null){
-            $where_sts="patients.is_active=1 and patients.hcNo=".$hcNo;
+            $where_sts="patients.is_active=1 and patients.id=".$id;
         }
 
         $patientDetails=DB::table('patients')->selectRaw("COALESCE(patients.age,'Not Provided') as age,COALESCE(patients.bloodGroup,'Not Provided') as bloodGroup,COALESCE(patients.dob,'Not Provided') as dob,COALESCE(patients.gender,'Not Provided') as gender,COALESCE(patients.martialStatus,'Not Provided') as martialStatus,COALESCE(patients.patientWeight,'Not Provided') as weight,COALESCE(patients.patientHeight,'Not Provided') as height,COALESCE(patients.address,'Not Provided') as address,COALESCE(patients.city,'Not Provided') as city,COALESCE(patients.state,'Not Provided') as state,COALESCE(patients.pincode,'Not Provided') as pincode,COALESCE(patients.spouseName,'Not Provided') as spouseName,COALESCE(patients.spousePhnNo,'Not Provided') as spousePhnNo,COALESCE(patients.refferedBy,'Not Provided') as refferedBy,COALESCE(patients.refDoctorName,'Not Provided') as refDoctorName,COALESCE(patients.refDrHospitalName,'Not Provided') as refDrHospitalName,COALESCE(patients.reason,'Not Provided') as reason,COALESCE(patients.is_active,'Not Provided') as status,patients.name,patients.hcNo,patients.phoneNo,patients.email,HEX(AES_ENCRYPT(patients.id,UNHEX(SHA2('".config('constant.mysql_custom_encrypt_key')."',512)))) as patientId,COALESCE(hospitalbranch.branchName,hospitalsettings.hospitalName) as hospitalName,hospitalsettings.address as hospitalAddress,patients.profileImage,COALESCE(patients.aadharCardNo,'') as aadharCardNo,attendingDoc.name as attendingDoctor,counsellor.name as counsellor,witnessHosp.name as witnessHospital,witnessBank.name as witnessBank,donorbanks.name as donorBankName,donorbanks.address as donorBankAddress,COALESCE(witnessHosp.address,'') as witnessHospAddress,COALESCE(witnessBank.address,'') as witnessBankAddress,COALESCE(counsellor.address,'') as counsellorAddress,COALESCE(attendingDoc.address,'') as attendingDoctorAddress")

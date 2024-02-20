@@ -5,7 +5,7 @@
     @include('layouts.mobileSideMenu') <div class="flex mt-[4.7rem] md:mt-0"> @include('layouts.sideMenu') 
         <!-- BEGIN: Content --> 
     <div class="content"> @include('layouts.topBar') 
-        <form id="frmSemenAnalysis">
+        <form id="frmSemenAnalysis" method="POST" enctype="multipart/form-data">
            
 <!-- <div class="intro-y box mt-5">
     <div id="boxed-tab" class="p-5"> -->
@@ -308,9 +308,49 @@
         </div>
     </div>
 </div>
-<div class="mt-3"> 
+<input id="txtIsSetImg" name="isSetOff" value="{{$isSetImg}}" type="hidden" class="form-control">
+
+<div id="divImageCaputre" class="intro-y box p-5 mt-5">
+<nav aria-label="breadcrumb" class="-intro-x mr-auto hidden sm:flex">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item active font-medium text-base  mr-auto" aria-current="page"> Capture Images  
+                <input id="btnOnCam" type="button" value="On Camera" class="btn btn-pending w-24">
+
+                            </li>
+                        </ol>
+                    </nav>
+                    <!-- BEGIN: Uplaod Images -->
+                        <div id="divCaptureImage" class="intro-y box p-5">
+                            <div class="border border-slate-200/60 dark:border-darkmode-400 rounded-md p-5">
+                                <div class="mt-5">
+                                    <div class="form-inline items-start flex-col xl:flex-row mt-10">
+                                        <div class="form-label w-full xl:w-64 xl:!mr-10">
+                                            <div class="text-left">
+                                            <!-- Image capture from camera -- Begin  -->
+                                                <div id="my_camera"></div>
+                                                <br/>
+                                                <input id="btnCaptureImg" type=button value="Caputre Images" class="btn btn-primary shadow-md mr-2">
+                                             <!-- Image capture from camera -- END  -->
+                                            </div>
+                                        </div>
+                                        <input id="txtImgCount" name="imgCount" value="0" type="hidden" class="form-control">
+                                        <div id="divImg" class="w-full mt-3 xl:mt-0 flex-1 border-2 border-dashed dark:border-darkmode-400 rounded-md pt-4">
+                                            <div id="divDisplayImg" class="grid grid-cols-10 gap-5 pl-4 pr-5">
+                                               
+                                            </div>
+                                            <div class="px-4 pb-4 mt-5 flex items-center justify-center cursor-pointer relative">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- END: Uplaod Images -->
+                       
+</div>
+<div class="mt-4"> 
                 <button id="btnSavesemenanalysis" type="submit" class="btn btn-primary w-24 ml-2"><i data-lucide="save" class="w-4 h-4 mr-2"></i>Save</button>
-                <button id="btnCancelanalysis" type="reset" class="btn btn-dark w-24"><i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>Cancel</button>
+                <button id="btnCancelanalysis" type="reset" class="btn btn-dark w-24 ml-2"><i data-lucide="x-circle" class="w-4 h-4 mr-2"></i>Cancel</button>
             </div>
 </div>
 
@@ -361,4 +401,5 @@
 @push('js')
 <script src="{{ asset('dist/js/app.js')}}"></script>
 <script type="module" src="{{ asset('dist/js/semenAnalysis.js')}}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/webcamjs/1.0.26/webcam.min.js" integrity="sha512-dQIiHSl2hr3NWKKLycPndtpbh5iaHLo6MwrXm7F0FM5e+kL2U16oE9uIwPHUl6fQBeCthiEuV/rzP3MiAB8Vfw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 @endpush

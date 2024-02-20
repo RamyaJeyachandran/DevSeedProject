@@ -18,7 +18,9 @@ class AppointmentController extends Controller
     public function index(Request $request)
     {
         if($request->session()->get('isSetDefault')==1){
-            return View("pages.addAppointment");
+            $patient_obj = new Patient;
+            $patientList = $patient_obj->getPatientByHospitalId($request->session()->get('hospitalId'),$request->session()->get('branchId'));
+            return View("pages.addAppointment")->with('patientList',$patientList);
         }
         else{
             return redirect()->action(
@@ -46,7 +48,7 @@ class AppointmentController extends Controller
             return response()->json($result,200);
         }catch(\Throwable $th){
             $result['Success']='failure';
-            $result['Message']=$th->getMessage();
+            $result['Message']= config('constant.error_msg');
             return response()->json($result,200);
         }
     }
